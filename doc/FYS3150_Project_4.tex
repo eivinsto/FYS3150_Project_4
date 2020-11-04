@@ -144,6 +144,105 @@ Abstract
 
 \section{Formalism} \label{sec:II}
 
+\subsection{The Ising Model} \label{sec:II:a}
+
+The Ising model is a mathematical model of ferromagnetic systems. It is based on a set of particles in a lattice with either spin up or down, and the energy that a particle has is dependent on other adjacent particles and on an external magnetic field if there is one. The energy of a configuration of such a system is thus:
+
+\begin{align*}
+E &= -J \sum\limits_{<kl>}^N s_k s_l - B \sum\limits_k^N s_k \numberthis \label{eq:ising_general_total_energy} \, ,
+\end{align*}
+
+where $J$ is a parameter determining the strength of the interaction between adjacent particles, $B$ is a parameter determining the strength of the external magnetic field, and $N$ is the number of particles. The notation $<kl>$ in the first sum indicates that we should sum over all adjacent particles, and the values summed over, $s$, are the spins of particles, where the subscripts denote which particle it belongs to. The spins can be $s = \pm 1$, which we often denote with an arrow pointing upwards ($\uparrow$) for $s = +1$ and a downwards pointing arrow ($\downarrow$) for $s = -1$.
+
+In order to further proceed we need a probability that governs the system. For this purpose, the Boltzmann distribution is used:
+
+\begin{align*}
+P_i (\beta) &= \frac{e^{-\beta E_i}}{Z} \numberthis \label{eq:boltzmann_dist} \, ,
+\end{align*}
+
+where $\beta = (k_B T)^{-1}$, $E_i$ the energy of a specific configuration of the system, $Z$ is the partition function, and the subscript $i$ denotes the configuration of the system. The parameter $\beta$ contains $k_B$ which is the Boltzmann constant, and $T$ is the temperature. The partition function is a normalization factor for the probability distribution, and is the sum of all the possible Boltzmann factors:
+
+\begin{align*}
+Z &= \sum\limits_i^M e^{-\beta E_i} \numberthis \label{eq:ising_partition_function} \, ,
+\end{align*}  
+
+where $M$ is the amount of microstates of the system. The magnetization of a given configuration is given by the sum of all the spins:
+
+\begin{align*}
+\mathcal{M}_i &= \sum\limits_j^N s_j \numberthis \label{eq:ising_magnetization}
+\end{align*}
+
+Two common sets of boundary conditions for this system is the 
+
+In the following section we look at a sample system.
+
+
+\subsubsection{Periodic 2x2 square lattice with no external field}
+
+We look at a system where we have particles in a 2x2 square lattice. A configuration of the system can be visualized as follows: \newline
+
+\begin{center}
+\begin{tabular}{cc}
+$\bullet$ & $\bullet$ \\
+$\bullet$ & $\bullet$
+\end{tabular}  , \newline
+\end{center}
+
+where we change the dots out for arrows to mark the spin of the particles. A sample configuration of the system can be visualized as follows: \newline
+
+\begin{center}
+\begin{tabular}{cc}
+$\uparrow$ & $\downarrow$ \\
+$\downarrow$ & $\uparrow$
+\end{tabular}  . \newline
+\end{center}
+
+
+We can denote the spins of the system as $s_{ij}$, where the index $i$ corresponds to the row the particle is in and $j$ to the column. With periodic boundary conditions, the total energy of the system is then given by:
+
+\begin{align*}
+E &= -J ( 2s_{11}s_{12} + 2s_{11}s_{21} + 2s_{22}s_{21} + 2s_{22}s_{12}) \numberthis \label{eq:2x2_sq_lattice_en}
+\end{align*}
+
+As there are two possible states that the particles can be in, and there are four particles total, there are $2^4 = 16$ microstates. We are interested in the possible energies of this system, and they are listed in table \ref{table:2x2_sq_lattice_en_and_mag} along with the total magnetization, where we have used \eqref{eq:2x2_sq_lattice_en} and \eqref{eq:ising_magnetization} to calculate these values. Note that the values in this table are sorted by macrostate, as some of the microstates are effectively equal because of the symmetries of the system. There are a total of 6 configurations with two spins pointing upwards, but these do not all have the same energy, which means that the macrostate of the system cannot be uniquely determined by the amount of spins that point up (or down for that matter). If the two spins pointing upwards are adjacent the total energy is 0, and there are four such configurations. If the two spins are not adjacent the total energy is $8J$, and there are two such states. As there are then two macrostates (different energies) corresponding to two spins pointing up, we need a second identifier. The degeneracy of these macrostates differ, and so by listing both the degeneracy and the amount of spins pointing up we can uniquely determine all the macrostates of the system. This was used in the table.
+
+\begin{table}[H]
+\centering
+\caption{This table contains the energies and total magnetization for all possible macrostates of the Ising model with a 2x2 square lattice of particles. The uniqueness of the macro state is determined by the amount of spins that are up (first column) and the degeneracy of said state (second column). Both are needed, as in the case with two spins pointing up there are four configurations with the two upwards pointing spins being adjacent, and two with them not being adjacent.} \label{table:2x2_sq_lattice_en_and_mag}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Spins up & Degeneracy & Energy & Magnetization \\
+\hline
+4 & 1 & -8J & 4 \\
+3 & 4 & 0 & 2 \\
+2 & 4 & 0 & 0 \\
+2 & 2 & 8J & 0 \\
+1 & 4 & 0 & -2 \\
+0 & 1 & -8J & -4 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+We can calculate the partition function of the system using \eqref{eq:ising_partition_function}:
+
+\begin{align*}
+Z &= \sum\limits_i^M e^{-\beta E_i} \\
+&= 2 \bigg(e^{8J\beta} + e^{-8J\beta} \bigg) 
+\end{align*}
+
+The probability distribution of the system is thus:
+
+\begin{align*}
+P_i(\beta) &= \frac{e^{-\beta E_i}}{2 (e^{8J\beta} + e^{-8J\beta} )}
+\end{align*}
+
+The expectation value for the energy can be found as follows:
+
+\begin{align*}
+\langle E \rangle &= \sum\limits_i^M E_i P_i(\beta) \\
+ &= -8J \frac{e^{8J\beta} + e^{-8J\beta}}{2 (e^{8J\beta} + e^{-8J\beta} )}
+\end{align*}
 
 \newpage
 
