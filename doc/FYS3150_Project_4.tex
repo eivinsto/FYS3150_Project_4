@@ -228,20 +228,30 @@ We can calculate the partition function of the system using \eqref{eq:ising_part
 
 \begin{align*}
 Z &= \sum\limits_i^M e^{-\beta E_i} \\
-&= 2 \bigg(e^{8J\beta} + e^{-8J\beta} \bigg) 
+&= 2 \bigg(e^{8J\beta} + e^{-8J\beta} \bigg) + 12 \\
+&= \cosh(8J\beta) + 12
 \end{align*}
 
 The probability distribution of the system is thus:
 
 \begin{align*}
-P_i(\beta) &= \frac{e^{-\beta E_i}}{2 (e^{8J\beta} + e^{-8J\beta} )}
+P_i(\beta) &= \frac{e^{-\beta E_i}}{\cosh (8J\beta) + 12}
 \end{align*}
 
 The expectation value for the energy can be found as follows:
 
 \begin{align*}
 \langle E \rangle &= \sum\limits_i^M E_i P_i(\beta) \\
- &= -8J \frac{e^{8J\beta} + e^{-8J\beta}}{2 (e^{8J\beta} + e^{-8J\beta} )}
+ &= -8J \frac{2e^{8J\beta}}{\cosh (8J\beta) + 12} + 8J \frac{2e^{-8J}}{\cosh (8J\beta) + 12} \\
+ &= -8J\frac{2(e^{8J\beta} - e^{-8J\beta})}{\cosh (8J\beta) + 12} \\
+ &= -8J\frac{\sinh(8J\beta) }{\cosh (8J\beta) + 12}
+\end{align*}
+
+The expectation value for the absolute value of the magnetization can be found similarly:
+
+\begin{align*}
+\langle |\mathcal{M}| \rangle &= \sum\limits_i |\mathcal{M}_i| P_i(\beta) \\
+ &= \frac{8e^{8J\beta} + 16}{\cosh (8 J \beta) + 12} 
 \end{align*}
 
 \newpage
