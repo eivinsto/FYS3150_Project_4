@@ -349,7 +349,23 @@ If two of the spins \(s_{k}\) have the same sign we get
 \end{align*}
 Thus we only have five possible diffrences in energy between states when we only flip one spin.
 
-
+The difference in magnetization can be simillarly found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\)
+\begin{align*}
+	\mathcal{M}_2 - \mathcal{M}_{1} &= \sum\limits_j^N s_j^{2} - \sum\limits_j^N s_j^{1} =
+	\sum\limits_{j}^{N}\left(s_{j}^{2} - s_{j}^{1}\right).
+\end{align*}
+Because we assume only spin \(s_{l}\) is flipped when changing states, the difference in magnetization becomes
+\begin{align*}
+ 	\mathcal{M}_2 - \mathcal{M}_{1} = \left(s_{l}^{2} - s_{l}^{1}\right).
+\end{align*} 
+Using that \(s_{l}^{1} = - s_{l}^{2}\), we get
+\begin{align*}
+	\mathcal{M}_2 - \mathcal{M}_{1} = \left(s_{l}^{2} + s_{l}^{2}\right) = 2s_{l}^{2},
+\end{align*}
+which gives that
+\begin{align*}
+	\mathcal{M}_2 = \mathcal{M}_1 + 2s_{l}^{2} \numberthis \label{eq:delta_m}
+\end{align*}
 
 \newpage
 
