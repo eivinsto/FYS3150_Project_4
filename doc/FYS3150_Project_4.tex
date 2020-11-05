@@ -305,6 +305,52 @@ This gives us the susceptibility by using equation \eqref{eq:magnetic_susceptibi
 
 All of these values we have calculated here can be compared with numerical results later on in order to evaluate the veracity of the numerical results.
 
+The difference in energy between two states of a two dimensional lattice, can be calculated using \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as
+\begin{align*}
+	\Delta E = E_{2} - E_{1} = \left(-J \sum\limits_{<kl>}^N s_k^{2} s_l^{2}\right) -
+	\left(-J \sum\limits_{<kl>}^N s_k^{1} s_l^{1}\right),
+\end{align*}
+where a superscript is used to denote which state the respective spins belong to.
+
+Since we are only interested in the difference in energy from flipping a single spin in the lattice, we can assume that \(s_{k}^{1} = s_{k}^{2} = s_{k}\). Thus we can rewrite \(\Delta E\) as
+\begin{align*}
+ 	\Delta E = J \sum_{<kl>}^{N} s_{k} \left(s_{l}^{1} - s_{l}^{2}\right).
+\end{align*}
+
+Furthermore, any spin can only be \(\pm 1\) and spin \(s_{l}\) is flipped such that \(s_{l}^{2} = -s_{l}^{1}\). From this it follows that \begin{align*}
+	\left(s_{l}^{1} - s_{l}^{2}\right) = \left(s_{l}^{1} + s_{l}^{1}\right) = 2s_{l}^{1}.
+\end{align*}
+
+The difference in energy can then be written as
+
+\begin{align*}
+ 	\Delta E = 2Js_{l}^{1} \sum_{<k>}^{N} s_{k}, \numberthis \label{eq:delta_e}
+\end{align*}
+
+where we only sum over \(k\), since only one spin \(s_{l}\) is flipped.
+For a two dimensional lattice, each spin only has four neighbours, thus we can write out the sum for any randomly chosen \(s_{l}\) with neighbours \(s_{a}, s_{b}, s_{c}, s_{d}\) as
+
+\begin{align*}
+	\Delta E = 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \\
+	\Delta E = 2J(\pm 1)\left[(\pm 1) + (\pm 1) + (\pm 1) + (\pm 1)\right]
+\end{align*}
+
+From this we see that if all spins \(s_{k}\) have the same sign we get
+\begin{align*}
+	\Delta E = \pm 2J(\pm 4) = \pm 8J.
+\end{align*}
+If three of the spins \(s_{k}\) have the same sign we get
+\begin{align*}
+	\Delta E = \pm 2J(\pm 2) = \pm 4J.
+\end{align*}
+If two of the spins \(s_{k}\) have the same sign we get
+\begin{align*}
+	\Delta E = \pm 2J(0) = 0.
+\end{align*}
+Thus we only have five possible diffrences in energy between states when we only flip one spin.
+
+
+
 \newpage
 
 \section{Method} \label{sec:III}
