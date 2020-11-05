@@ -172,16 +172,27 @@ where $M$ is the amount of microstates of the system. The magnetization of a giv
 \mathcal{M}_i &= \sum\limits_j^N s_j \numberthis \label{eq:ising_magnetization}
 \end{align*}
 
+The mean of a general variable, $Q_i$, can be defined as:
+
+\begin{align*}
+\langle Q \rangle &= \sum\limits_i^M Q_i P_i(\beta) 
+\end{align*}
 We will also need the relation between the Helmholtz free energy $F$ and the partition function:
 
 \begin{align*}
 F &= -k_B T \ln (Z) \, ,\numberthis \label{eq:helmholtz_free_energy}
 \end{align*}
 
-and also how specific heat $C_V$ at constant volume relates to the partition function:
+and also how heat capacity $C_V$ at constant volume relates to the partition function:
 
 \begin{align*}
-C_V &= \frac{1}{k_B T^2} \frac{\partial^2}{\partial \beta^2} \ln (Z) 
+C_V &= \frac{1}{k_B T^2} (\langle E^2 \rangle - \langle E \rangle^2) \numberthis \label{eq:heat_capacity}
+\end{align*}
+
+We will also need the magnetic susceptibility, $\chi$, of the system:
+
+\begin{align*}
+\chi &= \frac{1}{k_B T} ( \langle \mathcal{M}^2 \rangle - \langle \mathcal{M} \rangle^2) \numberthis \label{eq:magnetic_susceptibility}
 \end{align*}
 
 In the following section we look at a sample system.
@@ -239,30 +250,60 @@ We can calculate the partition function of the system using \eqref{eq:ising_part
 \begin{align*}
 Z &= \sum\limits_i^M e^{-\beta E_i} \\
 &= 2 \bigg(e^{8J\beta} + e^{-8J\beta} \bigg) + 12 \\
-&= \cosh(8J\beta) + 12
+&= 4\cosh(8J\beta) + 12
 \end{align*}
 
 The probability distribution of the system is thus:
 
 \begin{align*}
-P_i(\beta) &= \frac{e^{-\beta E_i}}{\cosh (8J\beta) + 12}
+P_i(\beta) &= \frac{e^{-\beta E_i}}{4\cosh (8J\beta) + 12}
 \end{align*}
 
 The expectation value for the energy can be found as follows:
 
 \begin{align*}
 \langle E \rangle &= \sum\limits_i^M E_i P_i(\beta) \\
- &= -8J \frac{2e^{8J\beta}}{\cosh (8J\beta) + 12} + 8J \frac{2e^{-8J}}{\cosh (8J\beta) + 12} \\
- &= -8J\frac{2(e^{8J\beta} - e^{-8J\beta})}{\cosh (8J\beta) + 12} \\
- &= -8J\frac{\sinh(8J\beta) }{\cosh (8J\beta) + 12}
+ &= -8J \frac{2e^{8J\beta}}{4\cosh (8J\beta) + 12} + 8J \frac{2e^{-8J}}{4\cosh (8J\beta) + 12} \\
+ &= -8J\frac{2(e^{8J\beta} - e^{-8J\beta})}{4\cosh (8J\beta) + 12} \\
+ &= -8J\frac{\sinh(8J\beta) }{\cosh (8J\beta) + 3} \numberthis \label{eq:2x2_energy}
 \end{align*}
 
-The expectation value for the absolute value of the magnetization can be found similarly:
+It is simple to see that $\langle M \rangle = 0$, so a more interesting measure would be the expectation value of the absolute of the magnetization. The expectation value for the absolute value of the magnetization can be found similarly:
 
 \begin{align*}
-\langle |\mathcal{M}| \rangle &= \sum\limits_i |\mathcal{M}_i| P_i(\beta) \\
- &= \frac{8e^{8J\beta} + 16}{\cosh (8 J \beta) + 12} 
+\langle |\mathcal{M}| \rangle &= \sum\limits_i^M |\mathcal{M}_i| P_i(\beta) \\
+ &= \frac{2e^{8J\beta} + 4}{\cosh (8 J \beta) + 3} \numberthis \label{eq:2x2_abs_magnetization}
 \end{align*}
+
+In order to find the heat capacity it is first necessary to find the expectation value of squared energy:
+
+\begin{align*}
+\langle E^2 \rangle &= \sum\limits_i^M E_i^2 P_i(\beta) \\
+&= 64J^2 \frac{\cosh(8J\beta)}{\cosh(8J\beta) + 3}
+\end{align*}
+
+This gives us the heat capacity by equation \eqref{eq:heat_capacity}:
+
+\begin{align*}
+C_V &= \frac{1}{k_B T^2} ( \langle E^2 \rangle - \langle E \rangle^2) \\
+&= \frac{64J^2}{k_B T^2} \frac{e^{-8J\beta}}{\cosh(8J\beta) + 3} \numberthis \label{eq:2x2_heat_capacity}
+\end{align*}
+
+Lastly we also want to find the magnetic susceptibility of the system. In order to do that we need to find:
+
+\begin{align*}
+\langle \mathcal{M}^2 \rangle &= \sum\limits_i \mathcal{M}_i^2 P_i(\beta) \\
+&= 8 \frac{e^{8J\beta} + 1}{\cosh(8J\beta) + 3}
+\end{align*}
+
+This gives us the susceptibility by using equation \eqref{eq:magnetic_susceptibility}:
+
+\begin{align*}
+\chi &= \frac{1}{k_B T} ( \langle \mathcal{M}^2 \rangle - \langle \mathcal{M} \rangle^2 ) \\
+&= \frac{8}{k_B T} \frac{e^{8J \beta}}{\cosh( 8J \beta) + 3} \numberthis \label{eq:2x2_susceptibility}
+\end{align*}
+
+All of these values we have calculated here can be compared with numerical results later on in order to evaluate the veracity of the numerical results.
 
 \newpage
 
