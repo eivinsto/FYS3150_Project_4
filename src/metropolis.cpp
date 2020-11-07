@@ -48,7 +48,7 @@ void Metropolis::one_monte_carlo_cycle() {
   for(int y =0; y < n_spins; y++) {
     for (int x= 0; x < n_spins; x++){
 
-      // Get random coordinates
+      // Get random indices
       int ix = int(ran1(&idum)*(double)n_spins);
       int iy = int(ran1(&idum)*(double)n_spins);
 
@@ -59,7 +59,7 @@ void Metropolis::one_monte_carlo_cycle() {
                     spin_matrix(iy,periodic(ix,n_spins,1)) +
                     spin_matrix(periodic(iy,n_spins,1),ix));
 
-                    
+
       // Flip spin if new config is accepted
       if ( ran1(&idum) <= w(deltaE+8) ) {
         spin_matrix(iy,ix) *= -1;
