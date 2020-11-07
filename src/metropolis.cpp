@@ -59,9 +59,11 @@ void Metropolis::one_monte_carlo_cycle() {
                     spin_matrix(iy,periodic(ix,n_spins,1)) +
                     spin_matrix(periodic(iy,n_spins,1),ix));
 
+                    
       // Flip spin if new config is accepted
-      if ( ran1(&idum) <= w[deltaE+8] ) {
+      if ( ran1(&idum) <= w(deltaE+8) ) {
         spin_matrix(iy,ix) *= -1;
+
 
         // Update energy and magnetization if spin is flipped
         M += double(2*spin_matrix(iy,ix));
@@ -81,7 +83,7 @@ void Metropolis::initialize() {
   spin_matrix.ones();
 
   // Initial magnetization
-  M = double(L*L);
+  M = n_spins2;
 
   // Initial energy
   for(int y =0; y < n_spins; y++) {
@@ -119,6 +121,8 @@ void Metropolis::run_multi() {
       w(de+8) = exp(-de/temp);
     }
 
+    initialize();
+
     for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
       one_monte_carlo_cycle();
       average(0) += E;
@@ -144,6 +148,8 @@ void Metropolis::run_single() {
   for (int de = -8; de<= 8; de+=4) {
     w(de+8) = exp(-de/temp);
   }
+
+  initialize();
 
   for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
     one_monte_carlo_cycle();

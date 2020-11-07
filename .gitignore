@@ -494,4 +494,7 @@ dmypy.json
 # profiling data
 .prof
 
+# specific files
+test.dat
+
 # End of https://www.toptal.com/developers/gitignore/api/data,latex,c++,python,linux
