@@ -36,17 +36,17 @@
 int main(int argc, char** argv) {
 
   // Check whether an appropriate amount of command line arguments are given
-  if ( (argc!=5)&&(argc!=7) ) {
+  if ( (argc!=6)&&(argc!=8) ) {
     std::cout << "Bad usage: Program must have exactly 5 or 7 command line arguments!" << std::endl;
     std::cout << "Exiting program..." << std::endl;
     return 1;
   }
 
   // Initialize variables and read in first four command line arguments
-  std::string datafile = argv[0];
-  std::string runflag = argv[1];
-  int num_spins = atoi(argv[2]);
-  int max_cycles = atoi(argv[3]);
+  std::string datafile = argv[1];
+  std::string runflag = argv[2];
+  int num_spins = atoi(argv[3]);
+  int max_cycles = atoi(argv[4]);
   double min_temp = 1;
   double max_temp = 1;
   double num_tempsteps = 1;
@@ -55,25 +55,25 @@ int main(int argc, char** argv) {
   // Read in last command line argument(s)
   if (runflag=="multi"){
     // Check if amount of command line arguments is correct pertaining to the runflag
-    if (argc!=7) {
+    if (argc!=8) {
       std::cout << "Bad usage: If runflag multi is chosen, there has to be 7 command line arguments." << std::endl;
       std::cout << "Exiting program..." << std::endl;
       return 1;
     }
     // Read in command line arguments
-    min_temp = atof(argv[4]);
-    max_temp = atof(argv[5]);
-    num_tempsteps = atof(argv[6]);
+    min_temp = atof(argv[5]);
+    max_temp = atof(argv[6]);
+    num_tempsteps = atof(argv[7]);
   }
   else{
     // Check if amount of command line arguments is correct pertaining to the runflag
-    if (argc!=5) {
+    if (argc!=6) {
       std::cout << "Bad usage: If runflag single is chosen, there has to be 5 command line arguments." << std::endl;
       std::cout << "Exiting program..." << std::endl;
       return 1;
     }
     // Read in command line argument
-    temp = atof(argv[4]);
+    temp = atof(argv[5]);
   }
 
   // Run simulation
