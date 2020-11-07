@@ -152,7 +152,7 @@ void Metropolis::run_single() {
 }
 
 /**
-* Member function used to write data to file.
+* Member function used to write data to file when runflag is multi.
 */
 void Metropolis::write_to_file_multi() {
   if(!ofile.good()) {
@@ -188,6 +188,10 @@ void Metropolis::write_to_file_multi() {
   ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins2 << std::endl;
 }
 
+
+/**
+* Member function used to write to file when runflag is single.
+*/
 void Metropolis::write_to_file_single() {
   if(!ofile.good()) {
     ofile.open(output_filename.c_str(), std::ofstream::out);
