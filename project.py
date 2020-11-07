@@ -23,11 +23,12 @@ if __name__=="__main__":
     build_cpp()
     temp = 3
     file = "../data/test.dat"
-    run(["./main.exe",file,"single","2","100",f"{temp}"],cwd=src)
+    run(["./main.exe",file,"single","2","100000",f"{temp}"],cwd=src)
     data = read_single_run_file(src+file)
 
     E = data[:,0]
     M = data[:,1]
     absM = data[:,2]
 
-    print(np.mean(E))
+    E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
+    print(np.mean(E)-E_exp)
