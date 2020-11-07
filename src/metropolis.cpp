@@ -6,25 +6,43 @@
 #include <iomanip>
 
 
+/**
+* Constructor that takes a minimum temperature, a max temperature, and amount
+* of steps for the temperature and sets up an array that contains temperature
+* values. This constructor also initializes variables that store the amount of
+* spins, the amount of Monte Carlo cycles to perform and the name of the output
+* file.
+*/
 Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
-    n_temps = temp_steps;
-    temperature = arma::linspace(min_temp,max_temp,n_temps);
-    n_spins = num_spins;
-    max_cycles = num_mcs;
-    output_filename = filename;
-    spin_matrix.ones(n_spins,n_spins);
-    runflag = "multi";
+    n_temps = temp_steps;                                      // Number of temperature steps
+    temperature = arma::linspace(min_temp,max_temp,n_temps);   // Setting temperature array
+    n_spins = num_spins;                                       // Number of spins to model
+    n_spins2 = n_spins*n_spins;                                // Number of spins squared (for use in write_to_file())
+    max_cycles = num_mcs;                                      // Number of Monte Carlo cycles to perform
+    output_filename = filename;                                // Output file name
+    spin_matrix.ones(n_spins,n_spins);                         // Set spin matrix
+    runflag = "multi";                                         // Runflag depending on temperature initialization
 }
 
+/**
+* Constructor that initializes variables that store the amount of
+* spins, the amount of Monte Carlo cycles to perform, the name of the output
+* file and the temperature to simulate at.
+*/
 Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::string filename){
-    temp = input_temp;
-    n_spins = num_spins;
-    max_cycles = num_mcs;
-    output_filename = filename;
-    spin_matrix.ones(n_spins,n_spins);
-    runflag = "single";
+    temp = input_temp;                    // Setting temperature
+    n_spins = num_spins;                  // Number of spins
+    n_spins2 = n_spins*n_spins;           // Number of spins squared (for use in write_to_file())
+    max_cycles = num_mcs;                 // Number of Monte Carlo cycles to perform
+    output_filename = filename;           // Output file name
+    spin_matrix.ones(n_spins,n_spins);    // Set spin matrix
+    runflag = "single";                   // Runflag depending on temperature initialization
 }
 
+/**
+* Member function that performs one Monte Carlo cycle on the system, using
+* the Metropolis algorithm.
+*/
 void Metropolis::one_monte_carlo_cycle() {
   // Loop over all spins
   for(int y =0; y < n_spins; y++) {
@@ -54,6 +72,9 @@ void Metropolis::one_monte_carlo_cycle() {
 }
 
 
+/**
+* Member function that resets the spin matrix, magnetization and energy.
+*/
 void Metropolis::initialize() {
 
   // Reset spin_matrix
@@ -72,13 +93,22 @@ void Metropolis::initialize() {
   }
 }
 
-
+/**
+* Member function that calls the correct function to run the simulation.
+* This calls either run_multi() or run_single() depending on the runflag.
+*/
 void Metropolis::run() {
   if (runflag=="single") run_single();
   else run_multi();
 }
 
 
+/**
+* Member function that runs the simulation for multiple values of the
+* temperature. In these kinds of simulations the average energy, magnetization
+* and other values derived from these are written to file after each simulation
+* is completed.
+*/
 void Metropolis::run_multi() {
   for (int i = 0; i<n_temps; ++i) {
     temp = temperature(i);
@@ -102,6 +132,11 @@ void Metropolis::run_multi() {
 }
 
 
+/**
+* Member function that runs the simulation for a single temperature value
+* specified upon instantiating the class. The energy, magnetization, and values
+* derived from these are in this case written to file once every Monte Carlo cycle.
+*/
 void Metropolis::run_single() {
   E = 0;
   M = 0;
@@ -124,7 +159,9 @@ void Metropolis::run_single() {
   }
 }
 
-
+/**
+* Member function used to write data to file.
+*/
 void Metropolis::write_to_file(int mcs) {
   if(!ofile.good()) {
     ofile.open(output_filename.c_str(), std::ofstream::out);
@@ -141,16 +178,20 @@ void Metropolis::write_to_file(int mcs) {
   double M2average = average(3)*norm;
   double Mabsaverage = average(4)*norm;
 
-  // all expectation values are per spin, divide by 1/n_spins/n_spins
-  double Evariance = (E2average- Eaverage*Eaverage)/n_spins/n_spins;
-  double Mvariance = (M2average - Mabsaverage*Mabsaverage)/n_spins/n_spins;
+  // all expectation values are per spin, divide by 1/(n_spins^2)
+  double Evariance = (E2average- Eaverage*Eaverage)/n_spins2;
+  double Mvariance = (M2average - Mabsaverage*Mabsaverage)/n_spins2;
   ofile << std::setiosflags(ios::showpoint | ios::uppercase);
   // Writing temperature
   ofile << std::setw(15) << std::setprecision(8) << temperature;
-  // Writing
-  ofile << std::setw(15) << std::setprecision(8) << Eaverage/n_spins/n_spins;
-  ofile << std::setw(15) << std::setprecision(8) << Evariance/temperature/temperature;
-  ofile << std::setw(15) << std::setprecision(8) << Maverage/n_spins/n_spins;
+  // Writing average energy per spin
+  ofile << std::setw(15) << std::setprecision(8) << Eaverage/n_spins2;
+  // Writing heat capacity
+  ofile << std::setw(15) << std::setprecision(8) << Evariance/(temperature*temperature);
+  // Writing average magnetization per spin
+  ofile << std::setw(15) << std::setprecision(8) << Maverage/n_spins2;
+  // Writing susceptibility
   ofile << std::setw(15) << std::setprecision(8) << Mvariance/temperature;
-  ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins/n_spins << std::endl;
+  // Writing average absolute of magnetization per spin
+  ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins2 << std::endl;
 }

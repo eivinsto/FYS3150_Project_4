@@ -36,6 +36,7 @@ private:
   std::string runflag;
   std::ofstream ofile;
   arma::vec average = arma::zeros(5);
+  double n_spins2;
 };
 
 
