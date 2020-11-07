@@ -6,8 +6,8 @@
 #include <iomanip>
 
 
-Metropolis::Metropolis (int num_spins, int dim, int num_mcs, double min_temp, double max_temp, double temp_step, std::string filename){
-    n_temps = int((max_temp-min_temp)/temp_step);
+Metropolis::Metropolis (int num_spins, int dim, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
+    n_temps = temp_steps;
     temperature = arma::linspace(min_temp,max_temp,n_temps);
     n_spins = num_spins;
     L = dim;
