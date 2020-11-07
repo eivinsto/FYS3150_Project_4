@@ -7,8 +7,8 @@
 
 class Metropolis {
 public:
-  Metropolis (int, int, int, double, double, int, std::string);
-  Metropolis (int, int, int, double, std::string);
+  Metropolis (int, int, double, double, int, std::string);
+  Metropolis (int, int, double, std::string);
   void run();
 
 

@@ -6,24 +6,22 @@
 #include <iomanip>
 
 
-Metropolis::Metropolis (int num_spins, int dim, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
+Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
     n_temps = temp_steps;
     temperature = arma::linspace(min_temp,max_temp,n_temps);
     n_spins = num_spins;
-    L = dim;
     max_cycles = num_mcs;
     output_filename = filename;
-    spin_matrix.ones(L,L);
+    spin_matrix.ones(n_spins,n_spins);
     runflag = "multi";
 }
 
-Metropolis::Metropolis (int num_spins, int dim, int num_mcs, double input_temp, std::string filename){
+Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::string filename){
     temp = input_temp;
     n_spins = num_spins;
-    L = dim;
     max_cycles = num_mcs;
     output_filename = filename;
-    spin_matrix.ones(L,L);
+    spin_matrix.ones(n_spins,n_spins);
     runflag = "single";
 }
 
@@ -59,7 +57,7 @@ void Metropolis::one_monte_carlo_cycle() {
 void Metropolis::initialize() {
 
   // Reset spin_matrix
-  spin_matrix.ones(L,L);
+  spin_matrix.ones();
 
   // Initial magnetization
   M = double(L*L);
@@ -147,7 +145,9 @@ void Metropolis::write_to_file(int mcs) {
   double Evariance = (E2average- Eaverage*Eaverage)/n_spins/n_spins;
   double Mvariance = (M2average - Mabsaverage*Mabsaverage)/n_spins/n_spins;
   ofile << std::setiosflags(ios::showpoint | ios::uppercase);
+  // Writing temperature
   ofile << std::setw(15) << std::setprecision(8) << temperature;
+  // Writing
   ofile << std::setw(15) << std::setprecision(8) << Eaverage/n_spins/n_spins;
   ofile << std::setw(15) << std::setprecision(8) << Evariance/temperature/temperature;
   ofile << std::setw(15) << std::setprecision(8) << Maverage/n_spins/n_spins;
