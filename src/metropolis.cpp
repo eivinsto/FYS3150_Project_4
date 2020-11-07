@@ -208,8 +208,6 @@ void Metropolis::write_to_file_single() {
   }
 
   ofile << std::setiosflags(ios::showpoint | ios::uppercase);
-  // Writing temperature
-  ofile << std::setw(15) << std::setprecision(8) << temp;
   // Writing average energy per spin
   ofile << std::setw(15) << std::setprecision(8) << E/n_spins2;
   // Writing average magnetization per spin
