@@ -31,4 +31,8 @@ if __name__=="__main__":
     absM = data[:,2]
 
     E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
+    absM_exp = (2*np.exp(8/temp) + 4)/(np.cosh(8/temp) + 3)/4
+
     print(np.mean(E)-E_exp)
+    print(np.mean(M))
+    print(np.mean(absM)-absM_exp)
