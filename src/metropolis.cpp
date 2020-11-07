@@ -127,7 +127,7 @@ void Metropolis::run_multi() {
       average(3) += M*M;
       average(4) += fabs(M);
     }
-    write_to_file(max_cycles);
+    write_to_file_multi();
   }
 }
 
@@ -147,22 +147,14 @@ void Metropolis::run_single() {
 
   for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
     one_monte_carlo_cycle();
-
-    // Technically these will not provide averages, but we pass them in the same array
-    // so that write_to_file() prints them to file.
-    average(0) = E;
-    average(1) = E*E;
-    average(2) = M;
-    average(3) = M*M;
-    average(4) = fabs(M);
-    write_to_file(1);
+    write_to_file_single();
   }
 }
 
 /**
 * Member function used to write data to file.
 */
-void Metropolis::write_to_file(int mcs) {
+void Metropolis::write_to_file_multi() {
   if(!ofile.good()) {
     ofile.open(output_filename.c_str(), std::ofstream::out);
     if(!ofile.good()) {
@@ -171,7 +163,7 @@ void Metropolis::write_to_file(int mcs) {
     }
   }
 
-  double norm = 1/(double(mcs));  // divided by total number of cycles
+  double norm = 1/(double(max_cycles));  // divided by total number of cycles
   double Eaverage = average(0)*norm;
   double E2average = average(1)*norm;
   double Maverage = average(2)*norm;
@@ -194,4 +186,24 @@ void Metropolis::write_to_file(int mcs) {
   ofile << std::setw(15) << std::setprecision(8) << Mvariance/temperature;
   // Writing average absolute of magnetization per spin
   ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins2 << std::endl;
+}
+
+void Metropolis::write_to_file_single() {
+  if(!ofile.good()) {
+    ofile.open(output_filename.c_str(), std::ofstream::out);
+    if(!ofile.good()) {
+      std::cout << "Error opening file " << output_filename << ". Aborting!" << std::endl;
+      std::terminate();
+    }
+  }
+
+  ofile << std::setiosflags(ios::showpoint | ios::uppercase);
+  // Writing temperature
+  ofile << std::setw(15) << std::setprecision(8) << temp;
+  // Writing average energy per spin
+  ofile << std::setw(15) << std::setprecision(8) << E/n_spins2;
+  // Writing average magnetization per spin
+  ofile << std::setw(15) << std::setprecision(8) << M/n_spins2;
+  // Writing average absolute of magnetization per spin
+  ofile << std::setw(15) << std::setprecision(8) << fabs(M)/n_spins2 << std::endl;
 }

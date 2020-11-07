@@ -15,7 +15,8 @@ public:
 private:
   inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
   void one_monte_carlo_cycle();
-  void write_to_file(int);
+  void write_to_file_multi();
+  void write_to_file_single();
   void run_multi();
   void run_single();
   void initialize();
