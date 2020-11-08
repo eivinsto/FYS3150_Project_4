@@ -8,6 +8,7 @@ import sys
 rootdir = os.getcwd()
 src = rootdir + "/src/"
 
+
 def build_cpp():
     run(["make", "all"], cwd=src)
 
@@ -17,22 +18,22 @@ def read_single_run_file(datafile):
         data = np.genfromtxt(infile)
     return data
 
-if __name__=="__main__":
 
+if __name__ == "__main__":
 
     build_cpp()
     temp = 3
-    file = "../data/test.dat"
-    run(["./main.exe",file,"single","2","100000",f"{temp}"],cwd=src)
-    data = read_single_run_file(src+file)
+    file = rootdir + "/data/test.dat"
+    run(["./main.exe", file, "single", "2", "100000", f"{temp}"], cwd=src)
+    data = read_single_run_file(file)
 
-    E = data[:,0]
-    M = data[:,1]
-    absM = data[:,2]
+    E = data[:, 0]
+    M = data[:, 1]
+    absM = data[:, 2]
 
     E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
     absM_exp = (2*np.exp(8/temp) + 4)/(np.cosh(8/temp) + 3)/4
 
-    print(np.mean(E)-E_exp)
-    print(np.mean(M))
-    print(np.mean(absM)-absM_exp)
+    print(f"{np.mean(E)-E_exp:e}")
+    print(f"{np.mean(M):e}")
+    print(f"{np.mean(absM)-absM_exp:e}")
