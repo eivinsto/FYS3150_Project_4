@@ -33,11 +33,14 @@
 *
 * 7: Amount of temperature values which should be simulated.
 */
+
+bool string2Bool(std::string var){ if(var == "true") return true; else return false; }
+
 int main(int argc, char** argv) {
 
   // Check whether an appropriate amount of command line arguments are given
-  if ( (argc!=6)&&(argc!=8) ) {
-    std::cout << "Bad usage: Program must have exactly 5 or 7 command line arguments!" << std::endl;
+  if ( (argc!=6)&&(argc!=7)&&(argc!=8) ) {
+    std::cout << "Bad usage: Program must have exactly 5/6 or 7 command line arguments!" << std::endl;
     std::cout << "Exiting program..." << std::endl;
     return 1;
   }
@@ -51,6 +54,7 @@ int main(int argc, char** argv) {
   double max_temp = 1;
   double num_tempsteps = 1;
   double temp = 1;
+  bool randspin = false;
 
   // Read in last command line argument(s)
   if (runflag=="multi"){
@@ -67,23 +71,24 @@ int main(int argc, char** argv) {
   }
   else{
     // Check if amount of command line arguments is correct pertaining to the runflag
-    if (argc!=6) {
-      std::cout << "Bad usage: If runflag single is chosen, there has to be 5 command line arguments." << std::endl;
+    if (argc!=7 and argc!=6) {
+      std::cout << "Bad usage: If runflag single is chosen, there has to be 5 or 6 command line arguments." << std::endl;
       std::cout << "Exiting program..." << std::endl;
       return 1;
     }
     // Read in command line argument
     temp = atof(argv[5]);
+    if(argc!=6) randspin = string2Bool(argv[6]);
   }
 
   // Run simulation
   if (runflag=="multi") {
     Metropolis simulation = Metropolis(num_spins,max_cycles,min_temp,max_temp,num_tempsteps,datafile);
-    simulation.run();
+    simulation.run(randspin);
   }
 
   if (runflag=="single") {
     Metropolis simulation = Metropolis(num_spins,max_cycles,temp,datafile);
-    simulation.run();
+    simulation.run(randspin);
   }
 }
