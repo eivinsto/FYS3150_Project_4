@@ -9,6 +9,7 @@ class Metropolis {
 public:
   Metropolis (int, int, double, double, int, std::string);
   Metropolis (int, int, double, std::string);
+  void run(bool randspin);
   void run();
 
 
@@ -17,9 +18,9 @@ private:
   void one_monte_carlo_cycle();
   void write_to_file_multi();
   void write_to_file_single();
-  void run_multi();
-  void run_single();
-  void initialize();
+  void run_multi(bool randspin);
+  void run_single(bool randspin);
+  void initialize(bool randspin);
 
   int n_spins;
   arma::Mat<int> spin_matrix;

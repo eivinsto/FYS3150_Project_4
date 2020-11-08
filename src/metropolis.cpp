@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <ctime>
 
 
 /**
@@ -73,14 +74,23 @@ void Metropolis::one_monte_carlo_cycle() {
   }
 }
 
-
 /**
 * Member function that resets the spin matrix, magnetization and energy.
+* @randspin -- bool, generates random spin_matrix if true.
 */
-void Metropolis::initialize() {
+void Metropolis::initialize(bool randspin) {
 
   // Reset spin_matrix
-  spin_matrix.ones();
+  if (randspin) {
+    srand(time(NULL));
+    for (int x = 0; x < n_spins; x++) {
+      for (int y = 0; y < n_spins; y++) {
+        spin_matrix(x,y) = (rand() > RAND_MAX/2) ? -1 : 1;
+      }
+    }
+  } else {
+    spin_matrix.ones();
+  }
 
   // Initial magnetization
   M = n_spins2;
@@ -99,9 +109,19 @@ void Metropolis::initialize() {
 * Member function that calls the correct function to run the simulation.
 * This calls either run_multi() or run_single() depending on the runflag.
 */
+
+/**
+* Member function that calls the correct function to run the simulation.
+* This calls either run_multi() or run_single() depending on the runflag.
+*/
 void Metropolis::run() {
-  if (runflag=="single") run_single();
-  else run_multi();
+  if (runflag=="single") run_single(false);
+  else run_multi(false);
+}
+
+void Metropolis::run(bool randspin) {
+  if (runflag=="single") run_single(randspin);
+  else run_multi(randspin);
 }
 
 
@@ -111,7 +131,7 @@ void Metropolis::run() {
 * and other values derived from these are written to file after each simulation
 * is completed.
 */
-void Metropolis::run_multi() {
+void Metropolis::run_multi(bool randspin) {
   for (int i = 0; i<n_temps; ++i) {
     temp = temperature(i);
     E = 0;
@@ -121,7 +141,7 @@ void Metropolis::run_multi() {
       w(de+8) = exp(-de/temp);
     }
 
-    initialize();
+    initialize(randspin);
 
     for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
       one_monte_carlo_cycle();
@@ -141,7 +161,7 @@ void Metropolis::run_multi() {
 * specified upon instantiating the class. The energy, magnetization, and values
 * derived from these are in this case written to file once every Monte Carlo cycle.
 */
-void Metropolis::run_single() {
+void Metropolis::run_single(bool randspin) {
   E = 0;
   M = 0;
   w.zeros();
@@ -149,7 +169,7 @@ void Metropolis::run_single() {
     w(de+8) = exp(-de/temp);
   }
 
-  initialize();
+  initialize(randspin);
 
   for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
     one_monte_carlo_cycle();
