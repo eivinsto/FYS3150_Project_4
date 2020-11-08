@@ -19,21 +19,67 @@ def read_single_run_file(datafile):
     return data
 
 
-def stabilization_run(maxn, temp, L):
-    E = np.empty(maxn//1000)
-    M = np.empty(maxn//1000)
-    absM = np.empty(maxn//1000)
+def stabilization_run(nmax, temp, L, randspin=False):
+    build_cpp()
+    file = rootdir + "/data/test.dat"
+    if randspin:
+        run(
+            [
+                "./main.exe",
+                file,
+                "single",
+                f"{L}",
+                f"{nmax}",
+                f"{temp}",
+                "true"
+            ],
+            cwd=src
+        )
+    else:
+        run(
+            [
+                "./main.exe",
+                file,
+                "single",
+                f"{L}",
+                f"{nmax}",
+                f"{temp}",
+            ],
+            cwd=src
+        )
+    data = read_single_run_file(file)
 
-    for i in range(maxn//1000):
-        print(f"Run with {(i+1)*1000} cycles.", end='\r')
-        file = rootdir + f"/data/test{i}.dat"
-        run(["./main.exe", file, "single", f"{L}", f"{(i+1)*1000}", f"{temp}"], cwd=src)
-        data = read_single_run_file(file)
+    E = data[:, 0]
+    absM = data[:, 2]
 
-        E[i] = np.mean(data[:, 0])
-        M[i] = np.mean(data[:, 1])
-        absM[i] = np.mean(data[:, 2])
-    return E, M, absM
+    n_cycles = np.linspace(1, nmax, len(E))
+    E = np.cumsum(E)/n_cycles
+    absM = np.cumsum(absM)/n_cycles
+
+    plt.figure()
+    plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
+    plt.plot(n_cycles, E, label="<E>")
+    plt.xlabel("N")
+    plt.ylabel("<E>")
+    plt.legend()
+    plt.grid()
+    plt.savefig(
+        rootdir + f"/data/{randspin}-t{temp*10}-{L}x{L}-E.pdf",
+        bbox_inches='tight'
+    )
+
+    plt.figure()
+    plt.title(f"Average magnitude of magnetization of {L}x{L}" +
+              f"lattice with T = {temp}")
+    plt.plot(n_cycles, absM, label="<|M|>")
+    plt.xlabel("N")
+    plt.ylabel("<|M|>")
+    plt.legend()
+    plt.grid()
+    plt.savefig(
+        rootdir + f"/data/{randspin}-t{temp*10}-{L}x{L}-|M|.pdf",
+        bbox_inches='tight'
+    )
 
 
 if __name__ == "__main__":
@@ -73,17 +119,6 @@ if __name__ == "__main__":
     plt.savefig(
         rootdir + f"/data/t{temp*10}-{L}x{L}-E.pdf", bbox_inches='tight')
 
-    # plt.figure()
-    # plt.title(f"Average magnetization of {L}x{L} lattice")
-    # plt.hlines(0, 0, nmax, 'r', label="Analytic")
-    # plt.plot(n_cycles, M, label="<M>")
-    # plt.xlabel("N")
-    # plt.ylabel("<M>")
-    # plt.legend()
-    # plt.grid()
-    # plt.savefig(
-    #     rootdir + f"/data/t{temp*10}-{L}x{L}-M.pdf", bbox_inches='tight')
-
     plt.figure()
     plt.title(f"Average magnitude of magnetization of {L}x{L}" +
               f"lattice with T = {temp}")
@@ -95,5 +130,10 @@ if __name__ == "__main__":
     plt.grid()
     plt.savefig(
         rootdir + f"/data/t{temp*10}-{L}x{L}-|M|.pdf", bbox_inches='tight')
+
+    stabilization_run(nmax, 1, 20)
+    stabilization_run(nmax, 2.4, 20)
+    stabilization_run(nmax, 1, 20, randspin=True)
+    stabilization_run(nmax, 2.4, 20, randspin=True)
 
     plt.show()
