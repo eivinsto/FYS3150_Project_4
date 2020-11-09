@@ -9,6 +9,7 @@ class Metropolis {
 public:
   Metropolis (int, int, double, double, int, std::string);
   Metropolis (int, int, double, std::string);
+  ~Metropolis();
   void run(bool);
   void run();
 
