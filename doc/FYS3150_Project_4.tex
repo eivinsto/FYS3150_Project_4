@@ -146,7 +146,7 @@ Abstract
 
 \subsection{The Ising Model} \label{sec:II:a}
 
-The Ising model is a mathematical model of ferromagnetic systems. It is based on a set of particles in a lattice with either spin up or down, and the energy that a particle has is dependent on other adjacent particles and on an external magnetic field if there is one. The energy of a configuration of such a system is thus:
+The Ising model is a mathematical model of ferromagnetic systems. It is based on a set of particles in a lattice with either spin up or down, and the energy that a particle has is dependent on other adjacent particles and on an external magnetic field if there is one. We will be working with this model in the canonical ensemble. The energy of a configuration of such a system is:
 
 \begin{align*}
 E &= -J \sum\limits_{<kl>}^N s_k s_l - B \sum\limits_k^N s_k \numberthis \label{eq:ising_general_total_energy} \, ,
@@ -198,7 +198,7 @@ We will also need the magnetic susceptibility, $\chi$, of the system:
 In the following section we look at a sample system.
 
 
-\subsubsection{Periodic 2x2 square lattice with no external field}
+\subsubsection{Periodic \( 2 \times 2 \) square lattice with no external field}
 
 We look at a system where we have particles in a 2x2 square lattice. A configuration of the system can be visualized as follows: \newline
 
@@ -366,6 +366,59 @@ which gives that
 \begin{align*}
 	\mathcal{M}_2 = \mathcal{M}_1 + 2s_{l}^{2} \numberthis \label{eq:delta_m}
 \end{align*}
+
+
+\subsubsection{Periodic \(L \times L\) square lattice with no external field} \label{sec:II:a:ii}
+
+Solving the two-dimensional Ising model is a highly non-trivial task, and so we will only list the resulting expressions in the case where there is no external field. These expressions were found by Lars Onsager so we refer to his work \citep{L.Onsager1944} instead of performing the calculations ourselves. The partition function is given by the following:
+
+\begin{align*}
+Z_N &= [2\cosh(\beta J) e^I ]^N \, , \numberthis \label{eq:LxL_partition_function}
+\end{align*}
+
+where: 
+
+\begin{align*}
+I &= \frac{1}{2\pi} \int_0^\pi d\phi \, \ln \bigg[\frac{1}{2}\bigg( 1 + ( 1 - \kappa^2 \sin^2 \phi)^{1/2} \bigg) \bigg] \, , 
+\end{align*}
+
+and:
+
+\begin{align*}
+\kappa &= \frac{2\sinh ( 2\beta J) }{\cosh^2(2\beta J)} \, ,
+\end{align*}
+
+and $N$ is the number of particles. The resulting mean energy is:
+
+\begin{align*}
+\langle E \rangle &= -J \coth( 2\beta J) \bigg[ 1 + \frac{2}{\pi} (2\tanh^2 (2\beta J) - 1) K_1(\kappa) \bigg] \, , \numberthis \label{eq:LxL_energy}
+\end{align*}
+
+where:
+
+\begin{align*}
+K_1 (\kappa) &= \int_0^{\pi/2} \frac{d\phi}{\sqrt{1 - \kappa^2 \sin^2 \phi}} \, .
+\end{align*}
+
+The heat capacity is derived from this quantity again, and is found to be:
+
+\begin{align*}
+C_V &= \frac{4k_B}{\pi} (\beta J \coth(2\beta J))^2 \bigg( K_1(\kappa) - K_2(\kappa) \\ 
+& \quad - (1 - \tanh^2 (2\beta J) ) \bigg[ \frac{\pi}{2} + (2\tanh^2 (2\beta J) - 1)K_1(\kappa) \bigg] \bigg) \, , \numberthis \label{eq:LxL_heat_capacity}
+\end{align*}
+
+where:
+
+\begin{align*}
+K_2(\kappa) &= \int_0^{\pi/2} d\phi \, \sqrt{1 - \kappa^2 \sin^2 \phi}
+\end{align*}
+
+The mean magnetization per spin is given by:
+
+\begin{align*}
+\langle \mathcal{M} / N \rangle &= \bigg[1 - \frac{(1- \tanh^2 (\beta J) )^4}{16\tanh^4 (\beta J)} \bigg]^{1/8} \, , \numberthis \label{eq:LxL_magnetization_per_spin}
+\end{align*}
+
 
 \newpage
 
