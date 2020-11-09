@@ -43,7 +43,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 * Member function that performs one Monte Carlo cycle on the system, using
 * the Metropolis algorithm.
 */
-void Metropolis::one_monte_carlo_cycle() {
+void Metropolis::one_monte_carlo_cycle(double &E, double &M) {
   // Loop over all spins
   for(int y =0; y < n_spins; y++) {
     for (int x= 0; x < n_spins; x++){
@@ -77,7 +77,7 @@ void Metropolis::one_monte_carlo_cycle() {
 * Member function that resets the spin matrix, magnetization and energy.
 * @randspin -- bool, generates random spin_matrix if true.
 */
-void Metropolis::initialize(bool randspin) {
+void Metropolis::initialize(bool randspin,double &E, double &M) {
 
   // Reset spin_matrix
   if (randspin) {
@@ -131,26 +131,30 @@ void Metropolis::run(bool randspin) {
 * is completed.
 */
 void Metropolis::run_multi(bool randspin) {
+  #pragma omp parallel for
   for (int i = 0; i<n_temps; ++i) {
+    arma::vec average = arma::zeros(5);
     temp = temperature(i);
-    E = 0;
-    M = 0;
+    double E = 0;
+    double M = 0;
     w.zeros();
     for (int de = -8; de<= 8; de+=4) {
       w(de+8) = exp(-de/temp);
     }
 
-    initialize(randspin);
+    initialize(randspin,E,M);
 
     for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
-      one_monte_carlo_cycle();
+      one_monte_carlo_cycle(E,M);
       average(0) += E;
       average(1) += E*E;
       average(2) += M;
       average(3) += M*M;
       average(4) += fabs(M);
     }
-    write_to_file_multi();
+    
+    #pragma omp critical
+    write_to_file_multi(average);
   }
 }
 
@@ -161,25 +165,25 @@ void Metropolis::run_multi(bool randspin) {
 * derived from these are in this case written to file once every Monte Carlo cycle.
 */
 void Metropolis::run_single(bool randspin) {
-  E = 0;
-  M = 0;
+  double E = 0;
+  double M = 0;
   w.zeros();
   for (int de = -8; de<= 8; de+=4) {
     w(de+8) = exp(-de/temp);
   }
 
-  initialize(randspin);
+  initialize(randspin,E,M);
 
   for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
-    one_monte_carlo_cycle();
-    write_to_file_single();
+    one_monte_carlo_cycle(E,M);
+    write_to_file_single(E,M);
   }
 }
 
 /**
 * Member function used to write data to file when runflag is multi.
 */
-void Metropolis::write_to_file_multi() {
+void Metropolis::write_to_file_multi(arma::vec average) {
   if(!ofile.good()) {
     ofile.open(output_filename.c_str(), std::ofstream::out);
     if(!ofile.good()) {
@@ -217,7 +221,7 @@ void Metropolis::write_to_file_multi() {
 /**
 * Member function used to write to file when runflag is single.
 */
-void Metropolis::write_to_file_single() {
+void Metropolis::write_to_file_single(double E, double M) {
   if(!ofile.good()) {
     ofile.open(output_filename.c_str(), std::ofstream::out);
     if(!ofile.good()) {

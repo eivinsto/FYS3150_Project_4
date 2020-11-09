@@ -15,12 +15,12 @@ public:
 
 private:
   inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
-  void one_monte_carlo_cycle();
-  void write_to_file_multi();
-  void write_to_file_single();
+  void one_monte_carlo_cycle(double&, double&);
+  void write_to_file_multi(arma::vec average);
+  void write_to_file_single(double, double);
   void run_multi(bool randspin);
   void run_single(bool randspin);
-  void initialize(bool randspin);
+  void initialize(bool randspin, double&, double&);
   double ran1();
 
   int n_spins;
@@ -28,8 +28,6 @@ private:
   arma::vec temperature;
   double temp;
   int n_temps;
-  double E;
-  double M;
   int L;
   int max_cycles;
   std::string output_filename;
@@ -38,7 +36,6 @@ private:
   int current_cycle;
   std::string runflag;
   std::ofstream ofile;
-  arma::vec average = arma::zeros(5);
   double n_spins2;
 };
 
