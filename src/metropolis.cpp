@@ -20,7 +20,6 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_
     n_spins2 = n_spins*n_spins;                                // Number of spins squared (for use in write_to_file())
     max_cycles = num_mcs;                                      // Number of Monte Carlo cycles to perform
     output_filename = filename;                                // Output file name
-    spin_matrix.ones(n_spins,n_spins);                         // Set spin matrix
     runflag = "multi";                                         // Runflag depending on temperature initialization
 }
 
@@ -35,7 +34,6 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
     n_spins2 = n_spins*n_spins;           // Number of spins squared (for use in write_to_file())
     max_cycles = num_mcs;                 // Number of Monte Carlo cycles to perform
     output_filename = filename;           // Output file name
-    spin_matrix.ones(n_spins,n_spins);    // Set spin matrix
     runflag = "single";                   // Runflag depending on temperature initialization
 }
 
@@ -43,7 +41,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 * Member function that performs one Monte Carlo cycle on the system, using
 * the Metropolis algorithm.
 */
-void Metropolis::one_monte_carlo_cycle(double &E, double &M) {
+void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, double &M, arma::vec w) {
   // Loop over all spins
   for(int y =0; y < n_spins; y++) {
     for (int x= 0; x < n_spins; x++){
@@ -77,7 +75,7 @@ void Metropolis::one_monte_carlo_cycle(double &E, double &M) {
 * Member function that resets the spin matrix, magnetization and energy.
 * @randspin -- bool, generates random spin_matrix if true.
 */
-void Metropolis::initialize(bool randspin,double &E, double &M) {
+void Metropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &E, double &M) {
 
   // Reset spin_matrix
   if (randspin) {
@@ -131,28 +129,33 @@ void Metropolis::run(bool randspin) {
 * is completed.
 */
 void Metropolis::run_multi(bool randspin) {
+  // Parallelized for loop
   #pragma omp parallel for
   for (int i = 0; i<n_temps; ++i) {
+    // Define local variables so the different cores do not update the same
+    // variables at the same time.
     arma::vec average = arma::zeros(5);
-    temp = temperature(i);
     double E = 0;
     double M = 0;
-    w.zeros();
+    arma::Mat<int> spin_matrix(n_spins,n_spins,arma::fill::ones);
+    temp = temperature(i);
+    arma::vec w = arma::zeros(17);
     for (int de = -8; de<= 8; de+=4) {
       w(de+8) = exp(-de/temp);
     }
 
-    initialize(randspin,E,M);
+    // Initialize spin matrix
+    initialize(randspin,spin_matrix,E,M);
 
     for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
-      one_monte_carlo_cycle(E,M);
+      one_monte_carlo_cycle(spin_matrix,E,M,w);
       average(0) += E;
       average(1) += E*E;
       average(2) += M;
       average(3) += M*M;
       average(4) += fabs(M);
     }
-    
+    // Only one core should call this function at a time
     #pragma omp critical
     write_to_file_multi(average);
   }
@@ -167,15 +170,16 @@ void Metropolis::run_multi(bool randspin) {
 void Metropolis::run_single(bool randspin) {
   double E = 0;
   double M = 0;
-  w.zeros();
+  arma::Mat<int> spin_matrix(n_spins,n_spins,arma::fill::ones);
+  arma::vec w = arma::zeros(17);
   for (int de = -8; de<= 8; de+=4) {
     w(de+8) = exp(-de/temp);
   }
 
-  initialize(randspin,E,M);
+  initialize(randspin,spin_matrix,E,M);
 
   for (int current_cycle = 1; current_cycle<=max_cycles; current_cycle++){
-    one_monte_carlo_cycle(E,M);
+    one_monte_carlo_cycle(spin_matrix,E,M,w);
     write_to_file_single(E,M);
   }
 }
