@@ -9,18 +9,18 @@ class Metropolis {
 public:
   Metropolis (int, int, double, double, int, std::string);
   Metropolis (int, int, double, std::string);
-  void run(bool randspin);
+  void run(bool);
   void run();
 
 
 private:
   inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
   void one_monte_carlo_cycle(arma::Mat<int>&, double&, double&, arma::vec);
-  void write_to_file_multi(arma::vec average);
+  void write_to_file_multi(arma::vec);
   void write_to_file_single(double, double);
-  void run_multi(bool randspin);
-  void run_single(bool randspin);
-  void initialize(bool randspin, arma::Mat<int>&, double&, double&);
+  void run_multi(bool);
+  void run_single(bool);
+  void initialize(bool, arma::Mat<int>&, double&, double&);
   double ran1();
 
   int n_spins;
