@@ -12,6 +12,12 @@
 * values. This constructor also initializes variables that store the amount of
 * spins, the amount of Monte Carlo cycles to perform and the name of the output
 * file.
+* @num_spins -- number of spins in each dimension
+* @num_mcs -- number of Monte Carlo cycles to perform
+* @min_temp -- lowest temperature to simulate at
+* @max_temp -- largest temperature to simulate at
+* @temp_steps -- amount of steps in temperature
+* @filename -- name of file to write resulting data from simulation to
 */
 Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
     n_temps = temp_steps;                                      // Number of temperature steps
@@ -27,6 +33,9 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_
 * Constructor that initializes variables that store the amount of
 * spins, the amount of Monte Carlo cycles to perform, the name of the output
 * file and the temperature to simulate at.
+* @num_spins -- number of spins in each dimension
+* @num_mcs -- number of Monte Carlo cycles to perform
+* @input_temp -- temperature to run simulation at
 */
 Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::string filename){
     temp = input_temp;                    // Setting temperature
@@ -40,6 +49,10 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 /**
 * Member function that performs one Monte Carlo cycle on the system, using
 * the Metropolis algorithm.
+* @spin_matrix -- matrix storing spin values
+* @E -- double containing energy of system
+* @M -- double containing magnetization of system
+* @w -- vector containing "probabilities" for energy changes
 */
 void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, double &M, arma::vec w) {
   // Loop over all spins
@@ -74,6 +87,9 @@ void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, d
 /**
 * Member function that resets the spin matrix, magnetization and energy.
 * @randspin -- bool, generates random spin_matrix if true.
+* @spin_matrix -- matrix storing spin values
+* @E -- double containing energy
+* @M -- double containing magnetization
 */
 void Metropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &E, double &M) {
 
@@ -106,16 +122,16 @@ void Metropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &
 * Member function that calls the correct function to run the simulation.
 * This calls either run_multi() or run_single() depending on the runflag.
 */
-
-/**
-* Member function that calls the correct function to run the simulation.
-* This calls either run_multi() or run_single() depending on the runflag.
-*/
 void Metropolis::run() {
   if (runflag=="single") run_single(false);
   else run_multi(false);
 }
 
+/**
+* Member function that calls the correct function to run the simulation.
+* This calls either run_multi() or run_single() depending on the runflag.
+* @randspin -- specifies whether or not the spin_matrix should be randomly generated
+*/
 void Metropolis::run(bool randspin) {
   if (runflag=="single") run_single(randspin);
   else run_multi(randspin);
@@ -127,6 +143,7 @@ void Metropolis::run(bool randspin) {
 * temperature. In these kinds of simulations the average energy, magnetization
 * and other values derived from these are written to file after each simulation
 * is completed.
+* @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
 void Metropolis::run_multi(bool randspin) {
   // Parallelized for loop
@@ -165,6 +182,7 @@ void Metropolis::run_multi(bool randspin) {
 * Member function that runs the simulation for a single temperature value
 * specified upon instantiating the class. The energy, magnetization, and values
 * derived from these are in this case written to file once every Monte Carlo cycle.
+* @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
 void Metropolis::run_single(bool randspin) {
   double E = 0;
@@ -185,6 +203,13 @@ void Metropolis::run_single(bool randspin) {
 
 /**
 * Member function used to write data to file when runflag is multi.
+* @average -- vector containing averaged values of:
+*             -Energy
+*             -Energy squared
+*             -Magnetization
+*             -Magnetization squared
+*             -Absolute of magnetization
+*             ... in that order.
 */
 void Metropolis::write_to_file_multi(arma::vec average) {
   if(!ofile.good()) {
@@ -223,6 +248,8 @@ void Metropolis::write_to_file_multi(arma::vec average) {
 
 /**
 * Member function used to write to file when runflag is single.
+* @E -- double containing energy of system
+* @M -- doouble containing magnetization of system
 */
 void Metropolis::write_to_file_single(double E, double M) {
   if(!ofile.good()) {
@@ -250,7 +277,8 @@ void Metropolis::write_to_file_single(double E, double M) {
 **           ran1()
 ** is an "Minimal" random number generator of Park and Miller
 ** (see Numerical recipe page 280) with Bays-Durham shuffle and
-** added safeguards. Call with idum a negative integer to initialize;
+** added safeguards. Call with idum a negative integer to initialize (NB!: this
+** was placed as a member variable of the class instead);
 ** thereafter, do not alter idum between sucessive deviates in a
 ** sequence. RNMX should approximate the largest floating point value
 ** that is less than 1.
