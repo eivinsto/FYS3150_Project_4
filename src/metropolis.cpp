@@ -153,7 +153,10 @@ void Metropolis::run(bool randspin) {
 */
 void Metropolis::run_multi(bool randspin) {
   // Parallelized for loop
-  #pragma omp parallel for num_threads(7)
+  int max_threads = omp_get_max_threads()/2;
+  int thrds = std::min(max_threads, n_temps);
+
+  #pragma omp parallel for num_threads(thrds)
   for (int i = 0; i<n_temps; ++i) {
     // Define local variables so the different cores do not update the same
     // variables at the same time.
