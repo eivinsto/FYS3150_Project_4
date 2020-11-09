@@ -13,7 +13,7 @@ def build_cpp():
     run(["make", "all"], cwd=src)
 
 
-def read_single_run_file(datafile):
+def read_data_file(datafile):
     with open(datafile) as infile:
         data = np.genfromtxt(infile)
     return data
@@ -47,7 +47,7 @@ def stabilization_run(nmax, temp, L, randspin=False):
             ],
             cwd=src
         )
-    data = read_single_run_file(file)
+    data = read_data_file(file)
 
     E = data[:, 0]
     absM = data[:, 2]
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     L = 2
     file = rootdir + "/data/test.dat"
     run(["./main.exe", file, "single", f"{L}", f"{nmax}", f"{temp}"], cwd=src)
-    data = read_single_run_file(file)
+    data = read_data_file(file)
 
     E = data[:, 0]
     M = data[:, 1]
