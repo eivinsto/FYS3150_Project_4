@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <ctime>
+#include <omp.h>
 
 
 /**
@@ -27,6 +28,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_
     max_cycles = num_mcs;                                      // Number of Monte Carlo cycles to perform
     output_filename = filename;                                // Output file name
     runflag = "multi";                                         // Runflag depending on temperature initialization
+    ofile.open(output_filename.c_str(), std::ofstream::out);
 }
 
 /**
@@ -44,6 +46,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
     max_cycles = num_mcs;                 // Number of Monte Carlo cycles to perform
     output_filename = filename;           // Output file name
     runflag = "single";                   // Runflag depending on temperature initialization
+    ofile.open(output_filename.c_str(), std::ofstream::out);
 }
 
 /**
@@ -150,7 +153,7 @@ void Metropolis::run(bool randspin) {
 */
 void Metropolis::run_multi(bool randspin) {
   // Parallelized for loop
-  #pragma omp parallel for
+  #pragma omp parallel for num_threads(7)
   for (int i = 0; i<n_temps; ++i) {
     // Define local variables so the different cores do not update the same
     // variables at the same time.
@@ -176,7 +179,7 @@ void Metropolis::run_multi(bool randspin) {
     }
     // Only one core should call this function at a time
     #pragma omp critical
-    write_to_file_multi(average);
+    write_to_file_multi(average, temperature(i));
   }
 }
 
@@ -214,16 +217,9 @@ void Metropolis::run_single(bool randspin) {
 *             -Absolute of magnetization
 *             ... in that order.
 */
-void Metropolis::write_to_file_multi(arma::vec average) {
-  if(!ofile.good()) {
-    ofile.open(output_filename.c_str(), std::ofstream::out);
-    if(!ofile.good()) {
-      std::cout << "Error opening file " << output_filename << ". Aborting!" << std::endl;
-      std::terminate();
-    }
-  }
-
+void Metropolis::write_to_file_multi(arma::vec average, double temperature) {
   double norm = 1/(double(max_cycles));  // divided by total number of cycles
+
   double Eaverage = average(0)*norm;
   double E2average = average(1)*norm;
   double Maverage = average(2)*norm;
@@ -245,7 +241,8 @@ void Metropolis::write_to_file_multi(arma::vec average) {
   // Writing susceptibility
   ofile << std::setw(15) << std::setprecision(8) << Mvariance/temperature;
   // Writing average absolute of magnetization per spin
-  ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins2 << std::endl;
+  ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins2;
+  ofile << std::setw(15) << omp_get_thread_num() << std::endl;
 }
 
 
@@ -255,14 +252,6 @@ void Metropolis::write_to_file_multi(arma::vec average) {
 * @M -- doouble containing magnetization of system
 */
 void Metropolis::write_to_file_single(double E, double M) {
-  if(!ofile.good()) {
-    ofile.open(output_filename.c_str(), std::ofstream::out);
-    if(!ofile.good()) {
-      std::cout << "Error opening file " << output_filename << ". Aborting!" << std::endl;
-      std::terminate();
-    }
-  }
-
   ofile << std::setiosflags(std::ios::showpoint | std::ios::uppercase);
   // Writing average energy per spin
   ofile << std::setw(15) << std::setprecision(8) << E/n_spins2;

@@ -16,7 +16,7 @@ public:
 private:
   inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
   void one_monte_carlo_cycle(arma::Mat<int>&, double&, double&, arma::vec);
-  void write_to_file_multi(arma::vec average);
+  void write_to_file_multi(arma::vec average, double temperature);
   void write_to_file_single(double, double);
   void run_multi(bool randspin);
   void run_single(bool randspin);
