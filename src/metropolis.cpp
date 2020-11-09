@@ -1,6 +1,5 @@
 #include "metropolis.hpp"
 #include <armadillo>
-#include "lib.h"  // For RNG ran1(int)
 #include <cmath>
 #include <iostream>
 #include <iomanip>
@@ -50,8 +49,8 @@ void Metropolis::one_monte_carlo_cycle() {
     for (int x= 0; x < n_spins; x++){
 
       // Get random indices
-      int ix = int(ran1(&idum)*(double)n_spins);
-      int iy = int(ran1(&idum)*(double)n_spins);
+      int ix = int(ran1()*(double)n_spins);
+      int iy = int(ran1()*(double)n_spins);
 
       // Calculate change in energy
       int deltaE =  2*spin_matrix(iy,ix)*
@@ -62,7 +61,7 @@ void Metropolis::one_monte_carlo_cycle() {
 
 
       // Flip spin if new config is accepted
-      if ( ran1(&idum) <= w(deltaE+8) ) {
+      if ( ran1() <= w(deltaE+8) ) {
         spin_matrix(iy,ix) *= -1;
 
 
@@ -199,7 +198,7 @@ void Metropolis::write_to_file_multi() {
   // all expectation values are per spin, divide by 1/(n_spins^2)
   double Evariance = (E2average- Eaverage*Eaverage)/n_spins2;
   double Mvariance = (M2average - Mabsaverage*Mabsaverage)/n_spins2;
-  ofile << std::setiosflags(ios::showpoint | ios::uppercase);
+  ofile << std::setiosflags(std::ios::showpoint | std::ios::uppercase);
   // Writing temperature
   ofile << std::setw(15) << std::setprecision(8) << temperature;
   // Writing average energy per spin
@@ -227,7 +226,7 @@ void Metropolis::write_to_file_single() {
     }
   }
 
-  ofile << std::setiosflags(ios::showpoint | ios::uppercase);
+  ofile << std::setiosflags(std::ios::showpoint | std::ios::uppercase);
   // Writing average energy per spin
   ofile << std::setw(15) << std::setprecision(8) << E/n_spins2;
   // Writing average magnetization per spin
@@ -235,3 +234,66 @@ void Metropolis::write_to_file_single() {
   // Writing average absolute of magnetization per spin
   ofile << std::setw(15) << std::setprecision(8) << fabs(M)/n_spins2 << std::endl;
 }
+
+
+/*
+** This function was "borrowed" from:
+** https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Programs/LecturePrograms/programs/cppLibrary/lib.cpp
+** The function
+**           ran1()
+** is an "Minimal" random number generator of Park and Miller
+** (see Numerical recipe page 280) with Bays-Durham shuffle and
+** added safeguards. Call with idum a negative integer to initialize;
+** thereafter, do not alter idum between sucessive deviates in a
+** sequence. RNMX should approximate the largest floating point value
+** that is less than 1.
+** The function returns a uniform deviate between 0.0 and 1.0
+** (exclusive of end-point values).
+*/
+
+#define IA 16807
+#define IM 2147483647
+#define AM (1.0/IM)
+#define IQ 127773
+#define IR 2836
+#define NTAB 32
+#define NDIV (1+(IM-1)/NTAB)
+#define EPS 1.2e-7
+#define RNMX (1.0-EPS)
+
+double Metropolis::ran1() {
+  int             j;
+  long            k;
+  static long     iy=0;
+  static long     iv[NTAB];
+  double          temp;
+
+  if (idum <= 0 || !iy) {
+    if (-idum < 1) idum=1;
+    else idum = -idum;
+    for(j = NTAB + 7; j >= 0; j--) {
+      k     = idum/IQ;
+      idum = IA*(idum - k*IQ) - IR*k;
+      if(idum < 0) idum += IM;
+      if(j < NTAB) iv[j] = idum;
+    }
+    iy = iv[0];
+  }
+  k     = (idum)/IQ;
+  idum = IA*(idum - k*IQ) - IR*k;
+  if(idum < 0) idum += IM;
+  j     = iy/NDIV;
+  iy    = iv[j];
+  iv[j] = idum;
+  if((temp=AM*iy) > RNMX) return RNMX;
+  else return temp;
+}
+#undef IA
+#undef IM
+#undef AM
+#undef IQ
+#undef IR
+#undef NTAB
+#undef NDIV
+#undef EPS
+#undef RNMX

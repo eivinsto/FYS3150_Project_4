@@ -21,6 +21,7 @@ private:
   void run_multi(bool randspin);
   void run_single(bool randspin);
   void initialize(bool randspin);
+  double ran1();
 
   int n_spins;
   arma::Mat<int> spin_matrix;
