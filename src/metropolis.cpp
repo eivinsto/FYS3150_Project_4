@@ -138,10 +138,9 @@ void Metropolis::run_multi(bool randspin) {
     double E = 0;
     double M = 0;
     arma::Mat<int> spin_matrix(n_spins,n_spins,arma::fill::ones);
-    temp = temperature(i);
     arma::vec w = arma::zeros(17);
     for (int de = -8; de<= 8; de+=4) {
-      w(de+8) = exp(-de/temp);
+      w(de+8) = exp(-de/temperature(i));
     }
 
     // Initialize spin matrix
