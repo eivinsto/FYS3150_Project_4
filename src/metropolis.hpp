@@ -35,6 +35,7 @@ private:
   std::string runflag;
   std::ofstream ofile;
   double n_spins2;
+  int accepted_configs = 0;
 };
 
 

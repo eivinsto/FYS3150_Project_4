@@ -79,6 +79,9 @@ void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, d
         // Update energy and magnetization if spin is flipped
         M += double(2*spin_matrix(iy,ix));
         E += double(deltaE);
+
+        // Count accepted configs
+        accepted_configs += 1;
       }
     }
   }
@@ -266,7 +269,9 @@ void Metropolis::write_to_file_single(double E, double M) {
   // Writing average magnetization per spin
   ofile << std::setw(15) << std::setprecision(8) << M/n_spins2;
   // Writing average absolute of magnetization per spin
-  ofile << std::setw(15) << std::setprecision(8) << fabs(M)/n_spins2 << std::endl;
+  ofile << std::setw(15) << std::setprecision(8) << fabs(M)/n_spins2;
+  // Write amount of accepted configs
+  ofile << accepted_configs << std::endl;
 }
 
 
