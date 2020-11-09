@@ -84,7 +84,7 @@ void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, d
         E += double(deltaE);
 
         // Count accepted configs
-        accepted_configs += 1;
+        accepted_configs++;
       }
     }
   }
