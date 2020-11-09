@@ -7,15 +7,18 @@
 
 class Metropolis {
 public:
+  // Constructors and destructors
   Metropolis (int, int, double, double, int, std::string);
   Metropolis (int, int, double, std::string);
   ~Metropolis();
+
+  // Functions that run simulations
   void run(bool);
   void run();
 
 
 private:
-  inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
+  // Private functions
   void one_monte_carlo_cycle(arma::Mat<int>&, double&, double&, arma::vec);
   void write_to_file_multi(arma::vec, double);
   void write_to_file_single(double, double);
@@ -24,6 +27,10 @@ private:
   void initialize(bool, arma::Mat<int>&, double&, double&);
   double ran1();
 
+  // Inline function that is used to generate periodic boundary conditions
+  inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
+
+  // Private variables
   int n_spins;
   arma::vec temperature;
   double temp;
