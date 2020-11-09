@@ -2,7 +2,7 @@ CC := g++
 FLAGS := -Wall -Wextra -O2 -march=native
 DEBUG := -g
 LIBS := -larmadillo
-OFILES := metropolis.o lib.o
+OFILES := metropolis.o
 
 .PHONY: all clean benchmark test
 
@@ -18,9 +18,6 @@ main.o: main.cpp
 
 metropolis.o: metropolis.cpp
 	$(CC) $(FLAGS) $(DEBUG) metropolis.cpp -c
-
-lib.o: lib.cpp
-	$(CC) $(FLAGS) $(DEBUG) lib.cpp -c
 
 
 # unittest program:
