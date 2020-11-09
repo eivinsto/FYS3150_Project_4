@@ -50,6 +50,14 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 }
 
 /**
+* Destructor that closes output file. None of the variables defined are
+* dynamically allocated, so this is the only necessary thing to do when
+* deinstantiating the class. Armadillo vectors/matrices automatically
+* deallocate when they move out of scope, and so they can be safely left behind.
+*/
+Metropolis::~Metropolis() { ofile.close(); }
+
+/**
 * Member function that performs one Monte Carlo cycle on the system, using
 * the Metropolis algorithm.
 * @spin_matrix -- matrix storing spin values
