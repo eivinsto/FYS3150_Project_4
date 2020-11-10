@@ -10,7 +10,7 @@ public:
   // Constructors and destructors
   Metropolis (int, int, double, double, int, std::string);
   Metropolis (int, int, double, std::string);
-  ~Metropolis();
+  // ~Metropolis();
 
   // Functions that run simulations
   void run(bool);

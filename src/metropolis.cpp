@@ -55,7 +55,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 * deinstantiating the class. Armadillo vectors/matrices automatically
 * deallocate when they move out of scope, and so they can be safely left behind.
 */
-Metropolis::~Metropolis() { ofile.close(); }
+// Metropolis::~Metropolis() { ofile.close(); }
 
 /**
 * Member function that performs one Monte Carlo cycle on the system, using
@@ -161,8 +161,9 @@ void Metropolis::run(bool randspin) {
 */
 void Metropolis::run_multi(bool randspin) {
   // Parallelized for loop
-  int max_threads = omp_get_max_threads()/2;
+  int max_threads = omp_get_max_threads()*3/4;
   int thrds = std::min(max_threads, n_temps);
+  std::cout << max_threads << " " << thrds << std::endl;
 
   #pragma omp parallel for num_threads(thrds)
   for (int i = 0; i<n_temps; ++i) {
