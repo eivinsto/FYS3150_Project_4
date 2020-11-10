@@ -130,58 +130,75 @@ def phase_trans_test(nmax):
         data[L] = np.genfromtxt(file)
 
 
+runflag = "start"
 if __name__ == "__main__":
+    while runflag != "an" and runflag != "st" and runflag != "ph":
+        runflag = input("Analytic vs numeric 2x2 = 'an', " +
+                        "stabilization run = 'st', " +
+                        "phase transition = ph, " +
+                        "quit = 'q'.\n" +
+                        "Enter run: ")
+        if runflag == "quit" or runflag == "q":
+            print("Exiting.")
+            sys.exit(0)
 
     build_cpp()
-    # temp = 1
-    nmax = int(1e3)
-    # L = 2
-    # file = rootdir + "/data/test.dat"
-    # run(["./main.exe", file, "single", f"{L}", f"{nmax}", f"{temp}"], cwd=src)
-    # data = np.genfromtxt(file)
-    #
-    # E = data[:, 0]
-    # M = data[:, 1]
-    # absM = data[:, 2]
-    #
-    # E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
-    # absM_exp = (2*np.exp(8/temp) + 4)/(np.cosh(8/temp) + 3)/4
-    #
-    # print(f"{np.mean(E)-E_exp:e}")
-    # print(f"{np.mean(M):e}")
-    # print(f"{np.mean(absM)-absM_exp:e}")
-    #
-    # n_cycles = np.linspace(1, nmax, len(E))
-    # E = np.cumsum(E)/n_cycles
-    # # M = np.cumsum(M)/n_cycles
-    # absM = np.cumsum(absM)/n_cycles
-    #
-    # plt.figure()
-    # plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
-    # plt.hlines(E_exp, 0, nmax, 'r', label="Analytic")
-    # plt.plot(n_cycles, E, label="<E>")
-    # plt.xlabel("N")
-    # plt.ylabel("<E>")
-    # plt.legend()
-    # plt.grid()
-    # plt.savefig(
-    #     rootdir + f"/data/t{temp*10}-{L}x{L}-E.pdf", bbox_inches='tight')
-    #
-    # plt.figure()
-    # plt.title(f"Average magnitude of magnetization of {L}x{L}" +
-    #           f"lattice with T = {temp}")
-    # plt.hlines(absM_exp, 0, nmax, 'r', label="Analytic")
-    # plt.plot(n_cycles, absM, label="<|M|>")
-    # plt.xlabel("N")
-    # plt.ylabel("<|M|>")
-    # plt.legend()
-    # plt.grid()
-    # plt.savefig(
-    #     rootdir + f"/data/t{temp*10}-{L}x{L}-|M|.pdf", bbox_inches='tight')
-    #
-    # stabilization_run(nmax, 1, 20)
-    # stabilization_run(nmax, 2.4, 20)
-    # stabilization_run(nmax, 1, 20, randspin=True)
-    # stabilization_run(nmax, 2.4, 20, randspin=True)
-    phase_trans_test(nmax)
+    nmax = int(1e6)
+
+    if runflag == "an":
+        temp = 1
+        L = 2
+        file = rootdir + "/data/2x2-test.dat"
+        run(["./main.exe", file, "single", f"{L}", f"{nmax}", f"{temp}"],
+            cwd=src)
+        data = np.genfromtxt(file)
+
+        E = data[:, 0]
+        M = data[:, 1]
+        absM = data[:, 2]
+
+        E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
+        absM_exp = (2*np.exp(8/temp) + 4)/(np.cosh(8/temp) + 3)/4
+
+        print(f"{np.mean(E)-E_exp:e}")
+        print(f"{np.mean(M):e}")
+        print(f"{np.mean(absM)-absM_exp:e}")
+
+        n_cycles = np.linspace(1, nmax, len(E))
+        E = np.cumsum(E)/n_cycles
+        # M = np.cumsum(M)/n_cycles
+        absM = np.cumsum(absM)/n_cycles
+
+        plt.figure()
+        plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
+        plt.hlines(E_exp, 0, nmax, 'r', label="Analytic")
+        plt.plot(n_cycles, E, label="<E>")
+        plt.xlabel("N")
+        plt.ylabel("<E>")
+        plt.legend()
+        plt.grid()
+        plt.savefig(
+            rootdir + f"/data/t{temp*10}-{L}x{L}-E.pdf", bbox_inches='tight')
+
+        plt.figure()
+        plt.title(f"Average magnitude of magnetization of {L}x{L}" +
+                  f"lattice with T = {temp}")
+        plt.hlines(absM_exp, 0, nmax, 'r', label="Analytic")
+        plt.plot(n_cycles, absM, label="<|M|>")
+        plt.xlabel("N")
+        plt.ylabel("<|M|>")
+        plt.legend()
+        plt.grid()
+        plt.savefig(
+            rootdir + f"/data/t{temp*10}-{L}x{L}-|M|.pdf", bbox_inches='tight')
+
+    if runflag == "st":
+        stabilization_run(nmax, 1, 20)
+        stabilization_run(nmax, 2.4, 20)
+        stabilization_run(nmax, 1, 20, randspin=True)
+        stabilization_run(nmax, 2.4, 20, randspin=True)
+
+    if runflag == "ph":
+        phase_trans_test(nmax)
+
     plt.show()
