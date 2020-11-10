@@ -46,5 +46,6 @@ clean:
 	rm -f *.o
 	rm -f *.exe
 	rm -f *.dat
+	rm -f *.gch
 
 print-% : ; @echo $* = $($*)
