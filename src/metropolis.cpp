@@ -163,7 +163,7 @@ void Metropolis::run_multi(bool randspin) {
   // Parallelized for loop
   int max_threads = omp_get_max_threads()*3/4;
   int thrds = std::min(max_threads, n_temps);
-  std::cout << max_threads << " " << thrds << std::endl;
+  std::cout << "Simulating L = " << n_spins << " with " << thrds << " threads." << std::endl;
 
   #pragma omp parallel for num_threads(thrds)
   for (int i = 0; i<n_temps; ++i) {

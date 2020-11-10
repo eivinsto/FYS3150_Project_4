@@ -118,7 +118,7 @@ def phase_trans_test(nmax):
 
     # iterating through number of subprocesses to spawn at the same time:
     for i in range(len(ranges)):
-        # spawning subprocesses:
+        print("spawning subprocesses:")
         sims = [phase_L_sim(j) for j in range(k, ranges[i] + k)]
         k += len(sims)  # counting up.
 
