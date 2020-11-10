@@ -55,7 +55,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 * deinstantiating the class. Armadillo vectors/matrices automatically
 * deallocate when they move out of scope, and so they can be safely left behind.
 */
-// Metropolis::~Metropolis() { ofile.close(); }
+Metropolis::~Metropolis() { if (ofile.is_open()) ofile.close(); }
 
 /**
 * Member function that performs one Monte Carlo cycle on the system, using
