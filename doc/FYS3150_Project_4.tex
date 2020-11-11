@@ -368,12 +368,12 @@ which gives that
 \end{align*}
 
 
-\subsubsection{Periodic \(L \times L\) square lattice with no external field} \label{sec:II:a:ii}
+\subsubsection{Periodic square lattice with no external field in the thermodynamical limit} \label{sec:II:a:ii}
 
 Solving the two-dimensional Ising model is a highly non-trivial task, and so we will only list the resulting expressions in the case where there is no external field. These expressions were found by Lars Onsager so we refer to his work \citep{L.Onsager1944} instead of performing the calculations ourselves. The partition function is given by the following:
 
 \begin{align*}
-Z_N &= [2\cosh(\beta J) e^I ]^N \, , \numberthis \label{eq:LxL_partition_function}
+Z_N &= [2\cosh(\beta J) e^I ]^N \, , \numberthis \label{eq:LO_partition_function}
 \end{align*}
 
 where: 
@@ -388,10 +388,10 @@ and:
 \kappa &= \frac{2\sinh ( 2\beta J) }{\cosh^2(2\beta J)} \, ,
 \end{align*}
 
-and $N$ is the number of particles. The resulting mean energy is:
+and $N$ is the number of particles. This determines the mean energy:
 
 \begin{align*}
-\langle E \rangle &= -J \coth( 2\beta J) \bigg[ 1 + \frac{2}{\pi} (2\tanh^2 (2\beta J) - 1) K_1(\kappa) \bigg] \, , \numberthis \label{eq:LxL_energy}
+\langle E \rangle &= -J \coth( 2\beta J) \bigg[ 1 + \frac{2}{\pi} (2\tanh^2 (2\beta J) - 1) K_1(\kappa) \bigg] \, , \numberthis \label{eq:LO_energy}
 \end{align*}
 
 where:
@@ -404,7 +404,7 @@ The heat capacity is derived from this quantity again, and is found to be:
 
 \begin{align*}
 C_V &= \frac{4k_B}{\pi} (\beta J \coth(2\beta J))^2 \bigg( K_1(\kappa) - K_2(\kappa) \\ 
-& \quad - (1 - \tanh^2 (2\beta J) ) \bigg[ \frac{\pi}{2} + (2\tanh^2 (2\beta J) - 1)K_1(\kappa) \bigg] \bigg) \, , \numberthis \label{eq:LxL_heat_capacity}
+& \quad - (1 - \tanh^2 (2\beta J) ) \bigg[ \frac{\pi}{2} + (2\tanh^2 (2\beta J) - 1)K_1(\kappa) \bigg] \bigg) \, , \numberthis \label{eq:LO_heat_capacity}
 \end{align*}
 
 where:
@@ -416,17 +416,68 @@ K_2(\kappa) &= \int_0^{\pi/2} d\phi \, \sqrt{1 - \kappa^2 \sin^2 \phi}
 The mean magnetization per spin is given by:
 
 \begin{align*}
-\langle \mathcal{M} / N \rangle &= \bigg[1 - \frac{(1- \tanh^2 (\beta J) )^4}{16\tanh^4 (\beta J)} \bigg]^{1/8} \, , \numberthis \label{eq:LxL_magnetization_per_spin}
+\langle \mathcal{M} / N \rangle &= \bigg[1 - \frac{(1- \tanh^2 (\beta J) )^4}{16\tanh^4 (\beta J)} \bigg]^{1/8} \, , \numberthis \label{eq:LO_magnetization_per_spin}
 \end{align*}
 
+when the temperature is lower than a specific critical value $T_C$. Above this value the mean magnetization per spin is zero.
 
+These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. It can be shown that the heat capacity, magnetization and susceptibility all excibit a power law behaviour. Specifically the heat capacity behaves as:
 
+\begin{align*}
+C_V &\sim \bigg| 1 - \frac{T}{T_C} \bigg| ^{-\alpha} \, , \numberthis \label{eq:power_law_heat_capacity}
+\end{align*} 
 
+when $T\to T_C$ from below, and $T$ is close to $T_C$. It can be determined that the correct solution is $\alpha = 0$, meaning that this behaves according to the power law singularity in the thermodynamic limit. The magnetization per spin behaves as:
 
+\begin{align*}
+\langle \mathcal{M} / N \rangle &\sim (T_C - T)^{\beta} \, , \numberthis \label{eq:power_law_magnetization_per_spin}
+\end{align*}
 
+in the same region, and with $\beta \to 1/8$. Similarly the susceptibility can be shown to behave as:
 
-\subsection{Phase transitions in the Ising Model} \label{sec:II:b}
+\begin{align*}
+\chi &\sim |T_C - T|^{-\gamma} \, , \numberthis \label{eq:power_law_susceptibility}
+\end{align*}
 
+in the same region, and with $\gamma \to 7/4$. The correlation function is a measure of how much the spins correlate with each other, and can be defined as the average of the spins of particles multiplied with each other:
+
+\begin{align*}
+g(m) &= \langle s_i s_{i+m} \rangle \, ,
+\end{align*} 
+
+where the parameter $m$ determines how far apart the spins are. This function can be shown to scale as:
+
+\begin{align*}
+g(m) &\sim \frac{1}{m^\nu} e^{-m/\xi} \, ,
+\end{align*}
+
+where $\xi$ is the correlation length, and $\nu$ is a constant. As we approach the critical temperature we expect this to decay slower, as a change in a spin should quickly correlate to a change in another spin elsewhere. As $m$ is only dependent on how far apart the spins are the only variable that can cause this to happen is the correlation length, meaning that it has to get large as we approach the critical temperature. Because of this it can be shown that close to the critical temperature the correlation length also exhibits power law behaviour:
+
+\begin{align*}
+\xi (T) &\sim |T-T_C|^{-\nu} \, . \numberthis \label{eq:power_law_correlation_length_} 
+\end{align*}
+
+A phase transition such as the one that the Ising model predicts is characterized by a correlation length that spans the whole system, and thus this correlation length can also be connected to the size of the system if we are looking at a finite lattice:
+
+\begin{align*}
+\xi (T) &\sim L^{-\frac{1}{\nu}} \, ,
+\end{align*}
+
+where $L$ is the amount of spins in one direction in this finite lattice. Connecting this with the previous result we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit ($L \to \infty$):
+
+\begin{align*}
+T_C(L) - T_C(L= \infty) &\sim L^{-1/\nu} \, , \numberthis \label{eq:crit_temperature_finite_lattice} 
+\end{align*}
+
+where $\nu$ is the same constant as earlier. Combining this with the results for the heat capacity, the mean magnetization, and the magnetic susceptibility gives us the following relations in a finite lattice:
+
+\begin{align*}
+C_V &\propto  L^{\alpha/\nu} \, , \numberthis \label{eq:finite_lattice_heat_capacity} \\
+\langle \mathcal M \rangle &\propto L^{-\beta /\nu} \, , \numberthis \label{eq:finite_lattice_magnetization_per_spin} \\
+\chi &\propto L^{\gamma/\nu} \, , \numberthis \label{eq:finite_lattice_susceptibility}
+\end{align*}
+
+where all variables are as defined earlier. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite lattice is simply not possible. 
 
 \newpage
 
