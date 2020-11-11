@@ -489,8 +489,79 @@ In this case we assume that the change in energy is positive number, so this is 
 
 As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as this contains an exponential this is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
 
+If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. This can be shown by realizing that a spin only reacts with its closest neighbours. Only ten transitions are possible, but half of them are equal to the other half as they are equivalent in terms of change in energy. Ee only display those with a unique change in energy:
 
+\begin{align*}
+E = -4J \quad \begin{array}{ccc}
+& \uparrow & \\
+\uparrow & \uparrow & \uparrow \\
+& \uparrow &
+\end{array} \quad \to \quad E = 4J \quad \begin{array}{ccc}
+& \uparrow & \\
+\uparrow & \downarrow & \uparrow \\
+& \uparrow &
+\end{array} \, ,
+\end{align*}
 
+with $\Delta E = 8J$, 
+
+\begin{align*}
+E = -2J \quad \begin{array}{ccc}
+& \uparrow & \\
+\downarrow & \uparrow & \uparrow \\
+& \uparrow &
+\end{array} \quad \to \quad E = 2J \quad \begin{array}{ccc}
+& \uparrow & \\
+\downarrow & \downarrow & \uparrow \\
+& \uparrow &
+\end{array} \, ,
+\end{align*}
+
+with $\Delta E = 4J$,
+
+\begin{align*}
+E = 0 \quad \, \quad \begin{array}{ccc}
+& \uparrow & \\
+\downarrow & \uparrow & \uparrow \\
+& \downarrow &
+\end{array} \quad \to \quad E = 0 \,\,\,\, \quad \begin{array}{ccc}
+& \uparrow & \\
+\downarrow & \downarrow & \uparrow \\
+& \downarrow &
+\end{array} \, ,
+\end{align*}
+
+with $\Delta E = 0$, 
+
+\begin{align*}
+E = 2J \quad \begin{array}{ccc}
+& \downarrow & \\
+\downarrow & \uparrow & \uparrow \\
+& \downarrow &
+\end{array} \quad \to \quad E = -2J \quad \begin{array}{ccc}
+& \downarrow & \\
+\downarrow & \downarrow & \uparrow \\
+& \downarrow &
+\end{array} \, ,
+\end{align*}
+
+with $\Delta E = -4J$, and lastly:
+
+\begin{align*}
+E = 4J \quad \begin{array}{ccc}
+& \downarrow & \\
+\downarrow & \uparrow & \downarrow \\
+& \downarrow &
+\end{array} \quad \to \quad E = -4J \quad \begin{array}{ccc}
+& \downarrow & \\
+\downarrow & \downarrow & \downarrow \\
+& \downarrow &
+\end{array} \, ,
+\end{align*}
+
+with $\Delta E = -8J$. These are the only possible changes in energy. The other five possible transitions are the ones where every spin in the constellations above are flipped, but the change in energy is equivalent in these cases and so they are not specifically listed. With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. 
+
+We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
 
 
