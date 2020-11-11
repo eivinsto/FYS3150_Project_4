@@ -477,6 +477,18 @@ where all variables are as defined earlier. This allows us to calculate values f
 
 \subsection{The Ising model and the Metropolis algorithm} \label{sec:II:b}
 
+One method of simulating a system in the Ising model is through a Markov Chain Monte Carlo setup, where we iterate and flip spins depending on the change in total energy that flipping said spins incur. The Metropolis algorithm \citep{Metropolis} is one such setup which we will explain in this section.
+
+We propose a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equillibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system, we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \ref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
+
+\begin{align*}
+P_{a\to b}(T)  &= \frac{P_b (T) }{P_a (T)} &= e^{-\beta \Delta E }\, . 
+\end{align*}
+
+In this case we assume that the change in energy is positive number, so this is always smaller than one as we wish for a probability. We then draw a random number $r$ between $0$ and $1$ using a random number generator, and compare this to the probability of the transition $P_{a\to b}(T)$. If $r\leq P_{a\to b} (T)$ we accept the new configuration, otherwise we keep the previous configuration. The process up to this point can be called a Monte Carlo cycle. The Monte Carlo cycle is performed a sufficient amount of times until the system has stabilized, which is characterized by the macroscopic variables of the system being stable.
+
+As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as this contains an exponential this is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
+
 
 
 
