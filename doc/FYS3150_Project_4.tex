@@ -421,7 +421,7 @@ The mean magnetization per spin is given by:
 
 when the temperature is lower than a specific critical value $T_C$. Above this value the mean magnetization per spin is zero.
 
-These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. It can be shown that the heat capacity, magnetization and susceptibility all excibit a power law behaviour. Specifically the heat capacity behaves as:
+These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. The heat capacity, magnetization and susceptibility all excibit a power law behaviour (\citep{Stanley1999}, \cite[chapter 2.1.2]{landau_binder_2014}) in the region where $T\to T_C$ and $T$ is close to $T_C$. Specifically the heat capacity behaves as:
 
 \begin{align*}
 C_V &\sim \bigg| 1 - \frac{T}{T_C} \bigg| ^{-\alpha} \, , \numberthis \label{eq:power_law_heat_capacity}
@@ -439,37 +439,31 @@ in the same region, and with $\beta \to 1/8$. Similarly the susceptibility can b
 \chi &\sim |T_C - T|^{-\gamma} \, , \numberthis \label{eq:power_law_susceptibility}
 \end{align*}
 
-in the same region, and with $\gamma \to 7/4$. The correlation function is a measure of how much the spins correlate with each other, and can be defined as the average of the spins of particles multiplied with each other:
+in the same region, and with $\gamma \to 7/4$. The correlation function, $C(r)$, where the parameter $r$ defines the distance between spins, is a measure of how much the spins correlate with each other, and can be shown \citep{Stanley1999} to scale as:
 
 \begin{align*}
-g(m) &= \langle s_i s_{i+m} \rangle \, ,
-\end{align*} 
-
-where the parameter $m$ determines how far apart the spins are. This function can be shown to scale as:
-
-\begin{align*}
-g(m) &\sim \frac{1}{m^\nu} e^{-m/\xi} \, ,
+C(r) &\sim  e^{-r/\xi} \, ,
 \end{align*}
 
-where $\xi$ is the correlation length, and $\nu$ is a constant. As we approach the critical temperature we expect this to decay slower, as a change in a spin should quickly correlate to a change in another spin elsewhere. As $m$ is only dependent on how far apart the spins are the only variable that can cause this to happen is the correlation length, meaning that it has to get large as we approach the critical temperature. Because of this it can be shown that close to the critical temperature the correlation length also exhibits power law behaviour:
+where $\xi$ is the correlation length. As we approach the critical temperature we expect this to decay slower, as a change in a spin should quickly correlate to a change in another spin elsewhere. As $r$ is only dependent on how far apart the spins are the only variable that can cause this to happen is the correlation length, meaning that it has to get large as we approach the critical temperature. Because of this it can be shown that close to the critical temperature the correlation length also exhibits power law behaviour  (this is shown in \citep{Stanley1999}, albeit by a different route than the one outlined here):
 
 \begin{align*}
-\xi (T) &\sim |T-T_C|^{-\nu} \, . \numberthis \label{eq:power_law_correlation_length_} 
+\xi (T) &\sim |T-T_C|^{-\nu} \, , \numberthis \label{eq:power_law_correlation_length_} 
 \end{align*}
 
-A phase transition such as the one that the Ising model predicts is characterized by a correlation length that spans the whole system, and thus this correlation length can also be connected to the size of the system if we are looking at a finite lattice:
+where $\nu$ is a constant. A phase transition such as the one that the Ising model predicts is characterized by a correlation length that spans the whole system, and thus this correlation length can also be connected to the size of the system if we are looking at a finite lattice:
 
 \begin{align*}
-\xi (T) &\sim L^{-\frac{1}{\nu}} \, ,
+\xi (T) &\propto L \, ,
 \end{align*}
 
-where $L$ is the amount of spins in one direction in this finite lattice. Connecting this with the previous result we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit ($L \to \infty$):
+where $L$ is the amount of spins in one direction in this finite lattice. Connecting this with the previous result we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit:
 
 \begin{align*}
 T_C(L) - T_C(L= \infty) &\sim L^{-1/\nu} \, , \numberthis \label{eq:crit_temperature_finite_lattice} 
 \end{align*}
 
-where $\nu$ is the same constant as earlier. Combining this with the results for the heat capacity, the mean magnetization, and the magnetic susceptibility gives us the following relations in a finite lattice:
+where $\nu$ is the same constant as earlier. Combining this with the results for the heat capacity, the mean magnetization, and the magnetic susceptibility gives us the following relations in a finite lattice (\citep[p.78]{landau_binder_2014}):
 
 \begin{align*}
 C_V &\propto  L^{\alpha/\nu} \, , \numberthis \label{eq:finite_lattice_heat_capacity} \\
@@ -478,6 +472,16 @@ C_V &\propto  L^{\alpha/\nu} \, , \numberthis \label{eq:finite_lattice_heat_capa
 \end{align*}
 
 where all variables are as defined earlier. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite lattice is simply not possible. 
+
+
+
+\subsection{The Ising model and the Metropolis algorithm} \label{sec:II:b}
+
+
+
+
+
+
 
 \newpage
 
