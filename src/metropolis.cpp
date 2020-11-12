@@ -55,7 +55,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 * deinstantiating the class. Armadillo vectors/matrices automatically
 * deallocate when they move out of scope, and so they can be safely left behind.
 */
-Metropolis::~Metropolis() { if (ofile.is_open()) ofile.close(); }
+// Metropolis::~Metropolis() { if (ofile.is_open()) ofile.close(); }
 
 /**
 * Member function that performs one Monte Carlo cycle on the system, using
@@ -66,13 +66,16 @@ Metropolis::~Metropolis() { if (ofile.is_open()) ofile.close(); }
 * @w -- vector containing "probabilities" for energy changes
 */
 void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, double &M, arma::vec w) {
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  std::uniform_real_distribution<double> RNG(0.0, 1.0);
   // Loop over all spins
   for(int y =0; y < n_spins; y++) {
     for (int x= 0; x < n_spins; x++){
 
       // Get random indices
-      int ix = int(ran1()*(double)n_spins);
-      int iy = int(ran1()*(double)n_spins);
+      int ix = int(RNG(gen)*(double)n_spins);
+      int iy = int(RNG(gen)*(double)n_spins);
 
       // Calculate change in energy
       int deltaE =  2*spin_matrix(iy,ix)*
@@ -83,7 +86,7 @@ void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, d
 
 
       // Flip spin if new config is accepted
-      if ( ran1() <= w(deltaE+8) ) {
+      if ( RNG(gen) <= w(deltaE+8) ) {
         spin_matrix(iy,ix) *= -1;
 
 
@@ -160,6 +163,9 @@ void Metropolis::run(bool randspin) {
 * @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
 void Metropolis::run_multi(bool randspin) {
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  std::uniform_real_distribution<double> RNG(0.0, 1.0);
   // Parallelized for loop
   int max_threads = omp_get_max_threads()*3/4;
   int thrds = std::min(max_threads, n_temps);
@@ -193,6 +199,8 @@ void Metropolis::run_multi(bool randspin) {
     #pragma omp critical
     write_to_file_multi(average, temperature(i));
   }
+
+  std::cout << "Finished simulating L = " << n_spins << " with " << thrds << " threads." << std::endl;
 }
 
 
@@ -280,7 +288,7 @@ void Metropolis::write_to_file_single(double E, double M) {
 ** This function was "borrowed" from:
 ** https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Programs/LecturePrograms/programs/cppLibrary/lib.cpp
 ** The function
-**           ran1()
+**           RNG(gen)
 ** is an "Minimal" random number generator of Park and Miller
 ** (see Numerical recipe page 280) with Bays-Durham shuffle and
 ** added safeguards. Call with idum a negative integer to initialize (NB!: this
@@ -291,50 +299,3 @@ void Metropolis::write_to_file_single(double E, double M) {
 ** The function returns a uniform deviate between 0.0 and 1.0
 ** (exclusive of end-point values).
 */
-
-#define IA 16807
-#define IM 2147483647
-#define AM (1.0/IM)
-#define IQ 127773
-#define IR 2836
-#define NTAB 32
-#define NDIV (1+(IM-1)/NTAB)
-#define EPS 1.2e-7
-#define RNMX (1.0-EPS)
-
-double Metropolis::ran1() {
-  int             j;
-  long            k;
-  static long     iy=0;
-  static long     iv[NTAB];
-  double          temp;
-
-  if (idum <= 0 || !iy) {
-    if (-idum < 1) idum=1;
-    else idum = -idum;
-    for(j = NTAB + 7; j >= 0; j--) {
-      k     = idum/IQ;
-      idum = IA*(idum - k*IQ) - IR*k;
-      if(idum < 0) idum += IM;
-      if(j < NTAB) iv[j] = idum;
-    }
-    iy = iv[0];
-  }
-  k     = (idum)/IQ;
-  idum = IA*(idum - k*IQ) - IR*k;
-  if(idum < 0) idum += IM;
-  j     = iy/NDIV;
-  iy    = iv[j];
-  iv[j] = idum;
-  if((temp=AM*iy) > RNMX) return RNMX;
-  else return temp;
-}
-#undef IA
-#undef IM
-#undef AM
-#undef IQ
-#undef IR
-#undef NTAB
-#undef NDIV
-#undef EPS
-#undef RNMX
