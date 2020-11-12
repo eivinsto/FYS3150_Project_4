@@ -1,5 +1,5 @@
 CC := g++
-FLAGS := -Wall -Wextra -O2 -march=native -fopenmp
+FLAGS := -Wall -Wextra -O3 -march=native -fopenmp
 DEBUG := -g
 LIBS := -larmadillo
 OFILES := metropolis.o
