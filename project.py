@@ -10,11 +10,11 @@ rootdir = os.getcwd()
 src = rootdir + "/src/"
 
 
-def Xi(M2mean, Mmean2, T):
+def Xifunc(M2mean, Mmean2, T):
     return (M2mean - Mmean2)/T
 
 
-def Cv(E2mean, Emean2, T):
+def Cvfunc(E2mean, Emean2, T):
     return (E2mean - Emean2)/T**2
 
 
@@ -85,13 +85,9 @@ def stabilization_run(nmax, temp, L, randspin=False):
     )
 
 
-def phase_trans_test(nmax):
+def phase_trans_test(nmax, Ls, files, n_temps):
     # lists of L-values and filenames:
-    Ls = [40, 60, 80, 100]
-    files = [rootdir + f"/data/{L}x{L}-multi.dat" for L in Ls]
     Tmin, Tmax = 2, 2.3  # min and max temp.
-    n_temps = 7  # number of temps to simulate per process.
-    data = {}  # dictionary for data.
 
     n_thrds = mp.cpu_count()//n_temps  # number of subprocesses to spawn
 
@@ -125,9 +121,13 @@ def phase_trans_test(nmax):
         # waiting for all concurrent subprocesses to finish:
         [p.wait() for p in sims]
 
+
+def read_phase_trans(nmax, Ls, files):
+    data = {}  # dictionary for data.
     # reading data from files:
     for L, file in zip(Ls, files):
         data[L] = np.genfromtxt(file)
+    return data
 
 
 runflag = "start"
@@ -199,6 +199,74 @@ if __name__ == "__main__":
         stabilization_run(nmax, 2.4, 20, randspin=True)
 
     if runflag == "ph":
-        phase_trans_test(nmax)
+        genflag = input("Generate data? y/n: ")
+        Ls = [40, 60, 80, 100]
+        files = [rootdir + f"/data/{L}x{L}-multi.dat" for L in Ls]
+        n_temps = 8  # number of temps to simulate per process.
+        if genflag == "y":
+            phase_trans_test(nmax, Ls, files)
+
+        data = read_phase_trans(nmax, Ls, files)
+
+        E = np.zeros((len(Ls), n_temps))
+        M = np.zeros((len(Ls), n_temps))
+        Cv = np.zeros((len(Ls), n_temps))
+        Xi = np.zeros((len(Ls), n_temps))
+        absM = np.zeros((len(Ls), n_temps))
+
+        sorted = np.argsort(data[Ls[0]][:, 0])
+        T = data[Ls[0]][sorted, 0]
+
+        for i in range(len(Ls)):
+            E[i, :] = data[Ls[i]][sorted, 1]
+            Cv[i, :] = data[Ls[i]][sorted, 2]
+            M[i, :] = data[Ls[i]][sorted, 3]
+            Xi[i, :] = data[Ls[i]][sorted, 4]
+            absM[i, :] = data[Ls[i]][sorted, 5]
+
+        plt.figure()
+        plt.title("<E>")
+        for i in range(len(Ls)):
+            plt.plot(T, E[i, :], label=f"L = {Ls[i]}")
+        plt.xlabel("T")
+        plt.ylabel("<E>")
+        plt.legend()
+        plt.grid()
+
+        plt.figure()
+        plt.title("<M>")
+        for i in range(len(Ls)):
+            plt.plot(T, M[i, :], label=f"L = {Ls[i]}")
+        plt.xlabel("T")
+        plt.ylabel("<M>")
+        plt.legend()
+        plt.grid()
+
+        plt.figure()
+        plt.title("Cv")
+        for i in range(len(Ls)):
+            plt.plot(T, Cv[i, :], label=f"L = {Ls[i]}")
+        plt.xlabel("T")
+        plt.ylabel("Cv")
+        plt.legend()
+        plt.grid()
+
+        plt.figure()
+        plt.title(r"$\chi$")
+        for i in range(len(Ls)):
+            plt.plot(T, Xi[i, :], label=f"L = {Ls[i]}")
+        plt.xlabel("T")
+        plt.ylabel(r"$\chi$")
+        plt.legend()
+        plt.grid()
+
+        plt.figure()
+        plt.title("<|M|>")
+        for i in range(len(Ls)):
+            plt.plot(T, absM[i, :], label=f"L = {Ls[i]}")
+        plt.xlabel("T")
+        plt.ylabel("<|M|>")
+        plt.legend()
+        plt.grid()
 
     plt.show()
