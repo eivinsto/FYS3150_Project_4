@@ -26,7 +26,6 @@ private:
   void run_multi(bool);
   void run_single(bool);
   void initialize(bool, arma::Mat<int>&, double&, double&);
-  double ran1();
 
   // Inline function that is used to generate periodic boundary conditions
   inline int periodic(int i, int limit, int add) { return (i+limit+add)%limit; }
