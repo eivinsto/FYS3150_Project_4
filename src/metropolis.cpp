@@ -282,20 +282,3 @@ void Metropolis::write_to_file_single(double E, double M) {
   // Write amount of accepted configs
   ofile << accepted_configs << std::endl;
 }
-
-
-/*
-** This function was "borrowed" from:
-** https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Programs/LecturePrograms/programs/cppLibrary/lib.cpp
-** The function
-**           RNG(gen)
-** is an "Minimal" random number generator of Park and Miller
-** (see Numerical recipe page 280) with Bays-Durham shuffle and
-** added safeguards. Call with idum a negative integer to initialize (NB!: this
-** was placed as a member variable of the class instead);
-** thereafter, do not alter idum between sucessive deviates in a
-** sequence. RNMX should approximate the largest floating point value
-** that is less than 1.
-** The function returns a uniform deviate between 0.0 and 1.0
-** (exclusive of end-point values).
-*/
