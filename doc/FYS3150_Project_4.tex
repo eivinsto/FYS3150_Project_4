@@ -487,7 +487,7 @@ One method of simulating a system in the Ising model is through a Markov Chain M
 We propose a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equillibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system, we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \ref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
 
 \begin{align*}
-P_{a\to b}(T)  &= \frac{P_b (T) }{P_a (T)} &= e^{-\beta \Delta E }\, . 
+P_{a\to b}(T)  &= \frac{P_b (T) }{P_a (T)} = e^{-\beta \Delta E }\, . 
 \end{align*}
 
 In this case we assume that the change in energy is positive number, so this is always smaller than one as we wish for a probability. We then draw a random number $r$ between $0$ and $1$ using a random number generator, and compare this to the probability of the transition $P_{a\to b}(T)$. If $r\leq P_{a\to b} (T)$ we accept the new configuration, otherwise we keep the previous configuration. The process up to this point can be called a Monte Carlo cycle. The Monte Carlo cycle is performed a sufficient amount of times until the system has stabilized, which is characterized by the macroscopic variables of the system being stable.
@@ -564,7 +564,13 @@ E = 4J \quad \begin{array}{ccc}
 \end{array} \, ,
 \end{align*}
 
-with $\Delta E = -8J$. These are the only possible changes in energy. The other five possible transitions are the ones where every spin in the constellations above are flipped, but the change in energy is equivalent in these cases and so they are not specifically listed. With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. 
+with $\Delta E = -8J$. These are the only possible changes in energy. The other five possible transitions are the ones where every spin in the constellations above are flipped, but the change in energy is equivalent in these cases and so they are not specifically listed. With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. In a two-dimensional system it is beneficiary to denote the spins as matrix elements $s_{ij}$ where $i$ is the lattice position of the spin in the $x$-direction and similarly for $j$ in the $y$-direction. With this notation we can establish an expression for the energy change from flipping spin $s_{ij}$:
+
+\begin{align*}
+\Delta E &= -J s_{ij} \bigg( s_{i,j+1} + s_{i,j-1} + s_{i+1,j} + s_{i-1,j} \bigg) \numberthis \label{eq:singleflip_energy_change}
+\end{align*}
+
+A problem we encounter at this point is how we model the periodic boundary conditions. MANGLERMEREHER
 
 We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
@@ -576,7 +582,7 @@ Every time a spin is flipped we need to update total energy and magnetization. T
 
 \section{Method} \label{sec:III}
 
-We have chosen to implement our simulations in C++, with framework to operate said simulations in Python, with some post-processing of data also being performed in Python. In this section we will first discuss details on how particular calculations are performed, and then go into more detail on the layout of our implementation. 
+In this report we present simulations of the Ising model, in two dimensions with no external field, using the Metropolis algorithm. We have chosen to implement our simulations in C++, with framework to operate said simulations in Python, with some post-processing of data also being performed in Python. In this section we will first discuss details on how particular calculations are performed, and then go into more detail on the layout of our implementation. 
 
 \subsection{Details on calculations} \label{sec:III:a}
 
@@ -610,7 +616,46 @@ for(int y =0; y < n_spins; y++) {
 }
 \end{cpp}
 
-Depending on the boolean variable \verb+randspin+ the spin-matrix is either generated as having all spins up (if \verb+randspin+ is false) or having a random spin configuration (if \verb+randspin+ is true). The spin matrix is an Armadillo \citep{Armadillo} integer matrix, which lets us use the \verb+ones()+ function to set all the spins to one. In this case the magnetization is simply the same as the total amount of spins which is stores in the variable \verb+n_spins2+. The random configuration is generated by using a double for loop, and random values drawn from the standard library \verb+rand()+ function. In this case, every spin value is added to the variable that stores the magnetization (\verb+M+) in the same double for loop. The energy cannot be calculated at the same time as the spin matrix is being generated, as it needs all the neares neighbours to be generated already. Thus this calculation is separated into a secondary for loop, which is used in both cases. 
+Depending on the boolean variable \verb+randspin+ the spin-matrix is either generated as having all spins up (if \verb+randspin+ is false) or having a random spin configuration (if \verb+randspin+ is true). The spin matrix is an Armadillo \citep{Armadillo} integer matrix, which lets us use the \verb+ones()+ function to set all the spins to one. In this case the magnetization is simply the same as the total amount of spins which is stores in the variable \verb+n_spins2+. The random configuration is generated by using a double for loop, and random values drawn from the standard library function \verb+rand()+. In this case, every spin value is added to the variable that stores the magnetization (\verb+M+) in the same double for loop. The energy cannot be calculated at the same time as the spin matrix is being generated, as it needs all the neares neighbours to be generated already. Thus this calculation is separated into a secondary for loop, which is used in both cases. In general calculation of energy and magnetization is based on equations  \eqref{eq:ising_general_total_energy} and \eqref{eq:ising_magnetization} respectively.
+
+
+\subsubsection{Performing a Monte Carlo sweep} \label{sec:III:a:ii}
+
+\begin{cpp}
+std::random_device rd;
+std::mt19937_64 gen(rd());
+std::uniform_real_distribution<double> RNG(0.0, 1.0);
+// Loop over all spins
+for(int y =0; y < n_spins; y++) {
+  for (int x= 0; x < n_spins; x++){
+
+    // Get random indices
+    int ix = int(RNG(gen)*(double)n_spins);
+    int iy = int(RNG(gen)*(double)n_spins);
+
+    // Calculate change in energy
+    int deltaE =  2*spin_matrix(iy,ix)*
+                  (spin_matrix(iy,periodic(ix,n_spins,-1))+
+                  spin_matrix(periodic(iy,n_spins,-1),ix) +
+                  spin_matrix(iy,periodic(ix,n_spins,1)) +
+                  spin_matrix(periodic(iy,n_spins,1),ix));
+
+
+    // Flip spin if new config is accepted
+    if ( RNG(gen) <= w(deltaE+8) ) {
+      spin_matrix(iy,ix) *= -1;
+
+
+      // Update energy and magnetization if spin is flipped
+      M += double(2*spin_matrix(iy,ix));
+      E += double(deltaE);
+
+      // Count accepted configs
+      accepted_configs++;
+    }
+  }
+}
+\end{cpp}
 
 
 \subsection{Implementation} \label{sec:III:b}
