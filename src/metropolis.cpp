@@ -110,20 +110,20 @@ void IsingMetropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double 
 */
 void IsingMetropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &E, double &M) {
 
-  // Reset spin_matrix
+  // Initiate spin matrix and magnetization
   if (randspin) {
     srand(time(NULL));
     for (int x = 0; x < n_spins; x++) {
       for (int y = 0; y < n_spins; y++) {
         spin_matrix(x,y) = (rand() > RAND_MAX/2) ? -1 : 1;
+        M += spin_matrix(x,y);
       }
     }
   } else {
     spin_matrix.ones();
+    M = n_spins2;
   }
 
-  // Initial magnetization
-  M = n_spins2;
 
   // Initial energy
   for(int y =0; y < n_spins; y++) {
