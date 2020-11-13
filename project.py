@@ -255,7 +255,7 @@ if __name__ == "__main__":
             absM[i, :] = data[Ls[i]][sorted, 5]
 
         TCinf,TC = get_critical_temperature(Ls,absM,Cv,Xi,T)
-        print(TCinf)
+        print("Estimated critical temperature in thermodynamical limit: ", TCinf)
 
         plt.figure()
         plt.title("<E>")
