@@ -83,12 +83,12 @@ int main(int argc, char** argv) {
 
   // Run simulation
   if (runflag=="multi") {
-    Metropolis simulation = Metropolis(num_spins,max_cycles,min_temp,max_temp,num_tempsteps,datafile);
+    IsingMetropolis simulation = IsingMetropolis(num_spins,max_cycles,min_temp,max_temp,num_tempsteps,datafile);
     simulation.run(randspin);
   }
 
   if (runflag=="single") {
-    Metropolis simulation = Metropolis(num_spins,max_cycles,temp,datafile);
+    IsingMetropolis simulation = IsingMetropolis(num_spins,max_cycles,temp,datafile);
     simulation.run(randspin);
   }
 }

@@ -20,7 +20,7 @@
 * @temp_steps -- amount of steps in temperature
 * @filename -- name of file to write resulting data from simulation to
 */
-Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
+IsingMetropolis::IsingMetropolis (int num_spins, int num_mcs, double min_temp, double max_temp, int temp_steps, std::string filename){
     n_temps = temp_steps;                                      // Number of temperature steps
     temperature = arma::linspace(min_temp,max_temp,n_temps);   // Setting temperature array
     n_spins = num_spins;                                       // Number of spins to model
@@ -39,7 +39,7 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double min_temp, double max_
 * @num_mcs -- number of Monte Carlo cycles to perform
 * @input_temp -- temperature to run simulation at
 */
-Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::string filename){
+IsingMetropolis::IsingMetropolis (int num_spins, int num_mcs, double input_temp, std::string filename){
     temp = input_temp;                    // Setting temperature
     n_spins = num_spins;                  // Number of spins
     n_spins2 = n_spins*n_spins;           // Number of spins squared (for use in write_to_file())
@@ -55,17 +55,17 @@ Metropolis::Metropolis (int num_spins, int num_mcs, double input_temp, std::stri
 * deinstantiating the class. Armadillo vectors/matrices automatically
 * deallocate when they move out of scope, and so they can be safely left behind.
 */
-// Metropolis::~Metropolis() { if (ofile.is_open()) ofile.close(); }
+// IsingMetropolis::~IsingMetropolis() { if (ofile.is_open()) ofile.close(); }
 
 /**
 * Member function that performs one Monte Carlo cycle on the system, using
-* the Metropolis algorithm.
+* the IsingMetropolis algorithm.
 * @spin_matrix -- matrix storing spin values
 * @E -- double containing energy of system
 * @M -- double containing magnetization of system
 * @w -- vector containing "probabilities" for energy changes
 */
-void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, double &M, arma::vec w) {
+void IsingMetropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, double &M, arma::vec w) {
   std::random_device rd;
   std::mt19937_64 gen(rd());
   std::uniform_real_distribution<double> RNG(0.0, 1.0);
@@ -108,7 +108,7 @@ void Metropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double &E, d
 * @E -- double containing energy
 * @M -- double containing magnetization
 */
-void Metropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &E, double &M) {
+void IsingMetropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &E, double &M) {
 
   // Reset spin_matrix
   if (randspin) {
@@ -139,7 +139,7 @@ void Metropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &
 * Member function that calls the correct function to run the simulation.
 * This calls either run_multi() or run_single() depending on the runflag.
 */
-void Metropolis::run() {
+void IsingMetropolis::run() {
   if (runflag=="single") run_single(false);
   else run_multi(false);
 }
@@ -149,7 +149,7 @@ void Metropolis::run() {
 * This calls either run_multi() or run_single() depending on the runflag.
 * @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
-void Metropolis::run(bool randspin) {
+void IsingMetropolis::run(bool randspin) {
   if (runflag=="single") run_single(randspin);
   else run_multi(randspin);
 }
@@ -162,7 +162,7 @@ void Metropolis::run(bool randspin) {
 * is completed.
 * @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
-void Metropolis::run_multi(bool randspin) {
+void IsingMetropolis::run_multi(bool randspin) {
   std::random_device rd;
   std::mt19937_64 gen(rd());
   std::uniform_real_distribution<double> RNG(0.0, 1.0);
@@ -210,7 +210,7 @@ void Metropolis::run_multi(bool randspin) {
 * derived from these are in this case written to file once every Monte Carlo cycle.
 * @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
-void Metropolis::run_single(bool randspin) {
+void IsingMetropolis::run_single(bool randspin) {
   double E = 0;
   double M = 0;
   arma::Mat<int> spin_matrix(n_spins,n_spins,arma::fill::ones);
@@ -237,7 +237,7 @@ void Metropolis::run_single(bool randspin) {
 *             -Absolute of magnetization
 *             ... in that order.
 */
-void Metropolis::write_to_file_multi(arma::vec average, double temperature) {
+void IsingMetropolis::write_to_file_multi(arma::vec average, double temperature) {
   double norm = 1/(double(max_cycles));  // divided by total number of cycles
 
   double Eaverage = average(0)*norm;
@@ -271,7 +271,7 @@ void Metropolis::write_to_file_multi(arma::vec average, double temperature) {
 * @E -- double containing energy of system
 * @M -- doouble containing magnetization of system
 */
-void Metropolis::write_to_file_single(double E, double M) {
+void IsingMetropolis::write_to_file_single(double E, double M) {
   ofile << std::setiosflags(std::ios::showpoint | std::ios::uppercase);
   // Writing average energy per spin
   ofile << std::setw(15) << std::setprecision(8) << E/n_spins2;

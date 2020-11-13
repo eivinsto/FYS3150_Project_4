@@ -6,12 +6,12 @@
 #include <iostream>
 #include <random>
 
-class Metropolis {
+class IsingMetropolis {
 public:
   // Constructors and destructors
-  Metropolis (int, int, double, double, int, std::string);
-  Metropolis (int, int, double, std::string);
-  // ~Metropolis();
+  IsingMetropolis (int, int, double, double, int, std::string);
+  IsingMetropolis (int, int, double, std::string);
+  // ~IsingMetropolis();
 
   // Functions that run simulations
   void run(bool);
