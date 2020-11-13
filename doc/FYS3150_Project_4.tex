@@ -567,7 +567,7 @@ E = 4J \quad \begin{array}{ccc}
 with $\Delta E = -8J$. These are the only possible changes in energy. The other five possible transitions are the ones where every spin in the constellations above are flipped, but the change in energy is equivalent in these cases and so they are not specifically listed. With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. In a two-dimensional system it is beneficiary to denote the spins as matrix elements $s_{ij}$ where $i$ is the lattice position of the spin in the $x$-direction and similarly for $j$ in the $y$-direction. With this notation we can establish an expression for the energy change from flipping spin $s_{ij}$:
 
 \begin{align*}
-\Delta E &= -J s_{ij} \bigg( s_{i,j+1} + s_{i,j-1} + s_{i+1,j} + s_{i-1,j} \bigg) \numberthis \label{eq:singleflip_energy_change}
+\Delta E &= -2J s_{ij} \bigg( s_{i,j+1} + s_{i,j-1} + s_{i+1,j} + s_{i-1,j} \bigg) \numberthis \label{eq:singleflip_energy_change}
 \end{align*}
 
 A problem we encounter at this point is how we model the periodic boundary conditions. If we use a square lattice, we can use the amount of spins in a dimension $L$ and the modulo operator to define a function $f(i,k)$ that takes a valid index $i$ and what is to be added to it $k$, and returns the correct index on the other side of the lattice if it is out of bounds:
@@ -626,6 +626,8 @@ Depending on the boolean variable \verb+randspin+ the spin-matrix is either gene
 
 
 \subsubsection{Performing a Monte Carlo sweep} \label{sec:III:a:ii}
+
+The following code snippet performs one Monte Carlo sweep (flipping several spins, one at a time) on the system:
 
 \begin{cpp}
 std::random_device rd;
