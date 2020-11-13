@@ -570,8 +570,14 @@ with $\Delta E = -8J$. These are the only possible changes in energy. The other 
 \Delta E &= -J s_{ij} \bigg( s_{i,j+1} + s_{i,j-1} + s_{i+1,j} + s_{i-1,j} \bigg) \numberthis \label{eq:singleflip_energy_change}
 \end{align*}
 
-A problem we encounter at this point is how we model the periodic boundary conditions. MANGLERMEREHER
+A problem we encounter at this point is how we model the periodic boundary conditions. If we use a square lattice, we can use the amount of spins in a dimension $L$ and the modulo operator to define a function $f(i,k)$ that takes a valid index $i$ and what is to be added to it $k$, and returns the correct index on the other side of the lattice if it is out of bounds:
 
+\begin{align*}
+f(i) &= (i+k+L)\%L \, , 
+\end{align*}
+
+where \% is the modulo operator in this case. Note that we add $L$ to the total as well, as the function could return a negative value if $k$ was negative otherwise. The function might still return a negative value, but we have assumed here that $|k|$ is never larger than $L$. 
+ 
 We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
 Every time a spin is flipped we need to update total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. In the case of the magnetization, flipping a spin will change the total magnetization by two times the flipped value of the spin. Flipping a spin up means changing it's spin-value by $2$ (from $-1$ to $1$ gives $\Delta s = 1 - (-1) = 2$) and similarly flipping a spin down means changing it's spin-value by $-2$. 
