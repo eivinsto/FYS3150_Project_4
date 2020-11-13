@@ -680,7 +680,56 @@ for (int de = -8; de<= 8; de+=4) {
 
 As the energy change is always an integer (we scaled the equations so that $J=1$) we can shift it by the lowest allowed value and use it as an index. This lets us access the probabilities using the energy change directly, removing the need for any calculation of any indices of \verb+w+ during the Monte Carlo sweep. Note that there are more values in \verb+w+ than there are allowed configurations. This is because the energy change can only be multiples of $2$. Dividing by two every time would cause unnecessary mathematical operations, so we instead define \verb+w+ to have twice as many elements as there are possible transitions between configurations.
 
-If the random number drawn is less then the probability of the transition of configuration, the condition passes and the spin is flipped. If this is done the energy change is added to the total energy, and the magnetization is updated as well. A counter that keeps track of how many transitions that are accepted is also incremented. For further details on the algorithm used in this section, see section \hyperref[sec:II:b]{II.B}.     
+If the random number drawn is less then the probability of the transition of configuration, the condition passes and the spin is flipped. If this is done the energy change is added to the total energy, and the magnetization is updated as well. A counter that keeps track of how many transitions that are accepted is also incremented. For further details on the algorithm used in this section, see section \hyperref[sec:II:b]{II.B}. 
+
+
+\subsubsection{Calculation and comparison of results} \label{sec:III:a:iii}
+
+The C++ programs output results to a file. Depending on the kind of run that is performed (see section \hyperref[sec:III:b]{III.B} for more details on this) the programs will either write results once per Monte Carlo sweep or once at the end of a simulation. If a single simulation (for one temperature) is performed the programs write total energy and magnetization to file once per Monte Carlo sweep. This is used to evaluate how quickly the solutions stabilize. The programs also have the possibility to run simulations for several temperatures with one run, and in this case the averaged energy, averaged magnetization, averaged absolute value of magnetization, heat capacity, magnetic susceptibility and temperature is written to file at the end of each simulation. In this case the heat capacity and magnetic susceptibility are calculated using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility} respectively.
+
+In post-processing these results can be used to estimate the critical temperature of the system. From the relations listed in equations \eqref{eq:power_law_heat_capacity}, \eqref{eq:power_law_magnetization_per_spin} and \eqref{eq:power_law_susceptibility} we can estimate the critical temperature from the behaviour of heat capacity, magnetization and magnetic susceptibility as functions of the temperature. As the exponent in the expressions for the heat capacity and magnetic susceptibility are negative, we expect that these will diverge closer to the critical temperature. In a numerical simulation of a finite lattice they will never actually diverge, but we still expect them to reach maximum values around the critical temperature, and this gives us two estimates of the critical temperature. 
+
+Using the magnetization, however, is a bit more tricky. As the exponent is positive, it is supposed to reach zero at the critical temperature. In a numerical simulation this will never happen, as when the temperature gets large enough it will oscillate around zero. In order to combat this slightly we can use the absolute value of the magnetization instead. In this case there will still be problems though, as it will never stabilize at zero. In fact, the smaller the lattice is, the more it will vary. With all this in mind it is difficult to estimate the critical temperature using the magnetization. All in all, however, it is still desirable to get an estimate from the magnetization, so in order to do this we find the turning point of the magnetization as a function of temperature. 
+
+We now have three estimates of the critical temperature. In order to obtain our final estimate we choose to average these three. This estimate is now an estimate of the critical temperature for a specific size of the lattice. These simulations can be repeated for other lattice sizes as well, and these estimates can then be used together along with equation \eqref{eq:crit_temperature_finite_lattice} in order to estimate the critical temperature in the thermodynamical limit. All of the calculations explained here are performed in the following Python function:
+
+\begin{python}
+def get_critical_temperature(Ls,absM,Cv,Xi,T):
+    # Create array to store critical temperatures
+    TC = np.zeros(len(Ls))
+    for i,L in enumerate(Ls):
+        # Get data arrays
+        Mi = absM[i,:].flatten()
+        Cvi = Cv[i,:].flatten()
+        Xii = Xi[i,:].flatten()
+
+        # Find critical temperature as turning point in (absolute) 
+        # magnetization
+        Mi_dder = np.gradient(np.gradient(Mi))
+        Midx = np.where(Mi_dder==np.min(Mi_dder))
+        TcM = T[Midx]
+
+        # Find critical temperature as maximum point of heat 
+        # capacity
+        TcCv = T[np.where(Cvi==np.max(Cvi))]
+
+        # Find critical temperature as maximum point in 
+        # susceptibility
+        TcXii = T[np.where(Xii==np.max(Xii))]
+
+        # Average the three values found for final value
+        TC[i] = (TcM + TcCv + TcXii)/3
+
+    # Fitting critical temperature as a function of L to estimate 
+    # critical temperature at L=inf
+    p = np.polyfit(1/np.array(Ls),TC,1)
+    return p[1],TC
+\end{python} 
+
+The variable \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+absM+ contains the averaged absolute of the magnetization, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. 
+
+COMMENT (AND CITE?) USAGE OF NUMPY FUNCTIONS  
+
 
 
 
