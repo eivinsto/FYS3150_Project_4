@@ -424,7 +424,7 @@ when the temperature is lower than a specific critical value $T_C$. Above this v
 These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. The heat capacity, magnetization and susceptibility all excibit a power law behaviour (\citep{Stanley1999}, \cite[chapter 2.1.2]{landau_binder_2014}) in the region where $T\to T_C$ and $T$ is close to $T_C$. Specifically the heat capacity behaves as:
 
 \begin{align*}
-C_V &\sim \bigg| 1 - \frac{T}{T_C} \bigg| ^{-\alpha} \, , \numberthis \label{eq:power_law_heat_capacity}
+C_V &\sim \bigg| T_C - T \bigg| ^{-\alpha} \, , \numberthis \label{eq:power_law_heat_capacity}
 \end{align*} 
 
 when $T\to T_C$ from below, and $T$ is close to $T_C$. It can be determined that the correct solution is $\alpha = 0$, meaning that this behaves according to the power law singularity in the thermodynamic limit. The magnetization per spin behaves as:
@@ -466,13 +466,18 @@ T_C(L) - T_C(L= \infty) &\sim L^{-1/\nu} \, , \numberthis \label{eq:crit_tempera
 where $\nu$ is the same constant as earlier. Combining this with the results for the heat capacity, the mean magnetization, and the magnetic susceptibility gives us the following relations in a finite lattice (\citep[p.78]{landau_binder_2014}):
 
 \begin{align*}
-C_V &\propto  L^{\alpha/\nu} \, , \numberthis \label{eq:finite_lattice_heat_capacity} \\
-\langle \mathcal M \rangle &\propto L^{-\beta /\nu} \, , \numberthis \label{eq:finite_lattice_magnetization_per_spin} \\
-\chi &\propto L^{\gamma/\nu} \, , \numberthis \label{eq:finite_lattice_susceptibility}
+C_V &\sim |T_C - T |^{-\alpha} \propto  L^{\alpha/\nu} \, , \numberthis \label{eq:finite_lattice_heat_capacity} \\
+\langle \mathcal M \rangle &\sim (T-T_C)^\beta \propto L^{-\beta /\nu} \, , \numberthis \label{eq:finite_lattice_magnetization_per_spin} \\
+\chi &\sim |T_C - T|^{-\gamma} \propto L^{\gamma/\nu} \, , \numberthis \label{eq:finite_lattice_susceptibility}
 \end{align*}
 
-where all variables are as defined earlier. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite lattice is simply not possible. 
+where all variables are as defined earlier. We can use these relations to generate an estimate of $T_C(L)$, and if this is done for multiple $L$ we can estimate $T_C(L=\infty)$ by using equation \eqref{eq:crit_temperature_finite_lattice}. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite is simply not possible. The analytical critical temperature with $\nu=1$ is (\citep{L.Onsager1944}):
 
+\begin{align*}
+\tilde{T}_C &= \frac{k_B T_C}{J} = \frac{2}{\ln(1 + \sqrt{2})} \approx 2.269 \, , \numberthis \label{eq:crit_temperature_analytical}
+\end{align*}
+
+where we have scaled the temperature $\tilde{T}_C$ using $k_B$ and $J$ so that it is a dimensionless quantity.
 
 
 \subsection{The Ising model and the Metropolis algorithm} \label{sec:II:b}
@@ -563,6 +568,7 @@ with $\Delta E = -8J$. These are the only possible changes in energy. The other 
 
 We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
+Every time a spin is flipped we need to update total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. In the case of the magnetization, flipping a spin will change the total magnetization by two times the flipped value of the spin. Flipping a spin up means changing it's spin-value by $2$ (from $-1$ to $1$ gives $\Delta s = 1 - (-1) = 2$) and similarly flipping a spin down means changing it's spin-value by $-2$. 
 
 
 
