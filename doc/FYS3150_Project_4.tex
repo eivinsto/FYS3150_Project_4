@@ -573,7 +573,7 @@ with $\Delta E = -8J$. These are the only possible changes in energy. The other 
 A problem we encounter at this point is how we model the periodic boundary conditions. If we use a square lattice, we can use the amount of spins in a dimension $L$ and the modulo operator to define a function $f(i,k)$ that takes a valid index $i$ and what is to be added to it $k$, and returns the correct index on the other side of the lattice if it is out of bounds:
 
 \begin{align*}
-f(i) &= (i+k+L)\%L \, , 
+f(i) &= (i+k+L)\%L \, , \numberthis \label{eq:periodic}
 \end{align*}
 
 where \% is the modulo operator in this case. Note that we add $L$ to the total as well, as the function could return a negative value if $k$ was negative otherwise. The function might still return a negative value, but we have assumed here that $|k|$ is never larger than $L$. 
@@ -588,7 +588,7 @@ Every time a spin is flipped we need to update total energy and magnetization. T
 
 \section{Method} \label{sec:III}
 
-In this report we present simulations of the Ising model, in two dimensions with no external field, using the Metropolis algorithm. We have chosen to implement our simulations in C++, with framework to operate said simulations in Python, with some post-processing of data also being performed in Python. In this section we will first discuss details on how particular calculations are performed, and then go into more detail on the layout of our implementation. 
+In this report we present simulations of the Ising model, in two dimensions with periodic boundary conditions and no external field, using the Metropolis algorithm. We have chosen to implement our simulations in C++, with framework to operate said simulations in Python, with some post-processing of data also being performed in Python. In this section we will first discuss details on how particular calculations are performed, and then go into more detail on the layout of our implementation. In general we scale all equations used in these calculations such that $k_B = J = 1$. This makes it so that we do not need any natural constants at all, which simplifies the implementation. 
 
 \subsection{Details on calculations} \label{sec:III:a}
 
@@ -627,7 +627,7 @@ Depending on the boolean variable \verb+randspin+ the spin-matrix is either gene
 
 \subsubsection{Performing a Monte Carlo sweep} \label{sec:III:a:ii}
 
-The following code snippet performs one Monte Carlo sweep (flipping several spins, one at a time) on the system:
+The following code snippet performs one Monte Carlo sweep (flipping several spins, one at a time) based on the Metropolis algorithm on the system:
 
 \begin{cpp}
 std::random_device rd;
@@ -665,8 +665,26 @@ for(int y =0; y < n_spins; y++) {
 }
 \end{cpp}
 
+The amount of spins that we attempt to flip, according to the condition from the Metropolis algorithm (see section \hyperref[sec:II:b]{II.B}), in one sweep is equal to the amount of spins in the system. The obvious solution in this case is to iterate through all the spins and attempt to flip each one, but a better solution is to let which spins we attempt to flip be random. In a physical context it is more realistic that all spins might flip at any point in time, meaning that any kind of ordering to which spin might flip would be unrealistic. To model this we use the Mersenne Twister random number generator \citep{MersenneTwister} which is implemented in the C++ standard library to draw random indices each iteration in the double for loop. 
 
-\subsection{Implementation} \label{sec:III:b}
+At this point the change in energy is calculated. In order to apply the periodic boundary conditions an inline function \verb+periodic()+ is used. This function is equivalent to equation \eqref{eq:periodic}. Related to this equation the arguments it takes as input is $i$, $L$, and $k$, in that order. Adding to an existing valid index using this function returns the corresponding index on the other side of the lattice if it would otherwise be out of bounds on another side of the lattice.
+
+Following this a random number is drawn, and if the probability of the energy transition is larger than this number then the spin is flipped. The Armadillo \citep{Armadillo} vector \verb+w+ stores the probabilities of the transitions and is calculated as follows:
+
+\begin{cpp}
+arma::vec w = arma::zeros(17);
+for (int de = -8; de<= 8; de+=4) {
+  w(de+8) = exp(-de/temperature(i));
+}
+\end{cpp} 
+
+As the energy change is always an integer (we scaled the equations so that $J=1$) we can shift it by the lowest allowed value and use it as an index. This lets us access the probabilities using the energy change directly, removing the need for any calculation of any indices of \verb+w+ during the Monte Carlo sweep. Note that there are more values in \verb+w+ than there are allowed configurations. This is because the energy change can only be multiples of $2$. Dividing by two every time would cause unnecessary mathematical operations, so we instead define \verb+w+ to have twice as many elements as there are possible transitions between configurations.
+
+If the random number drawn is less then the probability of the transition of configuration, the condition passes and the spin is flipped. If this is done the energy change is added to the total energy, and the magnetization is updated as well. A counter that keeps track of how many transitions that are accepted is also incremented. For further details on the algorithm used in this section, see section \hyperref[sec:II:b]{II.B}.     
+
+
+
+\subsection{Implementation layout and usage} \label{sec:III:b}
 
 
 \newpage
