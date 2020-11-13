@@ -130,6 +130,28 @@ def read_phase_trans(nmax, Ls, files):
     return data
 
 
+def get_critical_temperature(Ls,absM,Cv,Xi,T):
+    TC = np.zeros(len(Ls))
+    for i,L in enumerate(Ls):
+        Mi = absM[i,:].flatten()
+        Cvi = Cv[i,:].flatten()
+        Xii = Xi[i,:].flatten()
+
+        Mi_dder = np.gradient(np.gradient(Mi))
+        Midx = np.where(Mi_dder==np.min(Mi_dder))
+        TcM = T[Midx]
+
+        TcCv = T[np.where(Cvi==np.max(Cvi))]
+
+        TcXii = T[np.where(Xii==np.max(Xii))]
+
+        TC[i] = (TcM + TcCv + TcXii)/3
+
+    p = np.polyfit(1/np.array(Ls),TC,1)
+    return p[1],TC
+
+
+
 runflag = "start"
 if __name__ == "__main__":
     while runflag != "an" and runflag != "st" and runflag != "ph":
@@ -223,6 +245,9 @@ if __name__ == "__main__":
             M[i, :] = data[Ls[i]][sorted, 3]
             Xi[i, :] = data[Ls[i]][sorted, 4]
             absM[i, :] = data[Ls[i]][sorted, 5]
+
+        TCinf,TC = get_critical_temperature(Ls,absM,Cv,Xi,T)
+        print(TCinf)
 
         plt.figure()
         plt.title("<E>")
