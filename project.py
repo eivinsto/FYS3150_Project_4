@@ -130,34 +130,34 @@ def read_phase_trans(nmax, Ls, files):
     return data
 
 
-def get_critical_temperature(Ls,absM,Cv,Xi,T):
+def get_critical_temperature(Ls, absM, Cv, Xi, T):
     # Create array to store critical temperatures
     TC = np.zeros(len(Ls))
-    for i,L in enumerate(Ls):
+    for i, L in enumerate(Ls):
         # Get data arrays
-        Mi = absM[i,:].flatten()
-        Cvi = Cv[i,:].flatten()
-        Xii = Xi[i,:].flatten()
+        Mi = absM[i, :].flatten()
+        Cvi = Cv[i, :].flatten()
+        Xii = Xi[i, :].flatten()
 
-        # Find critical temperature as turning point in (absolute) magnetization
+        # Find critical temperature as
+        # turning point in (absolute) magnetization
         Mi_dder = np.gradient(np.gradient(Mi))
-        Midx = np.where(Mi_dder==np.min(Mi_dder))
+        Midx = np.where(Mi_dder == np.min(Mi_dder))
         TcM = T[Midx]
 
         # Find critical temperature as maximum point of heat capacity
-        TcCv = T[np.where(Cvi==np.max(Cvi))]
+        TcCv = T[np.where(Cvi == np.max(Cvi))]
 
         # Find critical temperature as maximum point in susceptibility
-        TcXii = T[np.where(Xii==np.max(Xii))]
+        TcXii = T[np.where(Xii == np.max(Xii))]
 
         # Average the three values found for final value
         TC[i] = (TcM + TcCv + TcXii)/3
 
     # Fitting critical temperature as a function of L to estimate critical
     # temperature at L=inf
-    p = np.polyfit(1/np.array(Ls),TC,1)
-    return p[1],TC
-
+    p = np.polyfit(1/np.array(Ls), TC, 1)
+    return p[1], TC
 
 
 runflag = "start"
@@ -254,8 +254,9 @@ if __name__ == "__main__":
             Xi[i, :] = data[Ls[i]][sorted, 4]
             absM[i, :] = data[Ls[i]][sorted, 5]
 
-        TCinf,TC = get_critical_temperature(Ls,absM,Cv,Xi,T)
-        print("Estimated critical temperature in thermodynamical limit: ", TCinf)
+        TCinf, TC = get_critical_temperature(Ls, absM, Cv, Xi, T)
+        print("Estimated critical temperature in thermodynamical limit: ",
+              TCinf)
 
         plt.figure()
         plt.title("<E>")
