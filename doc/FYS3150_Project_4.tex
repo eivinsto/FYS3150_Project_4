@@ -694,24 +694,41 @@ We now have two estimates of the critical temperature. In order to obtain our fi
 
 \begin{python}
 def get_critical_temperature(Ls, Cv, Xi, T):
-    # Create array to store critical temperatures
+    """Function calculating critical temperature from phase
+    transition data.
+
+    Returns tuple where first element is critical temperature at
+    the thermodynamical limit (float). Second element is array
+    containing mean of critical temperatures for each value of L.
+
+    Arguments:
+    Ls -- iterable: iterable containing the simulated L-values.
+    Cv -- iterable: iterable containing the values of the specific
+    				heat.
+    Xi -- iterable: iterable containing the values of the
+    				susceptibility.
+    T -- iterable: iterable containing the values of
+    			   temperature.
+    """
     TC = np.zeros(len(Ls))
     for i, L in enumerate(Ls):
         # Get data arrays
         Cvi = Cv[i, :].flatten()
         Xii = Xi[i, :].flatten()
 
-        # Find critical temperature as maximum point of heat capacity
+        # Find critical temperature as maximum point of
+        # heat capacity
         TcCv = T[np.where(Cvi == np.max(Cvi))]
 
-        # Find critical temperature as maximum point in susceptibility
+        # Find critical temperature as maximum point in
+        # susceptibility
         TcXii = T[np.where(Xii == np.max(Xii))]
 
         # Average the three values found for final value
         TC[i] = (TcCv + TcXii)*0.5
 
-    # Fitting critical temperature as a function of L to estimate critical
-    # temperature at L=inf
+    # Fitting critical temperature as a function of L to estimate
+    # critical temperature at L=inf
     p = np.polyfit(1/np.array(Ls), TC, 1)
     return p[1], TC
 \end{python} 
