@@ -109,13 +109,16 @@ void IsingMetropolis::one_monte_carlo_cycle(arma::Mat<int> &spin_matrix, double 
 * @M -- double containing magnetization
 */
 void IsingMetropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, double &E, double &M) {
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  std::uniform_real_distribution<double> RNG(0.0, 1.0);
 
   // Initiate spin matrix and magnetization
   if (randspin) {
     srand(time(NULL));
     for (int x = 0; x < n_spins; x++) {
       for (int y = 0; y < n_spins; y++) {
-        spin_matrix(x,y) = (rand() > RAND_MAX/2) ? -1 : 1;
+        spin_matrix(x,y) = (RNG(gen) >= 0.5) ? -1 : 1;
         M += spin_matrix(x,y);
       }
     }
