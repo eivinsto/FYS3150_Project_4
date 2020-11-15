@@ -599,10 +599,9 @@ Firstly, we will discuss how the system is initialized. We implemented two ways 
 \begin{cpp}
 // Initiate spin matrix and magnetization
 if (randspin) {
-  srand(time(NULL));
   for (int x = 0; x < n_spins; x++) {
     for (int y = 0; y < n_spins; y++) {
-      spin_matrix(x,y) = (rand() > RAND_MAX/2) ? -1 : 1;
+      spin_matrix(x,y) = (RNG(gen) >= 0.5) ? -1 : 1;
       M += spin_matrix(x,y);
     }
   }
@@ -616,8 +615,8 @@ if (randspin) {
 for(int y =0; y < n_spins; y++) {
   for (int x= 0; x < n_spins; x++){
     E -=  double(spin_matrix(y,x)*
-          (spin_matrix(periodic(y,n_spins,-1),x) +         
-  	      spin_matrix(y,periodic(x,n_spins,-1))));
+          (spin_matrix(periodic(y,n_spins,-1),x) +
+          spin_matrix(y,periodic(x,n_spins,-1))));
   }
 }
 \end{cpp}
@@ -689,41 +688,32 @@ The C++ programs output results to a file. Depending on the kind of run that is 
 
 In post-processing these results can be used to estimate the critical temperature of the system. From the relations listed in equations \eqref{eq:power_law_heat_capacity}, \eqref{eq:power_law_magnetization_per_spin} and \eqref{eq:power_law_susceptibility} we can estimate the critical temperature from the behaviour of heat capacity, magnetization and magnetic susceptibility as functions of the temperature. As the exponent in the expressions for the heat capacity and magnetic susceptibility are negative, we expect that these will diverge closer to the critical temperature. In a numerical simulation of a finite lattice they will never actually diverge, but we still expect them to reach maximum values around the critical temperature, and this gives us two estimates of the critical temperature. 
 
-Using the magnetization, however, is a bit more tricky. As the exponent is positive, it is supposed to reach zero at the critical temperature. In a numerical simulation this will never happen, as when the temperature gets large enough it will oscillate around zero. In order to combat this slightly we can use the absolute value of the magnetization instead. In this case there will still be problems though, as it will never stabilize at zero. In fact, the smaller the lattice is, the more it will vary. With all this in mind it is difficult to estimate the critical temperature using the magnetization. All in all, however, it is still desirable to get an estimate from the magnetization, so in order to do this we find the turning point of the magnetization as a function of temperature. 
+Using the magnetization, however, is a bit more tricky. As the exponent is positive, it is supposed to reach zero at the critical temperature. In a numerical simulation this will never happen, as when the temperature gets large enough it will oscillate around zero. In order to combat this slightly we can use the absolute value of the magnetization instead. In this case there will still be problems though, as it will never stabilize at zero. In fact, the smaller the lattice is, the more it will vary. With all this in mind it is difficult to estimate the critical temperature using the magnetization. Thus we omitt using the magnetization in our estimation of the critical temperature.
 
-We now have three estimates of the critical temperature. In order to obtain our final estimate we choose to average these three. This estimate is now an estimate of the critical temperature for a specific size of the lattice. These simulations can be repeated for other lattice sizes as well, and these estimates can then be used together along with equation \eqref{eq:crit_temperature_finite_lattice} in order to estimate the critical temperature in the thermodynamical limit. All of the calculations explained here are performed in the following Python function:
+We now have two estimates of the critical temperature. In order to obtain our final estimate we choose to average these two. This estimate is now an estimate of the critical temperature for a specific size of the lattice. These simulations can be repeated for other lattice sizes as well, and these estimates can then be used together along with equation \eqref{eq:crit_temperature_finite_lattice} in order to estimate the critical temperature in the thermodynamical limit. All of the calculations explained here are performed in the following Python function:
 
 \begin{python}
-def get_critical_temperature(Ls,absM,Cv,Xi,T):
+def get_critical_temperature(Ls, Cv, Xi, T):
     # Create array to store critical temperatures
     TC = np.zeros(len(Ls))
-    for i,L in enumerate(Ls):
+    for i, L in enumerate(Ls):
         # Get data arrays
-        Mi = absM[i,:].flatten()
-        Cvi = Cv[i,:].flatten()
-        Xii = Xi[i,:].flatten()
+        Cvi = Cv[i, :].flatten()
+        Xii = Xi[i, :].flatten()
 
-        # Find critical temperature as turning point in (absolute) 
-        # magnetization
-        Mi_dder = np.gradient(np.gradient(Mi))
-        Midx = np.where(Mi_dder==np.min(Mi_dder))
-        TcM = T[Midx]
+        # Find critical temperature as maximum point of heat capacity
+        TcCv = T[np.where(Cvi == np.max(Cvi))]
 
-        # Find critical temperature as maximum point of heat 
-        # capacity
-        TcCv = T[np.where(Cvi==np.max(Cvi))]
-
-        # Find critical temperature as maximum point in 
-        # susceptibility
-        TcXii = T[np.where(Xii==np.max(Xii))]
+        # Find critical temperature as maximum point in susceptibility
+        TcXii = T[np.where(Xii == np.max(Xii))]
 
         # Average the three values found for final value
-        TC[i] = (TcM + TcCv + TcXii)/3
+        TC[i] = (TcCv + TcXii)*0.5
 
-    # Fitting critical temperature as a function of L to estimate 
-    # critical temperature at L=inf
-    p = np.polyfit(1/np.array(Ls),TC,1)
-    return p[1],TC
+    # Fitting critical temperature as a function of L to estimate critical
+    # temperature at L=inf
+    p = np.polyfit(1/np.array(Ls), TC, 1)
+    return p[1], TC
 \end{python} 
 
 The variable \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+absM+ contains the averaged absolute of the magnetization, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. 
