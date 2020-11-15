@@ -1,9 +1,9 @@
-import numpy as np
-import multiprocessing as mp
-import matplotlib.pyplot as plt
 from subprocess import run, Popen
+import multiprocessing as mp
 import os
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Retrieving working directories
 rootdir = os.getcwd()
