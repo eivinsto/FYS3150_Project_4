@@ -22,9 +22,8 @@ def build_cpp():
     run(["make", "all"], cwd=src)
 
 
-def stabilization_run(nmax, temp, L, randspin=False):
+def stabilization_run(file, nmax, temp, L, randspin=False):
     build_cpp()
-    file = rootdir + "/data/test.dat"
     if randspin:
         run(
             [
@@ -50,6 +49,13 @@ def stabilization_run(nmax, temp, L, randspin=False):
             ],
             cwd=src
         )
+
+
+def read_stabilization_data(file, temp):
+    if file.split('-')[-2] == "random":
+        randstr = "unordered initial spin."
+    else:
+        randstr = "ordered initial spin."
     data = np.genfromtxt(file)
 
     E = data[:, 0]
@@ -60,27 +66,32 @@ def stabilization_run(nmax, temp, L, randspin=False):
     absM = np.cumsum(absM)/n_cycles
 
     plt.figure()
-    plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
+    plt.title(
+        f"Average energy with\n{L = }, T = {temp} and " +
+        randstr
+    )
     plt.plot(n_cycles, E, label="<E>")
     plt.xlabel("N")
     plt.ylabel("<E>")
     plt.legend()
     plt.grid()
     plt.savefig(
-        rootdir + f"/data/{randspin}-t{temp*10}-{L}x{L}-E.pdf",
+        rootdir + f"/data/{randstr}-t{temp*10}-{L}x{L}-E.pdf",
         bbox_inches='tight'
     )
 
     plt.figure()
-    plt.title(f"Average magnitude of magnetization of {L}x{L}" +
-              f"lattice with T = {temp}")
+    plt.title(
+        f"Average magnitude of magnetization with\n{L = }, T = {temp} and " +
+        randstr
+    )
     plt.plot(n_cycles, absM, label="<|M|>")
     plt.xlabel("N")
     plt.ylabel("<|M|>")
     plt.legend()
     plt.grid()
     plt.savefig(
-        rootdir + f"/data/{randspin}-t{temp*10}-{L}x{L}-|M|.pdf",
+        rootdir + f"/data/{randstr}-t{temp*10}-{L}x{L}-|M|.pdf",
         bbox_inches='tight'
     )
 
@@ -172,6 +183,7 @@ if __name__ == "__main__":
             print("Exiting.")
             sys.exit(0)
 
+    genflag = input("Generate data? y/n: ")
     build_cpp()
     nmax = int(1e6)
 
@@ -223,16 +235,31 @@ if __name__ == "__main__":
             rootdir + f"/data/t{temp*10}-{L}x{L}-|M|.pdf", bbox_inches='tight')
 
     if runflag == "st":
-        stabilization_run(nmax, 1, 20)
-        stabilization_run(nmax, 2.4, 20)
-        stabilization_run(nmax, 1, 20, randspin=True)
-        stabilization_run(nmax, 2.4, 20, randspin=True)
+        L = 20
+        Ts = [1, 2.4]
+        randfiles = [
+            rootdir +
+            f"/data/{L}-{T}-random-stabilization.dat" for T in Ts
+        ]
+        ordefiles = [
+            rootdir +
+            f"/data/{L}-{T}-ordered-stabilization.dat" for T in Ts
+        ]
+
+        if genflag == "y":
+            for i, (file1, file2) in enumerate(zip(randfiles, ordefiles)):
+                stabilization_run(file1, nmax, Ts[i], L, randspin=True)
+                stabilization_run(file2, nmax, Ts[i], L)
+
+        for i, (file1, file2) in enumerate(zip(randfiles, ordefiles)):
+            read_stabilization_data(file1, Ts[i])
+            read_stabilization_data(file2, Ts[i])
 
     if runflag == "ph":
-        genflag = input("Generate data? y/n: ")
         Ls = [40, 60, 80, 100]
         files = [rootdir + f"/data/{L}x{L}-multi.dat" for L in Ls]
         n_temps = 8  # number of temps to simulate per process.
+
         if genflag == "y":
             phase_trans_test(nmax, Ls, files)
 
