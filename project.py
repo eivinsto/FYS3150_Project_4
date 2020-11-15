@@ -10,61 +10,58 @@ rootdir = os.getcwd()
 src = rootdir + "/src/"
 
 
-def Xifunc(M2mean, Mmean2, T):
-    return (M2mean - Mmean2)/T
-
-
-def Cvfunc(E2mean, Emean2, T):
-    return (E2mean - Emean2)/T**2
-
-
 def build_cpp():
+    """Function building cpp program."""
     run(["make", "all"], cwd=src)
 
 
 def stabilization_run(file, nmax, temp, L, randspin=False):
+    """Function running cpp program for LxL lattice with ordered or
+    unordered spin. Resulting data is written to files in /data/.
+
+    Arguments:
+    file -- str: filename to write data to.
+    nmax -- int: number of Monte Carlo cycles to perform.
+    temp -- float: temperature of lattice.
+    L -- int: dimensionality of lattice.
+
+    Keyword arguments:
+    randspin -- bool: Set to True for unordered initial spins (default: False).
+    """
     build_cpp()
-    if randspin:
-        run(
-            [
-                "./main.exe",
-                file,
-                "single",
-                f"{L}",
-                f"{nmax}",
-                f"{temp}",
-                "true"
-            ],
-            cwd=src
-        )
-    else:
-        run(
-            [
-                "./main.exe",
-                file,
-                "single",
-                f"{L}",
-                f"{nmax}",
-                f"{temp}",
-            ],
-            cwd=src
-        )
+    spin = str(randspin).lower()
+    run(
+        ["./main.exe", file, "single", f"{L}",
+         f"{nmax}", f"{temp}", f"{spin}"],
+        cwd=src
+    )
 
 
-def read_stabilization_data(file, temp):
+def read_stabilization_data(file):
+    """Function reading data from stabilization run,
+    and plotting mean energy and magnitude of magnetization
+    as function of number of Monte Carlo cycles.
+
+    Arguments:
+    file -- str: filename to read data from.
+    """
+    temp = float(file.split('-')[-3])
     if file.split('-')[-2] == "random":
         randstr = "unordered initial spin."
     else:
         randstr = "ordered initial spin."
-    data = np.genfromtxt(file)
 
+    # reading data
+    data = np.genfromtxt(file)
     E = data[:, 0]
     absM = data[:, 2]
 
+    # taking normalized, cumulative sum of data
     n_cycles = np.linspace(1, nmax, len(E))
     E = np.cumsum(E)/n_cycles
     absM = np.cumsum(absM)/n_cycles
 
+    # plotting data and saving figures to /data/:
     plt.figure()
     plt.title(
         f"Average energy with\n{L = }, T = {temp} and " +
@@ -76,7 +73,7 @@ def read_stabilization_data(file, temp):
     plt.legend()
     plt.grid()
     plt.savefig(
-        rootdir + f"/data/{randstr}-t{temp*10}-{L}x{L}-E.pdf",
+        rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-E.pdf",
         bbox_inches='tight'
     )
 
@@ -91,20 +88,30 @@ def read_stabilization_data(file, temp):
     plt.legend()
     plt.grid()
     plt.savefig(
-        rootdir + f"/data/{randstr}-t{temp*10}-{L}x{L}-|M|.pdf",
+        rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-|M|.pdf",
         bbox_inches='tight'
     )
 
 
 def phase_trans_test(nmax, Ls, files, n_temps):
-    # lists of L-values and filenames:
+    """Function running simulations for phase transition.
+    Runs the cpp program for each L-value. If enough threads are available,
+    multiple instances of the cpp program are run concurrently.
+
+    Arguments:
+    nmax -- int: number of Monte Carlo cycles to perform.
+    Ls -- iterable: iterable containing the L-values to simulate.
+    files -- iterable: iterable containing the filenames to write to.
+    n_temps -- int: number of temperatures to simulate in interval
+                    [Tmin, Tmax].
+    """
     Tmin, Tmax = 2.2, 2.35  # min and max temp.
 
     # number of concurrent subprocesses to spawn
     n_thrds = np.max([mp.cpu_count()//n_temps, 1])
 
     def phase_L_sim(i):
-        """Function spawning process and returning it."""
+        """Function spawning subprocess and returning it."""
         p = Popen(
             [
                 "./main.exe",
@@ -126,6 +133,8 @@ def phase_trans_test(nmax, Ls, files, n_temps):
     print("Spawning subprocesses:")
     sims = [phase_L_sim(j) for j in range(ranges[0])]
 
+    # loop checking status of subprocesses,
+    # and spawning new subprocesses when a current one finishes.
     i = len(sims)
     while i < len(Ls):
         for p in sims:
@@ -134,17 +143,23 @@ def phase_trans_test(nmax, Ls, files, n_temps):
                 sims.append(phase_L_sim(i))
                 i += 1
 
+    # waiting for all subprocesses to finish
     [p.wait() for p in sims]
-    # for i in range(len(ranges)):
-    #     print("Spawning subprocesses:")
-    #     sims = [phase_L_sim(j) for j in range(k, ranges[i] + k)]
-    #     k += len(sims)  # counting up.
-    #
-    #     # waiting for all concurrent subprocesses to finish:
-    #     [p.wait() for p in sims]
 
 
 def read_phase_trans(nmax, Ls, files):
+    """Function reading phase transition data from files.
+
+    Returns dictionary containing numpy arrays. Keys of the dictionary are the
+    L-values simulated. Each array contains columns containing
+    T <E> <M> Cv Xi absM iT
+    where iT is the index of temperature in interval [Tmin, Tmax].
+
+    Arguments:
+    nmax -- int: number of Monte Carlo cycles to perform.
+    Ls -- iterable: iterable containing the simulated L-values.
+    files -- iterable: iterable containing the filenames to read from.
+    """
     data = {}  # dictionary for data.
     # reading data from files:
     for L, file in zip(Ls, files):
@@ -153,7 +168,18 @@ def read_phase_trans(nmax, Ls, files):
 
 
 def get_critical_temperature(Ls, Cv, Xi, T):
-    # Create array to store critical temperatures
+    """Function calculating critical temperature from phase transition data.
+
+    Returns tuple where first element is critical temperature at the
+    thermodynamical limit (float). Second element is array containing mean of
+    critical temperatures for each value of L.
+
+    Arguments:
+    Ls -- iterable: iterable containing the simulated L-values.
+    Cv -- iterable: iterable containing the values of the specific heat.
+    Xi -- iterable: iterable containing the values of the susceptibility.
+    T -- iterable: iterable containing the values of temperature.
+    """
     TC = np.zeros(len(Ls))
     for i, L in enumerate(Ls):
         # Get data arrays
@@ -188,33 +214,41 @@ if __name__ == "__main__":
             sys.exit(0)
 
     genflag = input("Generate data? y/n: ")
-    build_cpp()
     nmax = int(1e6)
 
     if runflag == "an":
-        temp = 1
-        L = 2
+        """Comparing numerical results for 2x2 lattice
+        with analytic results."""
+        temp = 1  # temperature of system.
+        L = 2  # dimensionality of lattice.
         file = rootdir + "/data/2x2-test.dat"
-        run(["./main.exe", file, "single", f"{L}", f"{nmax}", f"{temp}"],
-            cwd=src)
-        data = np.genfromtxt(file)
+        if genflag == "y":
+            build_cpp()
+            run(["./main.exe", file, "single", f"{L}", f"{nmax}", f"{temp}"],
+                cwd=src)
 
+        # reading data:
+        data = np.genfromtxt(file)
         E = data[:, 0]
         M = data[:, 1]
         absM = data[:, 2]
 
+        # calculating analytic results:
         E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
         absM_exp = (2*np.exp(8/temp) + 4)/(np.cosh(8/temp) + 3)/4
 
-        print(f"{np.mean(E)-E_exp:e}")
-        print(f"{np.mean(M):e}")
-        print(f"{np.mean(absM)-absM_exp:e}")
+        # printing absolute difference to terminal.
+        print("Difference between analytic and numeric results:")
+        print(f"<E>: {np.mean(E)-E_exp:e}")
+        print(f"<M>: {np.mean(M):e}")
+        print(f"<|M|>: {np.mean(absM)-absM_exp:e}")
 
+        # taking normalized, cumulative sum of data
         n_cycles = np.linspace(1, nmax, len(E))
         E = np.cumsum(E)/n_cycles
-        # M = np.cumsum(M)/n_cycles
         absM = np.cumsum(absM)/n_cycles
 
+        # plotting data, and saving figures to /data/:
         plt.figure()
         plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
         plt.hlines(
@@ -244,8 +278,11 @@ if __name__ == "__main__":
             rootdir + f"/data/t{temp*10}-{L}x{L}-|M|.pdf", bbox_inches='tight')
 
     if runflag == "st":
-        L = 20
-        Ts = [1, 2.4]
+        """Running simulations for 20x20 lattice with T = 1 and T = 2.4."""
+        L = 20  # dimensionality of lattice.
+        Ts = [1, 2.4]  # temperatures of lattice.
+
+        # filenames for unordered and ordered spin respectivly:
         randfiles = [
             rootdir +
             f"/data/{L}-{T}-random-stabilization.dat" for T in Ts
@@ -255,34 +292,41 @@ if __name__ == "__main__":
             f"/data/{L}-{T}-ordered-stabilization.dat" for T in Ts
         ]
 
-        if genflag == "y":
+        if genflag == "y":  # running simulations
             for i, (file1, file2) in enumerate(zip(randfiles, ordefiles)):
                 stabilization_run(file1, nmax, Ts[i], L, randspin=True)
                 stabilization_run(file2, nmax, Ts[i], L)
 
-        for i, (file1, file2) in enumerate(zip(randfiles, ordefiles)):
-            read_stabilization_data(file1, Ts[i])
-            read_stabilization_data(file2, Ts[i])
+        # reading and plotting data:
+        for file1, file2 in zip(randfiles, ordefiles):
+            read_stabilization_data(file1)
+            read_stabilization_data(file2)
 
     if runflag == "ph":
-        Ls = [40, 60, 80, 100]
+        """Simulating phase transitions to estimate critical temperature."""
+        Ls = [40, 60, 80, 100]  # dimensionalities of lattices.
+        # filenames for each simulation:
         files = [rootdir + f"/data/{L}x{L}-multi.dat" for L in Ls]
-        n_temps = 8  # number of temps to simulate per process.
+        n_temps = 8  # number of temps to simulate per subprocess.
 
-        if genflag == "y":
+        if genflag == "y":  # running simulations:
             phase_trans_test(nmax, Ls, files, n_temps)
 
+        # reading data from files:
         data = read_phase_trans(nmax, Ls, files)
 
+        # creating arrays for data:
         E = np.zeros((len(Ls), n_temps))
         M = np.zeros((len(Ls), n_temps))
         Cv = np.zeros((len(Ls), n_temps))
         Xi = np.zeros((len(Ls), n_temps))
         absM = np.zeros((len(Ls), n_temps))
 
+        # sorting data:
         sorted = np.argsort(data[Ls[0]][:, 0])
         T = data[Ls[0]][sorted, 0]
 
+        # unpacking data:
         for i in range(len(Ls)):
             E[i, :] = data[Ls[i]][sorted, 1]
             Cv[i, :] = data[Ls[i]][sorted, 2]
@@ -290,10 +334,12 @@ if __name__ == "__main__":
             Xi[i, :] = data[Ls[i]][sorted, 4]
             absM[i, :] = data[Ls[i]][sorted, 5]
 
+        # estimating critical temperature:
         TCinf, TC = get_critical_temperature(Ls, Cv, Xi, T)
         print("Estimated critical temperature in thermodynamical limit: ",
               TCinf)
 
+        # plotting data:
         plt.figure()
         plt.title(r"$\langle E \rangle$")
         for i in range(len(Ls)):
