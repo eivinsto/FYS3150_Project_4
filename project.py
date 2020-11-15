@@ -70,9 +70,9 @@ def read_stabilization_data(file, temp):
         f"Average energy with\n{L = }, T = {temp} and " +
         randstr
     )
-    plt.plot(n_cycles, E, label="<E>")
+    plt.plot(n_cycles, E, label=r"$\langle E \rangle$")
     plt.xlabel("N")
-    plt.ylabel("<E>")
+    plt.ylabel(r"$\langle E \rangle$")
     plt.legend()
     plt.grid()
     plt.savefig(
@@ -85,9 +85,9 @@ def read_stabilization_data(file, temp):
         f"Average magnitude of magnetization with\n{L = }, T = {temp} and " +
         randstr
     )
-    plt.plot(n_cycles, absM, label="<|M|>")
+    plt.plot(n_cycles, absM, label=r"$\langle | \mathcal{M} | \rangle$")
     plt.xlabel("N")
-    plt.ylabel("<|M|>")
+    plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
     plt.legend()
     plt.grid()
     plt.savefig(
@@ -98,7 +98,7 @@ def read_stabilization_data(file, temp):
 
 def phase_trans_test(nmax, Ls, files, n_temps):
     # lists of L-values and filenames:
-    Tmin, Tmax = 2, 2.4  # min and max temp.
+    Tmin, Tmax = 2.2, 2.35  # min and max temp.
 
     # number of concurrent subprocesses to spawn
     n_thrds = np.max([mp.cpu_count()//n_temps, 1])
@@ -152,20 +152,13 @@ def read_phase_trans(nmax, Ls, files):
     return data
 
 
-def get_critical_temperature(Ls, absM, Cv, Xi, T):
+def get_critical_temperature(Ls, Cv, Xi, T):
     # Create array to store critical temperatures
     TC = np.zeros(len(Ls))
     for i, L in enumerate(Ls):
         # Get data arrays
-        Mi = absM[i, :].flatten()
         Cvi = Cv[i, :].flatten()
         Xii = Xi[i, :].flatten()
-
-        # Find critical temperature as
-        # turning point in (absolute) magnetization
-        Mi_dder = np.gradient(np.gradient(Mi))
-        Midx = np.where(Mi_dder == np.min(Mi_dder))
-        TcM = T[Midx]
 
         # Find critical temperature as maximum point of heat capacity
         TcCv = T[np.where(Cvi == np.max(Cvi))]
@@ -174,7 +167,7 @@ def get_critical_temperature(Ls, absM, Cv, Xi, T):
         TcXii = T[np.where(Xii == np.max(Xii))]
 
         # Average the three values found for final value
-        TC[i] = (TcM + TcCv + TcXii)/3
+        TC[i] = (TcCv + TcXii)*0.5
 
     # Fitting critical temperature as a function of L to estimate critical
     # temperature at L=inf
@@ -224,10 +217,12 @@ if __name__ == "__main__":
 
         plt.figure()
         plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
-        plt.hlines(E_exp, 0, nmax, 'r', label="Analytic")
-        plt.plot(n_cycles, E, label="<E>")
+        plt.hlines(
+            E_exp, 0, nmax, 'r', label="Analytic " + r"$\langle E \rangle$"
+        )
+        plt.plot(n_cycles, E, label=r"$\langle E \rangle$")
         plt.xlabel("N")
-        plt.ylabel("<E>")
+        plt.ylabel(r"$\langle E \rangle$")
         plt.legend()
         plt.grid()
         plt.savefig(
@@ -236,10 +231,13 @@ if __name__ == "__main__":
         plt.figure()
         plt.title(f"Average magnitude of magnetization of {L}x{L}" +
                   f"lattice with T = {temp}")
-        plt.hlines(absM_exp, 0, nmax, 'r', label="Analytic")
-        plt.plot(n_cycles, absM, label="<|M|>")
+        plt.hlines(
+            absM_exp, 0, nmax, 'r',
+            label="Analytic " + r"$\langle | \mathcal{M} | \rangle$"
+        )
+        plt.plot(n_cycles, absM, label=r"$\langle | \mathcal{M} | \rangle$")
         plt.xlabel("N")
-        plt.ylabel("<|M|>")
+        plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
         plt.legend()
         plt.grid()
         plt.savefig(
@@ -292,34 +290,34 @@ if __name__ == "__main__":
             Xi[i, :] = data[Ls[i]][sorted, 4]
             absM[i, :] = data[Ls[i]][sorted, 5]
 
-        TCinf, TC = get_critical_temperature(Ls, absM, Cv, Xi, T)
+        TCinf, TC = get_critical_temperature(Ls, Cv, Xi, T)
         print("Estimated critical temperature in thermodynamical limit: ",
               TCinf)
 
         plt.figure()
-        plt.title("<E>")
+        plt.title(r"$\langle E \rangle$")
         for i in range(len(Ls)):
             plt.plot(T, E[i, :], label=f"L = {Ls[i]}")
         plt.xlabel("T")
-        plt.ylabel("<E>")
+        plt.ylabel(r"$\langle E \rangle$")
         plt.legend()
         plt.grid()
 
         plt.figure()
-        plt.title("<M>")
+        plt.title(r"$\langle \mathcal{M} \rangle$")
         for i in range(len(Ls)):
             plt.plot(T, M[i, :], label=f"L = {Ls[i]}")
         plt.xlabel("T")
-        plt.ylabel("<M>")
+        plt.ylabel(r"$\langle \mathcal{M} \rangle$")
         plt.legend()
         plt.grid()
 
         plt.figure()
-        plt.title("Cv")
+        plt.title(r"$C_{v}$")
         for i in range(len(Ls)):
             plt.plot(T, Cv[i, :], label=f"L = {Ls[i]}")
         plt.xlabel("T")
-        plt.ylabel("Cv")
+        plt.ylabel(r"$C_{v}$")
         plt.legend()
         plt.grid()
 
@@ -333,11 +331,11 @@ if __name__ == "__main__":
         plt.grid()
 
         plt.figure()
-        plt.title("<|M|>")
+        plt.title(r"$\langle | \mathcal{M} | \rangle$")
         for i in range(len(Ls)):
             plt.plot(T, absM[i, :], label=f"L = {Ls[i]}")
         plt.xlabel("T")
-        plt.ylabel("<|M|>")
+        plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
         plt.legend()
         plt.grid()
 
