@@ -115,7 +115,6 @@ void IsingMetropolis::initialize(bool randspin, arma::Mat<int> &spin_matrix, dou
 
   // Initiate spin matrix and magnetization
   if (randspin) {
-    srand(time(NULL));
     for (int x = 0; x < n_spins; x++) {
       for (int y = 0; y < n_spins; y++) {
         spin_matrix(x,y) = (RNG(gen) >= 0.5) ? -1 : 1;
