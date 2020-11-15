@@ -98,9 +98,10 @@ def read_stabilization_data(file, temp):
 
 def phase_trans_test(nmax, Ls, files, n_temps):
     # lists of L-values and filenames:
-    Tmin, Tmax = 2, 2.3  # min and max temp.
+    Tmin, Tmax = 2, 2.4  # min and max temp.
 
-    n_thrds = mp.cpu_count()//n_temps  # number of subprocesses to spawn
+    # number of concurrent subprocesses to spawn
+    n_thrds = np.max([mp.cpu_count()//n_temps, 1])
 
     def phase_L_sim(i):
         """Function spawning process and returning it."""
@@ -121,16 +122,26 @@ def phase_trans_test(nmax, Ls, files, n_temps):
 
     # sets number of subprocesses to spawn at the same time:
     ranges = [len(Ls[i:i+n_thrds]) for i in range(0, len(Ls), n_thrds)]
-    k = 0  # counter for number of subprocesses that have been run
-
     # iterating through number of subprocesses to spawn at the same time:
-    for i in range(len(ranges)):
-        print("Spawning subprocesses:")
-        sims = [phase_L_sim(j) for j in range(k, ranges[i] + k)]
-        k += len(sims)  # counting up.
+    print("Spawning subprocesses:")
+    sims = [phase_L_sim(j) for j in range(ranges[0])]
 
-        # waiting for all concurrent subprocesses to finish:
-        [p.wait() for p in sims]
+    i = len(sims)
+    while i < len(Ls):
+        for p in sims:
+            if p.poll() is not None:
+                print("Spawning subprocesses:")
+                sims.append(phase_L_sim(i))
+                i += 1
+
+    [p.wait() for p in sims]
+    # for i in range(len(ranges)):
+    #     print("Spawning subprocesses:")
+    #     sims = [phase_L_sim(j) for j in range(k, ranges[i] + k)]
+    #     k += len(sims)  # counting up.
+    #
+    #     # waiting for all concurrent subprocesses to finish:
+    #     [p.wait() for p in sims]
 
 
 def read_phase_trans(nmax, Ls, files):
@@ -261,7 +272,7 @@ if __name__ == "__main__":
         n_temps = 8  # number of temps to simulate per process.
 
         if genflag == "y":
-            phase_trans_test(nmax, Ls, files)
+            phase_trans_test(nmax, Ls, files, n_temps)
 
         data = read_phase_trans(nmax, Ls, files)
 
