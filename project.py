@@ -55,11 +55,12 @@ def read_stabilization_data(file):
     data = np.genfromtxt(file)
     E = data[:, 0]
     absM = data[:, 2]
+    accepted_configs = data[:, 3]
 
     # taking normalized, cumulative sum of data
     n_cycles = np.linspace(1, nmax, len(E))
-    E = np.cumsum(E)/n_cycles
-    absM = np.cumsum(absM)/n_cycles
+    Emean = np.cumsum(E)/n_cycles
+    absMmean = np.cumsum(absM)/n_cycles
 
     # plotting data and saving figures to /data/:
     plt.figure()
@@ -67,7 +68,7 @@ def read_stabilization_data(file):
         f"Average energy with\n{L = }, T = {temp} and " +
         randstr
     )
-    plt.plot(n_cycles, E, label=r"$\langle E \rangle$")
+    plt.plot(n_cycles, Emean, label=r"$\langle E \rangle$")
     plt.xlabel("N")
     plt.ylabel(r"$\langle E \rangle$")
     plt.legend()
@@ -82,13 +83,45 @@ def read_stabilization_data(file):
         f"Average magnitude of magnetization with\n{L = }, T = {temp} and " +
         randstr
     )
-    plt.plot(n_cycles, absM, label=r"$\langle | \mathcal{M} | \rangle$")
+    plt.plot(n_cycles, absMmean, label=r"$\langle | \mathcal{M} | \rangle$")
     plt.xlabel("N")
     plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
     plt.legend()
     plt.grid()
     plt.savefig(
         rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-|M|.pdf",
+        bbox_inches='tight'
+    )
+
+    plt.figure()
+    plt.title(
+        f"Accepted configurations with\n{L = }, T = {temp} and " +
+        randstr
+    )
+    plt.semilogy(n_cycles, accepted_configs,
+                 label="Accepted spin flips")
+    plt.xlabel("N")
+    plt.ylabel("Number of flips")
+    plt.legend()
+    plt.grid()
+    plt.savefig(
+        rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-Nconf.pdf",
+        bbox_inches='tight'
+    )
+
+    plt.figure()
+    plt.title(
+        f"Distribution of energies\n{L = }, T = {temp} and " +
+        randstr
+    )
+    slicer = int(4e5)
+    plt.hist(E[slicer:], bins="auto", density=True, stacked=True)
+    plt.xlabel("E")
+    plt.ylabel("P(E)")
+    # plt.legend()
+    plt.grid()
+    plt.savefig(
+        rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-PE.pdf",
         bbox_inches='tight'
     )
 
@@ -208,13 +241,13 @@ if __name__ == "__main__":
                         "stabilization run = 'st', " +
                         "phase transition = ph, " +
                         "quit = 'q'.\n" +
-                        "Enter run: ")
+                        "Enter run: ").strip().lower()
         if runflag == "quit" or runflag == "q":
             print("Exiting.")
             sys.exit(0)
 
-    genflag = input("Generate data? y/n: ")
-    nmax = int(1e6)
+    genflag = input("Generate data? y/n: ").strip().lower()
+    nmax = int(1e7)
 
     if runflag == "an":
         """Comparing numerical results for 2x2 lattice
