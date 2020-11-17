@@ -247,7 +247,7 @@ if __name__ == "__main__":
             sys.exit(0)
 
     genflag = input("Generate data? y/n: ").strip().lower()
-    nmax = int(1e7)
+    nmax = int(3e6)
 
     if runflag == "an":
         """Comparing numerical results for 2x2 lattice
