@@ -282,5 +282,5 @@ void IsingMetropolis::write_to_file_single(double E, double M) {
   // Writing average absolute of magnetization per spin
   ofile << std::setw(15) << std::setprecision(8) << fabs(M)/n_spins2;
   // Write amount of accepted configs
-  ofile << accepted_configs << std::endl;
+  ofile << std::setw(15) << accepted_configs << std::endl;
 }
