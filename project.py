@@ -109,12 +109,16 @@ def read_stabilization_data(file):
         bbox_inches='tight'
     )
 
+    slicer = int(4e5)
+
+    Evar = np.var(E[slicer:])
+    var = r"$\sigma_{E}^{2} = $" + f"{Evar:.4g}"
+
     plt.figure()
     plt.title(
         f"Distribution of energies\n{L = }, T = {temp} and " +
-        randstr
+        randstr + "\n" + var
     )
-    slicer = int(4e5)
     plt.hist(E[slicer:], bins="auto", density=True, stacked=True)
     plt.xlabel("E")
     plt.ylabel("P(E)")
