@@ -1,4 +1,4 @@
-from subprocess import run, Popen
+from subprocess import run, Popen, PIPE, call
 import multiprocessing as mp
 import os
 import sys
@@ -234,19 +234,97 @@ def get_critical_temperature(Ls, Cv, Xi, T):
     return p[1], TC
 
 
+def benchmark(N_list, gccflags, archflag, L, n_temps):
+    Tmin, Tmax = 2.2, 2.35  # min and max temp.
+    output = {}
+    print(N_list)
+    for k, N in enumerate(N_list):
+        for j in range(2):
+            for i in range(len(gccflags)):
+                if j == 0:
+                    call(["g++", gccflags[i], "metropolis.cpp",
+                          "-fopenmp", "-c"], cwd=src)
+                    call(["g++", gccflags[i], "main.cpp",
+                          "-fopenmp", "-c"], cwd=src)
+                    call(["g++", gccflags[i], "-fopenmp", "main.o",
+                          "metropolis.o", "-o", "benchmark.exe",
+                          "-larmadillo"],
+                         cwd=src)
+                else:
+                    call(["g++", gccflags[i], archflag, "metropolis.cpp",
+                          "-fopenmp", "-c"], cwd=src)
+                    call(["g++", gccflags[i], archflag, "main.cpp",
+                          "-fopenmp", "-c"], cwd=src)
+                    call(["g++", gccflags[i], archflag, "-fopenmp", "main.o",
+                          "metropolis.o", "-o", "benchmark.exe",
+                          "-larmadillo"],
+                         cwd=src)
+
+                p = Popen(
+                    [
+                        "./benchmark.exe",
+                        rootdir + "/data/benchmarkrun.dat",
+                        "multi",
+                        f"{L}",
+                        f"{N}",
+                        f"{Tmin}",
+                        f"{Tmax}",
+                        f"{n_temps}"
+                    ],
+                    stdout=PIPE,
+                    stderr=PIPE,
+                    cwd=src
+                )
+
+                stdout, stderr = p.communicate()
+                output[(k, j, i)] = stdout.decode('utf-8')
+
+    times = np.empty((len(N_list), 2, 4))
+    for key in output:
+        string = output[key].split('=')[3].strip()
+        time = string.split('\n')[0]
+        times[key[0], key[1], key[2]] = float(time)
+
+    np.save(rootdir + "/data/benchmarkrun.npy", times, allow_pickle=False)
+
+
+def read_benchmark(N_list, gccflags, archflag, L, n_temps):
+    times = np.load(rootdir + "/data/benchmarkrun.npy")
+    plt.figure()
+    for j in range(2):
+        for i in range(1, len(gccflags)):
+            if j == 0:
+                labelstr = f"{gccflags[i]}, {archflag}"
+            else:
+                labelstr = f"{gccflags[i]}"
+
+            plt.semilogx(N_list, times[:, j, i], 'x--',
+                         label=labelstr)
+    plt.title(f"Timing of compilerflags for {L = }")
+    plt.xlabel("N")
+    plt.ylabel("Time improvement [%]")
+    plt.legend()
+    plt.savefig(rootdir + "/data/benchmark.pdf")
+
+
 runflag = "start"
 if __name__ == "__main__":
-    while runflag != "an" and runflag != "st" and runflag != "ph":
+    while (runflag != "an" and runflag != "st" and runflag != "ph"
+           and runflag != "b"):
+
         runflag = input("Analytic vs numeric 2x2 = 'an', " +
                         "stabilization run = 'st', " +
                         "phase transition = ph, " +
+                        "OpenMP benchmark = b, " +
                         "quit = 'q'.\n" +
                         "Enter run: ").strip().lower()
+
         if runflag == "quit" or runflag == "q":
             print("Exiting.")
             sys.exit(0)
 
-    genflag = input("Generate data? y/n: ").strip().lower()
+    if runflag != "test":
+        genflag = input("Generate data? y/n: ").strip().lower()
     nmax = int(3e6)
 
     if runflag == "an":
@@ -417,5 +495,16 @@ if __name__ == "__main__":
         plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
         plt.legend()
         plt.grid()
+
+    if runflag == "b":
+        L = 20
+        n_temps = 8
+        N_list = np.logspace(3, 8, 6)
+        gccflags = ["-O0", "-O1", "-O2", "-O3"]
+        archflag = "-march=native"
+        if genflag == "y":
+            benchmark(N_list, gccflags, archflag, L, n_temps)
+
+        read_benchmark(N_list, gccflags, archflag, L, n_temps)
 
     plt.show()
