@@ -239,12 +239,25 @@ def get_critical_temperature(Ls, Cv, Xi, T):
 
 
 def benchmark(N_list, gccflags, archflag, L, n_temps):
+    """Function generating benchmark data for -O0, -O1, -O2, -O3
+    and -march=native compiler flags. Data is stored in
+    benchmarkrun.npy file in /data/.
+
+    Arguments:
+    N_list -- Iterable: Iterable containing number of Monte Carlo
+                        cycles to run.
+    gccflags -- Iterable: Iterable containing optimization-flags as strings.
+    archflag -- str: flag for architecture-specific optimization.
+    L -- int: dimensionality of test lattice.
+    n_temps -- int: number of temperature values to test.
+    """
     Tmin, Tmax = 2.2, 2.35  # min and max temp.
     output = {}
     print(N_list)
     for k, N in enumerate(N_list):
         for j in range(2):
             for i in range(len(gccflags)):
+                # compiling program with specified flags
                 if j == 0:
                     call(["g++", gccflags[i], "metropolis.cpp",
                           "-fopenmp", "-c"], cwd=src)
@@ -264,6 +277,7 @@ def benchmark(N_list, gccflags, archflag, L, n_temps):
                           "-larmadillo"],
                          cwd=src)
 
+                # running simulation with current compilation.
                 p = Popen(
                     [
                         "./benchmark.exe",
@@ -280,21 +294,39 @@ def benchmark(N_list, gccflags, archflag, L, n_temps):
                     cwd=src
                 )
 
+                # capturing standard streams from process
+                # and decoding data
                 stdout, stderr = p.communicate()
                 output[(k, j, i)] = stdout.decode('utf-8')
                 run(["rm", "-rf", rootdir + "/data/benchmarkrun.dat"])
 
+    # unpacking data and storing in array
     times = np.empty((len(N_list), 2, 4))
     for key in output:
         string = output[key].split('=')[3].strip()
         time = string.split('\n')[0]
         times[key[0], key[1], key[2]] = float(time)
 
+    # saving array to file
     np.save(rootdir + "/data/benchmarkrun.npy", times, allow_pickle=False)
 
 
 def read_benchmark(N_list, gccflags, archflag, L, n_temps):
+    """Function reading and plotting benchmark data for -O0, -O1, -O2,
+    -O3 and -march=native compiler flags.
+
+    Arguments:
+    N_list -- Iterable: Iterable containing number of Monte Carlo
+                        cycles to run.
+    gccflags -- Iterable: Iterable containing optimization-flags as strings.
+    archflag -- str: flag for architecture-specific optimization.
+    L -- int: dimensionality of test lattice.
+    n_temps -- int: number of temperature values to test.
+    """
+    # loading data from file
     times = np.load(rootdir + "/data/benchmarkrun.npy")
+
+    # plotting data
     plt.figure()
     normtime = times[:, 0, 0]
     for j in range(2):
@@ -306,6 +338,7 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
 
             plt.semilogx(N_list, 100*(normtime-times[:, j, i])/normtime, 'x--',
                          label=labelstr)
+
     plt.title(f"Timing of compilerflags for {L = }")
     plt.xlabel("N")
     plt.ylabel("Time improvement [%]")
