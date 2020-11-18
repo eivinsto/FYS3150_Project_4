@@ -165,14 +165,13 @@ void IsingMetropolis::run(bool randspin) {
 * @randspin -- specifies whether or not the spin_matrix should be randomly generated
 */
 void IsingMetropolis::run_multi(bool randspin) {
-  std::random_device rd;
-  std::mt19937_64 gen(rd());
-  std::uniform_real_distribution<double> RNG(0.0, 1.0);
-  // Parallelized for loop
+  // Setting up parallelization and timing of simulations
   int max_threads = omp_get_max_threads()*3/4;
   int thrds = std::min(max_threads, n_temps);
   std::cout << "Simulating L = " << n_spins << " with " << thrds << " threads." << std::endl;
   double wtime = omp_get_wtime ( );
+
+  // Parallelized for loop
   #pragma omp parallel for num_threads(thrds)
   for (int i = 0; i<n_temps; ++i) {
     // Define local variables so the different cores do not update the same
