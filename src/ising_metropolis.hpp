@@ -1,5 +1,5 @@
-#ifndef METROPOLIS_HPP
-#define METROPOLIS_HPP
+#ifndef ISING_METROPOLIS_HPP
+#define ISING_METROPOLIS_HPP
 
 #include <armadillo>
 #include <string>

@@ -1,4 +1,4 @@
-#include "metropolis.hpp"
+#include "ising_metropolis.hpp"
 #include <armadillo>
 #include <cmath>
 #include <iostream>

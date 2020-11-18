@@ -2,7 +2,7 @@ CC := g++
 FLAGS := -Wall -Wextra -O3 -march=native -fopenmp
 DEBUG := -g
 LIBS := -larmadillo
-OFILES := metropolis.o
+OFILES := ising_metropolis.o
 
 .PHONY: all clean benchmark test
 
@@ -16,8 +16,8 @@ main.exe: main.o $(OFILES)
 main.o: main.cpp
 	$(CC) $(FLAGS) $(DEBUG) main.cpp -c
 
-metropolis.o: metropolis.cpp
-	$(CC) $(FLAGS) $(DEBUG) metropolis.cpp -c
+metropolis.o: ising_metropolis.cpp
+	$(CC) $(FLAGS) $(DEBUG) ising_metropolis.cpp -c
 
 
 # unittest program:
