@@ -109,12 +109,16 @@ def read_stabilization_data(file):
         bbox_inches='tight'
     )
 
+    slicer = int(4e5)
+
+    Evar = np.var(E[slicer:])
+    var = r"$\sigma_{E}^{2} = $" + f"{Evar:.4g}"
+
     plt.figure()
     plt.title(
         f"Distribution of energies\n{L = }, T = {temp} and " +
-        randstr
+        randstr + "\n" + var
     )
-    slicer = int(4e5)
     plt.hist(E[slicer:], bins="auto", density=True, stacked=True)
     plt.xlabel("E")
     plt.ylabel("P(E)")
@@ -292,23 +296,26 @@ def benchmark(N_list, gccflags, archflag, L, n_temps):
 def read_benchmark(N_list, gccflags, archflag, L, n_temps):
     times = np.load(rootdir + "/data/benchmarkrun.npy")
     plt.figure()
+    normtime = times[:, 0, 0]
     for j in range(2):
         for i in range(1, len(gccflags)):
             if j == 0:
-                labelstr = f"{gccflags[i]}, {archflag}"
-            else:
                 labelstr = f"{gccflags[i]}"
+            else:
+                labelstr = f"{gccflags[i]}, {archflag}"
 
-            plt.semilogx(N_list, times[:, j, i], 'x--',
+            plt.semilogx(N_list, 100*(normtime-times[:, j, i])/normtime, 'x--',
                          label=labelstr)
     plt.title(f"Timing of compilerflags for {L = }")
     plt.xlabel("N")
     plt.ylabel("Time improvement [%]")
     plt.legend()
+    plt.grid()
     plt.savefig(rootdir + "/data/benchmark.pdf")
 
 
 runflag = "start"
+nmax = int(3e6)
 if __name__ == "__main__":
     while (runflag != "an" and runflag != "st" and runflag != "ph"
            and runflag != "b" and runflag != "test"):
@@ -327,7 +334,6 @@ if __name__ == "__main__":
 
     if runflag != "test":
         genflag = input("Generate data? y/n: ").strip().lower()
-    nmax = int(3e6)
 
     if runflag == "an":
         """Comparing numerical results for 2x2 lattice
@@ -506,9 +512,9 @@ if __name__ == "__main__":
         archflag = "-march=native"
         if genflag == "y":
             benchmark(N_list, gccflags, archflag, L, n_temps)
+            run(["make", "clean"], cwd=src)
 
         read_benchmark(N_list, gccflags, archflag, L, n_temps)
-        run(["make", "clean"], cwd=src)
 
     if runflag == "test":
         run(["python", "-m", "pytest", "-v"])
