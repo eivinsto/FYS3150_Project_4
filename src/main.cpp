@@ -1,4 +1,4 @@
-#include "metropolis.hpp"
+#include "ising_metropolis.hpp"
 #include <string>
 #include <iostream>
 
