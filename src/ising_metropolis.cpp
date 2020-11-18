@@ -174,8 +174,7 @@ void IsingMetropolis::run_multi(bool randspin) {
   // Parallelized for loop
   #pragma omp parallel for num_threads(thrds)
   for (int i = 0; i<n_temps; ++i) {
-    // Define local variables so the different cores do not update the same
-    // variables at the same time.
+    // Define local variables so the different threads do not use the same variables.
     arma::vec average = arma::zeros(5);
     double E = 0;
     double M = 0;
