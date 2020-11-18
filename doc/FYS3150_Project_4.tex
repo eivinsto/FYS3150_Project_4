@@ -594,9 +594,9 @@ which gives that:
 
 \section{Method} \label{sec:III}
 
-In this report we present simulations of the Ising model, in two dimensions with periodic boundary conditions and no external field, using the Metropolis algorithm. We have chosen to implement our simulations in C++, with framework to operate said simulations in Python, with some post-processing of data also being performed in Python. In this section we will first discuss details on how particular calculations are performed, and then go into more detail on the layout of our implementation. In general we scale all equations used in these calculations such that $k_B = J = 1$. This makes it so that we do not need any natural constants at all, which simplifies the implementation. 
+In this report we present simulations of the Ising model, in two dimensions with periodic boundary conditions and no external field, using the Metropolis algorithm. We have chosen to implement our solver as a class in C++ called \verb+IsingMetropolis+, with framework to operate said class using command line arguments in a main program in C++. Processing the results is done in Python, and all the simulations performed in this report is automated in Python as well. In this section we will discuss details on how key calculations are performed. In general we scale all equations used in these calculations such that $k_B = J = 1$. This makes it so that we do not need any natural constants at all, which simplifies the implementation significantly. The programs used are all linked to in appendix \hyperref[A]{A}.
 
-\subsection{Details on calculations} \label{sec:III:a}
+\subsection{Details on calculations and key functions} \label{sec:III:a}
 
 \subsubsection{Initialization of system} \label{sec:III:a:i}
 
@@ -688,7 +688,13 @@ As the energy change is always an integer (we scaled the equations so that $J=1$
 If the random number drawn is less then the probability of the transition of configuration, the condition passes and the spin is flipped. If this is done the energy change is added to the total energy, and the magnetization is updated as well. A counter that keeps track of how many transitions that are accepted is also incremented. For further details on the algorithm used in this section, see section \hyperref[sec:II:b]{II.B}. 
 
 
-\subsubsection{Calculation and comparison of results} \label{sec:III:a:iii}
+\subsubsection{Running simulations} \label{sec:III:a:iii}
+
+Simulations are performed by running the \verb+run()+ method of the \verb+IsingMetropolis+ class. As the program can run a simulation for a single temperature, or several simulations with different temperatures (all with the same lattice dimensions), this method is simply a wrapper that calls the correct function to run the simulation(s). In the case where a simulation is run for a single temperature, the following code snippet is used to run the simulation:
+
+
+
+\subsubsection{Calculation and comparison of results} \label{sec:III:a:iv}
 
 The C++ programs output results to a file. Depending on the kind of run that is performed (see section \hyperref[sec:III:b]{III.B} for more details on this) the programs will either write results once per Monte Carlo sweep or once at the end of a simulation. If a single simulation (for one temperature) is performed the programs write total energy and magnetization to file once per Monte Carlo sweep. This is used to evaluate how quickly the solutions stabilize. The programs also have the possibility to run simulations for several temperatures with one run, and in this case the averaged energy, averaged magnetization, averaged absolute value of magnetization, heat capacity, magnetic susceptibility and temperature is written to file at the end of each simulation. In this case the heat capacity and magnetic susceptibility are calculated using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility} respectively.
 
@@ -746,14 +752,19 @@ We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arr
 
 
 
-\subsection{Implementation layout and usage} \label{sec:III:b}
-
-We implemented our solver as a class in C++ which we named \verb+IsingMetropolis+ as it solves the Ising model with the Metropolis algorithm. We also limit ourselves to a two-dimensional square lattice, but as naming goes we omitted including this in the name of the class. The class is defined in the header file \verb+ising_metropolis.hpp+ (see appendix \hyperref[A.1]{A.1}) with the functions belonging to it being defined in \verb+ising_metropolis.cpp+ (see appendix \hyperref[A.2]{A.2}). The program \verb+main.cpp+ (see appendix \hyperref[A.3}{A.3}) takes command line arguments and operates the simulation using these. Finally the Python script \verb+project.py+ automates all of the simulations that we perform, and processes the resulting data to produce the results shown later in this report. We will discuss these programs in more detail in the order outlined here. 
 
 
-\cprotect\subsubsection{A class to simulate the Ising model using the Metropolis algorithm} \label{sec:III:b:i}
 
-The \verb+IsingMetropolis+ class has several functions that we will cover here. 
+%\subsection{Program usage} \label{sec:III:b}
+
+%We implemented our solver as a class in C++ which we named \verb+IsingMetropolis+ as it solves the Ising model with the Metropolis algorithm. We also limit ourselves to a two-dimensional square lattice, but as naming goes we omitted including this in the name of the class. The class is defined in the header file \verb+ising_metropolis.hpp+ (see appendix \hyperref[A.1]{A.1}) with the functions belonging to it being defined in \verb+ising_metropolis.cpp+ (see appendix \hyperref[A.2]{A.2}). The program \verb+main.cpp+ (see appendix \hyperref[A.3}{A.3}) takes command line arguments and operates the simulation using these. Finally the Python script \verb+project.py+ automates all of the simulations that we perform, and processes the resulting data to produce the results shown later in this report. We will discuss these programs in more detail in the order outlined here. 
+
+
+%\cprotect\subsubsection{A class to simulate the Ising model using the Metropolis algorithm} \label{sec:III:b:i}
+
+%The \verb+IsingMetropolis+ class has several functions that we will cover here. First we must describe the two different ways in which a simulation can be run, as the split between these two is relevant throughout almost all of the programs. The class can either run a single simulation at a specified temperature, or it can run simulations at several temperatures in a single run. The differences between what the program does in these cases will be covered where it is relevant.
+
+%There are two constructors belonging to the class, one that establishes the necessary variables in order to run the simulation at a single temperature, and one that does the same in case simulations for multiple temperatures are to be performed. The first constructor takes (in order) the number of spins in one direction in the lattice, the number of Monte Carlo cycles to perform, and the name of a file to write the results to. 
 
 
 \newpage
