@@ -278,6 +278,7 @@ def benchmark(N_list, gccflags, archflag, L, n_temps):
 
                 stdout, stderr = p.communicate()
                 output[(k, j, i)] = stdout.decode('utf-8')
+                run(["rm", "-rf", rootdir + "/data/benchmarkrun.dat"])
 
     times = np.empty((len(N_list), 2, 4))
     for key in output:
@@ -310,12 +311,13 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
 runflag = "start"
 if __name__ == "__main__":
     while (runflag != "an" and runflag != "st" and runflag != "ph"
-           and runflag != "b"):
+           and runflag != "b" and runflag != "test"):
 
         runflag = input("Analytic vs numeric 2x2 = 'an', " +
                         "stabilization run = 'st', " +
                         "phase transition = ph, " +
                         "OpenMP benchmark = b, " +
+                        "Unit tests = test, " +
                         "quit = 'q'.\n" +
                         "Enter run: ").strip().lower()
 
@@ -332,7 +334,7 @@ if __name__ == "__main__":
         with analytic results."""
         temp = 1  # temperature of system.
         L = 2  # dimensionality of lattice.
-        file = rootdir + "/data/2x2-test.dat"
+        file = rootdir + "/data/2x2-comparison.dat"
         if genflag == "y":
             build_cpp()
             run(["./main.exe", file, "single", f"{L}", f"{nmax}", f"{temp}"],
@@ -499,12 +501,17 @@ if __name__ == "__main__":
     if runflag == "b":
         L = 20
         n_temps = 8
-        N_list = np.logspace(3, 8, 6)
+        N_list = np.logspace(3, 7, 5)
         gccflags = ["-O0", "-O1", "-O2", "-O3"]
         archflag = "-march=native"
         if genflag == "y":
             benchmark(N_list, gccflags, archflag, L, n_temps)
 
         read_benchmark(N_list, gccflags, archflag, L, n_temps)
+        run(["make", "clean"], cwd=src)
+
+    if runflag == "test":
+        run(["python", "-m", "pytest", "-v"])
+        run(["rm", "-rf", "2x2-test.dat"])
 
     plt.show()
