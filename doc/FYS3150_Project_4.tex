@@ -748,6 +748,13 @@ We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arr
 
 \subsection{Implementation layout and usage} \label{sec:III:b}
 
+We implemented our solver as a class in C++ which we named \verb+IsingMetropolis+ as it solves the Ising model with the Metropolis algorithm. We also limit ourselves to a two-dimensional square lattice, but as naming goes we omitted including this in the name of the class. The class is defined in the header file \verb+ising_metropolis.hpp+ (see appendix \hyperref[A.1]{A.1}) with the functions belonging to it being defined in \verb+ising_metropolis.cpp+ (see appendix \hyperref[A.2]{A.2}). The program \verb+main.cpp+ (see appendix \hyperref[A.3}{A.3}) takes command line arguments and operates the simulation using these. Finally the Python script \verb+project.py+ automates all of the simulations that we perform, and processes the resulting data to produce the results shown later in this report. We will discuss these programs in more detail in the order outlined here. 
+
+
+\cprotect\subsubsection{A class to simulate the Ising model using the Metropolis algorithm} \label{sec:III:b:i}
+
+The \verb+IsingMetropolis+ class has several functions that we will cover here. 
+
 
 \newpage
 
@@ -772,13 +779,23 @@ We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arr
 \appendix
 \section{Source code} \label{A}
 All code for this report was written in C++ and Python 3.8, and the complete set of files can be found at
-\url{https://github.com/eivinsto/FYS3150_Project_X.git}.
+\url{https://github.com/eivinsto/FYS3150_Project_4.git}.
+
+\cprotect\subsection{\verb+ising_metropolis.hpp+} \label{A.1}
+
+\cprotect\subsection{\verb+ising_metropolis.cpp+} \label{A.2}
+
+\cprotect\subsection{\verb+main.cpp+} \label{A.3}
+
+\cprotect\subsection{\verb+python.py+} \label{A.4}
+
+\cprotect\subsection{\verb+test_functions.py+} \label{A.5}
 
 \newpage
 \section{Selected results} \label{B}
 Here is a folder of selected results from running our code.
 
-\url{https://github.com/eivinsto/FYS3150_Project_X/tree/master/data}
+\url{https://github.com/eivinsto/FYS3150_Project_4/tree/master/data}
 
 ~
 \newpage
