@@ -512,6 +512,6 @@ if __name__ == "__main__":
 
     if runflag == "test":
         run(["python", "-m", "pytest", "-v"])
-        run(["rm", "-rf", "2x2-test.dat"])
+        run(["rm", "-rf", rootdir + "/data/2x2-test.dat"])
 
     plt.show()
