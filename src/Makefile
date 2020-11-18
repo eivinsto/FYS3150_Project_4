@@ -1,5 +1,5 @@
 CC := g++
-FLAGS := -Wall -Wextra -O3 -fopenmp
+FLAGS := -Wall -Wextra -O3 -march=native -fopenmp
 DEBUG := -g
 LIBS := -larmadillo
 OFILES := ising_metropolis.o
