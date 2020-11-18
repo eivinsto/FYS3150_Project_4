@@ -692,7 +692,80 @@ If the random number drawn is less then the probability of the transition of con
 
 Simulations are performed by running the \verb+run()+ method of the \verb+IsingMetropolis+ class. As the program can run a simulation for a single temperature, or several simulations with different temperatures (all with the same lattice dimensions), this method is simply a wrapper that calls the correct function to run the simulation(s). In the case where a simulation is run for a single temperature, the following code snippet is used to run the simulation:
 
+\begin{cpp}
+double E = 0;
+double M = 0;
+arma::Mat<int> spin_matrix(n_spins,n_spins,arma::fill::ones);
+arma::vec w = arma::zeros(17);
+for (int de = -8; de<= 8; de+=4) {
+  w(de+8) = exp(-de/temp);
+}
 
+initialize(randspin,spin_matrix,E,M);
+
+for (int current_cycle = 1; current_cycle<=max_cycles; 
+	 current_cycle++){
+  one_monte_carlo_cycle(spin_matrix,E,M,w);
+  write_to_file_single(E,M);
+}
+\end{cpp}
+
+This implementation is quite straight forward. Doubles are created to store the energy and magnetization of the system, the spin matrix is instantiated, and \verb+w+ is generated as outlined in the previous section. Following this the system is initialized using the \verb+initialize()+ method which was covered in section \hyperref[sec:III:a:i]{III.A.1}. Then we loop our the specified amount of Monte Carlo cycles (\verb+max_cycles+), calling the method \verb+one_monte_carlo_cycle()+ which is the code snippet covered in section \hyperref[sec:III:a:2]{III.A.2}. In the loop the method \verb+write_to_file_single()+ is called, which does exactly what you would expect: it writes the results of the simulation to a file. This method writes the energy and magnetization per spin, and the total number of accepted configurations for each Monte Carlo cycle. 
+
+If a set of simulations with the same lattice dimensions and varying temperatures are to be performed, the following code snippet is used:
+
+\begin{cpp}
+// Setting up parallelization and timing of simulation
+int max_threads = omp_get_max_threads()*3/4;
+int thrds = std::min(max_threads, n_temps);
+std::cout << "Simulating L = " << n_spins << " with " 
+		  << thrds << " threads." << std::endl;
+double wtime = omp_get_wtime ( );
+
+// Parallelized for loop
+#pragma omp parallel for num_threads(thrds)
+for (int i = 0; i<n_temps; ++i) {
+  // Define local variables so the different threads do not use 
+  // the same variables.
+  arma::vec average = arma::zeros(5);
+  double E = 0;
+  double M = 0;
+  arma::Mat<int> spin_matrix(n_spins,n_spins,arma::fill::ones);
+  arma::vec w = arma::zeros(17);
+  for (int de = -8; de<= 8; de+=4) {
+    w(de+8) = exp(-de/temperature(i));
+  }
+
+  // Initialize spin matrix
+  initialize(randspin,spin_matrix,E,M);
+
+  for (int current_cycle = 1; current_cycle<=max_cycles; 
+  	   current_cycle++){
+    one_monte_carlo_cycle(spin_matrix,E,M,w);
+    average(0) += E;
+    average(1) += E*E;
+    average(2) += M;
+    average(3) += M*M;
+    average(4) += fabs(M);
+  }
+  // Only one core should call this function at a time
+  #pragma omp critical
+  write_to_file_multi(average, temperature(i));
+}
+wtime = omp_get_wtime ( ) - wtime;
+std::cout << "Finished simulating L = " << n_spins << " with " 
+	      << thrds << " threads."
+  		  << "\nElapsed time in seconds = " << wtime << std::endl;
+\end{cpp} 
+
+A for loop is used to iterate over the temperatures, and a simulation is performed for each of them. As these simulations are completely independent from each other, parallelizing this code using OpenMP is fairly straight forward, and we have done so in order to increase the efficiency of the simulation. We only need to make sure that the variables that are independent to the simulation are not shared. 
+
+In general this functions very similarly to the previous code snippet inside this parallelized for loop. There are some key differences however. The most important one (which also happens to be related to all the differences) is that we do not write results to file each Monte Carlo cycle, instead we write to file once after a simulation is completed. What we write to file this time is also different than previously, and as some calculations are performed inside the \verb+write_to_file_multi()+ method, we will cover this shortly after we have finished outlining what is happening in this code snippet. The \verb+write_to_file_multi()+ method is passed an Armadillo \citep{Armadillo} vector containing averaged energy, energy squared, magnetization, magnetization squared and absolute of magnetization. Along with this vector the temperature at which the simulation was ran is passed as an argument. In order to make sure that several threads do not write to the output file at the same time (which might result in cluttered lines) this call is defined as a critical section using OpenMP.
+
+Outside the loop of the temperatures, the double \verb+wtime+ is used to measure the amount of time it takes to run all the simulations. Before the simulations start the amound of threads allocated is printed to the terminal, and after they are finished the time spent is also printed to the terminal.
+
+
+INSERT WRITETOFILEMULTI() CODE SNIPPET
 
 \subsubsection{Calculation and comparison of results} \label{sec:III:a:iv}
 
