@@ -305,68 +305,6 @@ This gives us the susceptibility by using equation \eqref{eq:magnetic_susceptibi
 
 All of these values we have calculated here can be compared with numerical results later on in order to evaluate the veracity of the numerical results.
 
-The difference in energy between two states of a two dimensional lattice, can be calculated using \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as
-\begin{align*}
-	\Delta E = E_{2} - E_{1} = \left(-J \sum\limits_{<kl>}^N s_k^{2} s_l^{2}\right) -
-	\left(-J \sum\limits_{<kl>}^N s_k^{1} s_l^{1}\right),
-\end{align*}
-where a superscript is used to denote which state the respective spins belong to.
-
-Since we are only interested in the difference in energy from flipping a single spin in the lattice, we can assume that \(s_{k}^{1} = s_{k}^{2} = s_{k}\). Thus we can rewrite \(\Delta E\) as
-\begin{align*}
- 	\Delta E = J \sum_{<kl>}^{N} s_{k} \left(s_{l}^{1} - s_{l}^{2}\right).
-\end{align*}
-
-Furthermore, any spin can only be \(\pm 1\) and spin \(s_{l}\) is flipped such that \(s_{l}^{2} = -s_{l}^{1}\). From this it follows that \begin{align*}
-	\left(s_{l}^{1} - s_{l}^{2}\right) = \left(s_{l}^{1} + s_{l}^{1}\right) = 2s_{l}^{1}.
-\end{align*}
-
-The difference in energy can then be written as
-
-\begin{align*}
- 	\Delta E = 2Js_{l}^{1} \sum_{<k>}^{N} s_{k}, \numberthis \label{eq:delta_e}
-\end{align*}
-
-where we only sum over \(k\), since only one spin \(s_{l}\) is flipped.
-For a two dimensional lattice, each spin only has four neighbours, thus we can write out the sum for any randomly chosen \(s_{l}\) with neighbours \(s_{a}, s_{b}, s_{c}, s_{d}\) as
-
-\begin{align*}
-	\Delta E = 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \\
-	\Delta E = 2J(\pm 1)\left[(\pm 1) + (\pm 1) + (\pm 1) + (\pm 1)\right]
-\end{align*}
-
-From this we see that if all spins \(s_{k}\) have the same sign we get
-\begin{align*}
-	\Delta E = \pm 2J(\pm 4) = \pm 8J.
-\end{align*}
-If three of the spins \(s_{k}\) have the same sign we get
-\begin{align*}
-	\Delta E = \pm 2J(\pm 2) = \pm 4J.
-\end{align*}
-If two of the spins \(s_{k}\) have the same sign we get
-\begin{align*}
-	\Delta E = \pm 2J(0) = 0.
-\end{align*}
-Thus we only have five possible diffrences in energy between states when we only flip one spin.
-
-The difference in magnetization can be simillarly found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\)
-\begin{align*}
-	\mathcal{M}_2 - \mathcal{M}_{1} &= \sum\limits_j^N s_j^{2} - \sum\limits_j^N s_j^{1} =
-	\sum\limits_{j}^{N}\left(s_{j}^{2} - s_{j}^{1}\right).
-\end{align*}
-Because we assume only spin \(s_{l}\) is flipped when changing states, the difference in magnetization becomes
-\begin{align*}
- 	\mathcal{M}_2 - \mathcal{M}_{1} = \left(s_{l}^{2} - s_{l}^{1}\right).
-\end{align*} 
-Using that \(s_{l}^{1} = - s_{l}^{2}\), we get
-\begin{align*}
-	\mathcal{M}_2 - \mathcal{M}_{1} = \left(s_{l}^{2} + s_{l}^{2}\right) = 2s_{l}^{2},
-\end{align*}
-which gives that
-\begin{align*}
-	\mathcal{M}_2 = \mathcal{M}_1 + 2s_{l}^{2} \numberthis \label{eq:delta_m}
-\end{align*}
-
 
 \subsubsection{Periodic square lattice with no external field in the thermodynamical limit} \label{sec:II:a:ii}
 
@@ -494,7 +432,51 @@ In this case we assume that the change in energy is positive number, so this is 
 
 As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as this contains an exponential this is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
 
-If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. This can be shown by realizing that a spin only reacts with its closest neighbours. Only ten transitions are possible, but half of them are equal to the other half as they are equivalent in terms of change in energy. Ee only display those with a unique change in energy:
+If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. The difference in energy between the states of a two dimensional lattice when one spin is flipped can be calculated using \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as:
+
+\begin{align*}
+	\Delta E = E_{2} - E_{1} = \left(-J \sum\limits_{<kl>}^N s_k^{2} s_l^{2}\right) -
+	\left(-J \sum\limits_{<kl>}^N s_k^{1} s_l^{1}\right),
+\end{align*}
+
+where a superscript is used to denote which state the respective spins belong to.
+
+Since we are only interested in the difference in energy from flipping a single spin in the lattice, we can assume that \(s_{k}^{1} = s_{k}^{2} = s_{k}\). Thus we can rewrite \(\Delta E\) as
+\begin{align*}
+ 	\Delta E = J \sum_{<kl>}^{N} s_{k} \left(s_{l}^{1} - s_{l}^{2}\right).
+\end{align*}
+
+Furthermore, any spin can only be \(\pm 1\) and spin \(s_{l}\) is flipped such that \(s_{l}^{2} = -s_{l}^{1}\). From this it follows that \begin{align*}
+	\left(s_{l}^{1} - s_{l}^{2}\right) = \left(s_{l}^{1} + s_{l}^{1}\right) = 2s_{l}^{1}.
+\end{align*}
+
+The difference in energy can then be written as
+
+\begin{align*}
+ 	\Delta E = 2Js_{l}^{1} \sum_{<k>}^{N} s_{k}, \numberthis \label{eq:delta_e}
+\end{align*}
+
+where we only sum over \(k\), since only one spin \(s_{l}\) is flipped.
+For a two dimensional lattice, each spin only has four neighbours, thus we can write out the sum for any randomly chosen \(s_{l}\) with neighbours \(s_{a}, s_{b}, s_{c}, s_{d}\) as
+
+\begin{align*}
+	\Delta E = 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \\
+	\Delta E = 2J(\pm 1)\left[(\pm 1) + (\pm 1) + (\pm 1) + (\pm 1)\right]
+\end{align*}
+
+From this we see that if all spins \(s_{k}\) have the same sign we get
+\begin{align*}
+	\Delta E = \pm 2J(\pm 4) = \pm 8J.
+\end{align*}
+If three of the spins \(s_{k}\) have the same sign we get
+\begin{align*}
+	\Delta E = \pm 2J(\pm 2) = \pm 4J.
+\end{align*}
+If two of the spins \(s_{k}\) have the same sign we get
+\begin{align*}
+	\Delta E = \pm 2J(0) = 0.
+\end{align*}
+Thus we only have five possible diffrences in energy between states when we only flip one spin. We can also visualize the possible transitions as follows:
 
 \begin{align*}
 E = -4J \quad \begin{array}{ccc}
@@ -564,7 +546,9 @@ E = 4J \quad \begin{array}{ccc}
 \end{array} \, ,
 \end{align*}
 
-with $\Delta E = -8J$. These are the only possible changes in energy. The other five possible transitions are the ones where every spin in the constellations above are flipped, but the change in energy is equivalent in these cases and so they are not specifically listed. With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. In a two-dimensional system it is beneficiary to denote the spins as matrix elements $s_{ij}$ where $i$ is the lattice position of the spin in the $x$-direction and similarly for $j$ in the $y$-direction. With this notation we can establish an expression for the energy change from flipping spin $s_{ij}$:
+with $\Delta E = -8J$. These are the only possible changes in energy. The other possible transitions are the ones above but in reverse, and the energy change is then just what is listed, but with the sign being flipped. 
+
+With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. In a two-dimensional system it is beneficiary to denote the spins as matrix elements $s_{ij}$ where $i$ is the lattice position of the spin in the $x$-direction and similarly for $j$ in the $y$-direction. With this notation we can establish an expression for the energy change from flipping spin $s_{ij}$:
 
 \begin{align*}
 \Delta E &= -2J s_{ij} \bigg( s_{i,j+1} + s_{i,j-1} + s_{i+1,j} + s_{i-1,j} \bigg) \numberthis \label{eq:singleflip_energy_change}
@@ -580,8 +564,30 @@ where \% is the modulo operator in this case. Note that we add $L$ to the total 
  
 We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
-Every time a spin is flipped we need to update total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. In the case of the magnetization, flipping a spin will change the total magnetization by two times the flipped value of the spin. Flipping a spin up means changing it's spin-value by $2$ (from $-1$ to $1$ gives $\Delta s = 1 - (-1) = 2$) and similarly flipping a spin down means changing it's spin-value by $-2$. 
+Every time a spin is flipped we need to update total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. The difference in magnetization can be found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\) (subscript one denotes the magnetization before the spin is flipped, and 2 the magnetization after): 
 
+\begin{align*}
+	\mathcal{M}_2 - \mathcal{M}_{1} &= \sum\limits_j^N s_j^{2} - \sum\limits_j^N s_j^{1} =
+	\sum\limits_{j}^{N}\left(s_{j}^{2} - s_{j}^{1}\right).
+\end{align*}
+
+Because we assume only spin \(s_{l}\) is flipped when changing states, the difference in magnetization becomes:
+
+\begin{align*}
+ 	\mathcal{M}_2 - \mathcal{M}_{1} = \left(s_{l}^{2} - s_{l}^{1}\right).
+\end{align*} 
+
+Using that \(s_{l}^{1} = - s_{l}^{2}\), we get:
+
+\begin{align*}
+	\mathcal{M}_2 - \mathcal{M}_{1} = \left(s_{l}^{2} + s_{l}^{2}\right) = 2s_{l}^{2},
+\end{align*}
+
+which gives that:
+
+\begin{align*}
+	\mathcal{M}_2 = \mathcal{M}_1 + 2s_{l}^{2} \numberthis \label{eq:delta_m}
+\end{align*}
 
 
 \newpage
@@ -688,7 +694,7 @@ The C++ programs output results to a file. Depending on the kind of run that is 
 
 In post-processing these results can be used to estimate the critical temperature of the system. From the relations listed in equations \eqref{eq:power_law_heat_capacity}, \eqref{eq:power_law_magnetization_per_spin} and \eqref{eq:power_law_susceptibility} we can estimate the critical temperature from the behaviour of heat capacity, magnetization and magnetic susceptibility as functions of the temperature. As the exponent in the expressions for the heat capacity and magnetic susceptibility are negative, we expect that these will diverge closer to the critical temperature. In a numerical simulation of a finite lattice they will never actually diverge, but we still expect them to reach maximum values around the critical temperature, and this gives us two estimates of the critical temperature. 
 
-Using the magnetization, however, is a bit more tricky. As the exponent is positive, it is supposed to reach zero at the critical temperature. In a numerical simulation this will never happen, as when the temperature gets large enough it will oscillate around zero. In order to combat this slightly we can use the absolute value of the magnetization instead. In this case there will still be problems though, as it will never stabilize at zero. In fact, the smaller the lattice is, the more it will vary. With all this in mind it is difficult to estimate the critical temperature using the magnetization. Thus we omitt using the magnetization in our estimation of the critical temperature.
+Using the magnetization, however, is a bit more tricky. As the exponent is positive, it is supposed to reach zero at the critical temperature. In a numerical simulation this will never happen, as when the temperature gets large enough it will oscillate around zero. In order to combat this slightly we can use the absolute value of the magnetization instead. In this case there will still be problems though, as it will never stabilize at zero. In fact, the smaller the lattice is, the more it will vary. With all this in mind it is difficult to estimate the critical temperature using the magnetization. Thus we omit using the magnetization in our estimation of the critical temperature.
 
 We now have two estimates of the critical temperature. In order to obtain our final estimate we choose to average these two. This estimate is now an estimate of the critical temperature for a specific size of the lattice. These simulations can be repeated for other lattice sizes as well, and these estimates can then be used together along with equation \eqref{eq:crit_temperature_finite_lattice} in order to estimate the critical temperature in the thermodynamical limit. All of the calculations explained here are performed in the following Python function:
 
@@ -735,7 +741,7 @@ def get_critical_temperature(Ls, Cv, Xi, T):
 
 The variable \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+absM+ contains the averaged absolute of the magnetization, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. 
 
-COMMENT (AND CITE?) USAGE OF NUMPY FUNCTIONS  
+We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arrays are both practical and have useful built-in functions that can act upon these that significantly simplify the calculations we perform in Python. In this case we use them to identify the maximum points in the two arrays for heat capacity and magnetic susceptibility using \verb+numpy.where()+ function which returns the indices at which the argument are true (argument should be a boolean array). We also use the \verb+flatten()+ member function of arrays which reduces the array to a 1-dimensional array. This is to avoid any unwanted nesting that might show up. Lastly, \verb+numpy.polyfit()+ is used to fit the calculated critical temperatures at different lattice lengths $L$ to the first order polynomial given in \eqref{eq:crit_temperature_finite_lattice}. The constant term from this fit is our estimate of the critical temperature in the thermodynamic limit. The function returns all of the critical temperature estimates.
 
 
 
