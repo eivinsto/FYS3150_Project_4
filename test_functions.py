@@ -6,7 +6,7 @@ import numpy as np
 
 def test_analytic():
     """Unit test of metropolis ising simulation of 2x2 lattice."""
-    tol = 1e-4
+    tol = 1e-3
     temp = 1  # temperature of system.
     L = 2  # dimensionality of lattice.
     file = p.rootdir + "/data/2x2-test.dat"
