@@ -557,7 +557,7 @@ if __name__ == "__main__":
         read_benchmark(N_list, gccflags, archflag, L, n_temps)
 
     if runflag == "test":
-        run(["python", "-m", "pytest", "-v"])
+        run(["python3", "-m", "pytest", "-v"])
         run(["rm", "-rf", rootdir + "/data/2x2-test.dat"])
 
     plt.show()
