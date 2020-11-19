@@ -259,21 +259,21 @@ def benchmark(N_list, gccflags, archflag, L, n_temps):
             for i in range(len(gccflags)):
                 # compiling program with specified flags
                 if j == 0:
-                    call(["g++", gccflags[i], "metropolis.cpp",
+                    call(["g++", gccflags[i], "ising_metropolis.cpp",
                           "-fopenmp", "-c"], cwd=src)
                     call(["g++", gccflags[i], "main.cpp",
                           "-fopenmp", "-c"], cwd=src)
                     call(["g++", gccflags[i], "-fopenmp", "main.o",
-                          "metropolis.o", "-o", "benchmark.exe",
+                          "ising_metropolis.o", "-o", "benchmark.exe",
                           "-larmadillo"],
                          cwd=src)
                 else:
-                    call(["g++", gccflags[i], archflag, "metropolis.cpp",
+                    call(["g++", gccflags[i], archflag, "ising_metropolis.cpp",
                           "-fopenmp", "-c"], cwd=src)
                     call(["g++", gccflags[i], archflag, "main.cpp",
                           "-fopenmp", "-c"], cwd=src)
                     call(["g++", gccflags[i], archflag, "-fopenmp", "main.o",
-                          "metropolis.o", "-o", "benchmark.exe",
+                          "ising_metropolis.o", "-o", "benchmark.exe",
                           "-larmadillo"],
                          cwd=src)
 
@@ -326,15 +326,20 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
     # loading data from file
     times = np.load(rootdir + "/data/benchmarkrun.npy")
 
+    normtime = times[:, 0, 0]
+    print(f"Unoptimized {n_temps} threads, 1e5 MC cycles: {normtime[2]} s")
+
     # plotting data
     plt.figure()
-    normtime = times[:, 0, 0]
     for j in range(2):
         for i in range(1, len(gccflags)):
             if j == 0:
                 labelstr = f"{gccflags[i]}"
             else:
                 labelstr = f"{gccflags[i]}, {archflag}"
+
+            print(labelstr +
+                  f" {n_temps} threads, 1e5 MC cycles: {times[2, j, i]} s")
 
             plt.semilogx(N_list, 100*(normtime-times[:, j, i])/normtime, 'x--',
                          label=labelstr)
@@ -348,7 +353,7 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
 
 
 runflag = "start"
-nmax = int(3e6)
+nmax = int(1e6)
 if __name__ == "__main__":
     while (runflag != "an" and runflag != "st" and runflag != "ph"
            and runflag != "b" and runflag != "test"):
@@ -462,6 +467,7 @@ if __name__ == "__main__":
         n_temps = 8  # number of temps to simulate per subprocess.
 
         if genflag == "y":  # running simulations:
+            build_cpp()
             phase_trans_test(nmax, Ls, files, n_temps)
 
         # reading data from files:

@@ -877,6 +877,28 @@ We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arr
 
 \section{Results} \label{sec:IV}
 
+\subsection{Benchmark and timings} \label{sec:IV:}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|c|}
+		\hline
+		Optimization & Elapsed time \\
+		\hline
+		Serialized, flags: -O3 -march=native & \(\SI{45.5962}{\second}\) \\
+		Parallelized, flags: -O0 & \(\SI{6.8382}{\second}\) \\
+		Parallelized, flags: -O3 -march=native & \(\SI{3.0332}{\second}\) \\
+		\hline
+	\end{tabular}
+	\label{table:benchmark_parallel}
+	\caption{Benchmark results of Ising-Metropolis simulation of a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\), and \(10^{5}\) Monte Carlo cycles. Optimization flags used are -O3 and -march=native. Unoptimized program is compiled with -O0. Parallelized results achieved with \(8\) threads (one value of \(T\) per thread).}
+\end{table}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\columnwidth]{../data/benchmark.pdf}
+	\caption{Timing results of various compiler optimization flags for . }
+\end{figure}
+
 
 \newpage
 
