@@ -293,7 +293,7 @@ This gives us the heat capacity by equation \eqref{eq:heat_capacity}:
 
 \begin{align*}
 C_V &= \frac{1}{k_B T^2} ( \langle E^2 \rangle - \langle E \rangle^2) \\
-&= \frac{64J^2}{k_B T^2} \frac{e^{-8J\beta}}{\cosh(8J\beta) + 3} \numberthis \label{eq:2x2_heat_capacity}
+&= \frac{192J^2}{k_B T^2} \frac{\cosh(8J\beta)}{(\cosh(8J\beta) + 3)^2} \numberthis \label{eq:2x2_heat_capacity}
 \end{align*}
 
 Lastly we also want to find the magnetic susceptibility of the system. In order to do that we need to find:
@@ -307,7 +307,7 @@ This gives us the susceptibility by using equation \eqref{eq:magnetic_susceptibi
 
 \begin{align*}
 \chi &= \frac{1}{k_B T} ( \langle \mathcal{M}^2 \rangle - \langle \mathcal{M} \rangle^2 ) \\
-&= \frac{8}{k_B T} \frac{e^{8J \beta}}{\cosh( 8J \beta) + 3} \numberthis \label{eq:2x2_susceptibility}
+&= \frac{8}{k_B T} \frac{e^{8J \beta} + 1}{\cosh( 8J \beta) + 3} \numberthis \label{eq:2x2_susceptibility}
 \end{align*}
 
 All of these values we have calculated here can be compared with numerical results later on in order to evaluate the veracity of the numerical results.
@@ -866,6 +866,11 @@ We were only able to device one good unit-test for the system. As this is a Mont
 \section{Results} \label{sec:IV}
 
 \subsection{Benchmark and timings} \label{sec:IV:A}
+
+We performed several benchmarks of our solver with and without parallelization and with different compiler flags. In table \ref{table:benchmark_parallel} we have listed timings of simulations with a $20 \times 20$ lattice at various temperatures. These simulations were ran both parallelized and serialized. In the case of the latter only one set of simulations was run with the optimalization flags -O3 and -march=native in C++. In the case of the former the simulations were run once with only the -O0 compiler flag, and once with the same set of compiler flags as the latter.
+
+We also measured the improvement in time consumption for the parallelized simulations for different combinations of compiler flags, and various amounts of Monte Carlo cycles. These time improvements are plotted against amount of Monte Carlo cycles in figure \ref{fig:benchmark_compiler_flags}.
+
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|l|c|}
@@ -881,10 +886,12 @@ We were only able to device one good unit-test for the system. As this is a Mont
 	\caption{Benchmark results of Ising-Metropolis simulation of a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\), and \(10^{5}\) Monte Carlo cycles. Optimization flags used are -O3 and -march=native. Unoptimized program is compiled with -O0. Parallelized results are achieved with \(8\) threads (one value of \(T\) per thread).}
 \end{table}
 
+
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\columnwidth]{../data/benchmark.pdf}
-	\caption{Time improvement in percentage of various compiler optimization flags for a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\). All results are achieved with parallelized runs with \(8\) threads (one value of \(T\) per thread)}
+	\caption{Time improvement in percentage of various compiler optimization flags for a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\). All results are achieved with parallelized runs with \(8\) threads (one value of \(T\) per thread)} \label{fig:benchmark_compiler_flags}
 \end{figure}
 
 
