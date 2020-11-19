@@ -26,7 +26,8 @@ def stabilization_run(file, nmax, temp, L, randspin=False):
     L -- int: dimensionality of lattice.
 
     Keyword arguments:
-    randspin -- bool: Set to True for disordered initial spins (default: False).
+    randspin -- bool: Set to True for disordered initial spins
+                      (default: False).
     """
     build_cpp()
     spin = str(randspin).lower()
