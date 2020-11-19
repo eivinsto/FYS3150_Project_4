@@ -362,9 +362,9 @@ if __name__ == "__main__":
 
         runflag = input("Analytic vs numeric 2x2 = 'an', " +
                         "stabilization run = 'st', " +
-                        "phase transition = ph, " +
-                        "OpenMP benchmark = b, " +
-                        "Unit tests = test, " +
+                        "phase transition = 'ph', " +
+                        "OpenMP benchmark = 'b', " +
+                        "Unit tests = 'test', " +
                         "quit = 'q'.\n" +
                         "Enter run: ").strip().lower()
 
