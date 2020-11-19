@@ -1,4 +1,3 @@
-import pytest
 import project as p
 from subprocess import run
 import numpy as np
