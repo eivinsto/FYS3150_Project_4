@@ -17,7 +17,7 @@ def build_cpp():
 
 def stabilization_run(file, nmax, temp, L, randspin=False):
     """Function running cpp program for LxL lattice with ordered or
-    unordered spin. Resulting data is written to files in /data/.
+    disordered spin. Resulting data is written to files in /data/.
 
     Arguments:
     file -- str: filename to write data to.
@@ -26,7 +26,7 @@ def stabilization_run(file, nmax, temp, L, randspin=False):
     L -- int: dimensionality of lattice.
 
     Keyword arguments:
-    randspin -- bool: Set to True for unordered initial spins (default: False).
+    randspin -- bool: Set to True for disordered initial spins (default: False).
     """
     build_cpp()
     spin = str(randspin).lower()
@@ -47,7 +47,7 @@ def read_stabilization_data(file):
     """
     temp = float(file.split('-')[-3])
     if file.split('-')[-2] == "random":
-        randstr = "unordered initial spin."
+        randstr = "disordered initial spin."
     else:
         randstr = "ordered initial spin."
 
@@ -68,9 +68,9 @@ def read_stabilization_data(file):
         f"Average energy with\nL = {L}, T = {temp} and " +
         randstr
     )
-    plt.plot(n_cycles, Emean, label=r"$\langle E \rangle$")
+    plt.plot(n_cycles, Emean, label=r"$\langle E \rangle/J$")
     plt.xlabel("N")
-    plt.ylabel(r"$\langle E \rangle$")
+    plt.ylabel(r"$\langle E \rangle/J$")
     plt.legend()
     plt.grid()
     plt.savefig(
@@ -119,10 +119,9 @@ def read_stabilization_data(file):
         f"Distribution of energies\nL = {L}, T = {temp} and " +
         randstr + "\n" + var
     )
-    plt.hist(E[slicer:], bins=np.linspace(np.min(E[slicer:]), np.max(
-        E[slicer:]), 50), density=True, stacked=True, edgecolor="black")
-    plt.xlabel("E")
-    plt.ylabel("P(E)")
+    plt.hist(E[slicer:], bins="auto", density=True, stacked=True)
+    plt.xlabel("E/J")
+    plt.ylabel("P(E/J)")
     # plt.legend()
     plt.grid()
     plt.savefig(
@@ -412,11 +411,11 @@ if __name__ == "__main__":
         plt.figure()
         plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
         plt.hlines(
-            E_exp, 0, nmax, 'r', label="Analytic " + r"$\langle E \rangle$"
+            E_exp, 0, nmax, 'r', label="Analytic " + r"$\langle E \rangle/J$"
         )
-        plt.plot(n_cycles, E, label=r"$\langle E \rangle$")
+        plt.plot(n_cycles, E, label=r"$\langle E \rangle/J$")
         plt.xlabel("N")
-        plt.ylabel(r"$\langle E \rangle$")
+        plt.ylabel(r"$\langle E \rangle/J$")
         plt.legend()
         plt.grid()
         plt.savefig(
@@ -502,11 +501,11 @@ if __name__ == "__main__":
 
         # plotting data:
         plt.figure()
-        plt.title(r"$\langle E \rangle$")
+        plt.title(r"$\langle E \rangle/J$")
         for i in range(len(Ls)):
             plt.plot(T, E[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel("T")
-        plt.ylabel(r"$\langle E \rangle$")
+        plt.xlabel(r"$k_B T/J$")
+        plt.ylabel(r"$\langle E \rangle/J$")
         plt.legend()
         plt.grid()
 
@@ -514,7 +513,7 @@ if __name__ == "__main__":
         plt.title(r"$\langle \mathcal{M} \rangle$")
         for i in range(len(Ls)):
             plt.plot(T, M[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel("T")
+        plt.xlabel(r"$k_B T/J$")
         plt.ylabel(r"$\langle \mathcal{M} \rangle$")
         plt.legend()
         plt.grid()
@@ -523,7 +522,7 @@ if __name__ == "__main__":
         plt.title(r"$C_{v}$")
         for i in range(len(Ls)):
             plt.plot(T, Cv[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel("T")
+        plt.xlabel(r"$k_B T/J$")
         plt.ylabel(r"$C_{v}$")
         plt.legend()
         plt.grid()
@@ -532,7 +531,7 @@ if __name__ == "__main__":
         plt.title(r"$\chi$")
         for i in range(len(Ls)):
             plt.plot(T, Xi[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel("T")
+        plt.xlabel(r"$k_B T/J$")
         plt.ylabel(r"$\chi$")
         plt.legend()
         plt.grid()
@@ -541,7 +540,7 @@ if __name__ == "__main__":
         plt.title(r"$\langle | \mathcal{M} | \rangle$")
         for i in range(len(Ls)):
             plt.plot(T, absM[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel("T")
+        plt.xlabel(r"$k_B T/J$")
         plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
         plt.legend()
         plt.grid()
