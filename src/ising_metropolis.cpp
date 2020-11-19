@@ -249,14 +249,15 @@ void IsingMetropolis::write_to_file_multi(arma::vec average, double temperature)
   double M2average = average(3)*norm;
   double Mabsaverage = average(4)*norm;
 
+  // Calculate heat capacity and susceptibility
+  double heat_capacity = (E2average- Eaverage*Eaverage)/(n_spins2*temperature*temperature);
+  double susceptibility = (M2average - Mabsaverage*Mabsaverage)/(n_spins2*temperature);
+
   // All expectation values are per spin, divide by 1/(n_spins^2)
   Eaverage /= n_spins2;
   Maverage /= n_spins2;
   Mabsaverage /= n_spins2;
 
-  // Calculate heat capacity and susceptibility
-  double heat_capacity = (E2average- Eaverage*Eaverage)/(n_spins2*temperature*temperature);
-  double susceptibility = (M2average - Mabsaverage*Mabsaverage)/(n_spins2*temperature);
 
 
   ofile << std::setiosflags(std::ios::showpoint | std::ios::uppercase);
