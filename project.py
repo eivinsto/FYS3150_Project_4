@@ -328,7 +328,8 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
     times = np.load(rootdir + "/data/benchmarkrun.npy")
 
     normtime = times[:, 0, 0]
-    print(f"Unoptimized {n_temps} threads, 1e5 MC cycles: {normtime[2]} s")
+    print(f"Unoptimized {n_temps} threads, {N_list[2]} MC cycles:" +
+          f" {normtime[2]} s")
 
     # plotting data
     plt.figure()
@@ -340,7 +341,8 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
                 labelstr = f"{gccflags[i]}, {archflag}"
 
             print(labelstr +
-                  f" {n_temps} threads, 1e5 MC cycles: {times[2, j, i]} s")
+                  f" {n_temps} threads, {N_list[2]} MC cycles:" +
+                  f" {times[2, j, i]} s")
 
             plt.semilogx(N_list, 100*(normtime-times[:, j, i])/normtime, 'x--',
                          label=labelstr)
