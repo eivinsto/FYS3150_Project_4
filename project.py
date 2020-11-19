@@ -345,7 +345,7 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
             plt.semilogx(N_list, 100*(normtime-times[:, j, i])/normtime, 'x--',
                          label=labelstr)
 
-    plt.title(f"Timing of compilerflags for L = {L}")
+    plt.title(f"Timing of compiler flags for L = {L}")
     plt.xlabel("N")
     plt.ylabel("Time improvement [%]")
     plt.legend()
