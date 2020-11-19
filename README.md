@@ -23,3 +23,37 @@ Generate data? y/n:
 Selecting 'y' will run the selected simulation(s), and data analysis. Selecting 'n' will not run the selected simulation(s). Instead the script will attempt to load previously generated data from the /data/ directory, and perform the data analysis.
 
 The "test" run will generate data each time.
+
+Example run of benchmark:
+```console
+$ python project.py
+Analytic vs numeric 2x2 = 'an', stabilization run = 'st', phase transition = ph, OpenMP benchmark = b, Unit tests = test, quit = 'q'.
+Enter run: b
+Generate data? y/n: n
+Unoptimized 8 threads, 100000.0 MC cycles: 6.83823 s
+-O1 8 threads, 100000.0 MC cycles: 3.27981 s
+-O2 8 threads, 100000.0 MC cycles: 3.5443 s
+-O3 8 threads, 100000.0 MC cycles: 3.33299 s
+-O1, -march=native 8 threads, 100000.0 MC cycles: 3.28577 s
+-O2, -march=native 8 threads, 100000.0 MC cycles: 3.54694 s
+-O3, -march=native 8 threads, 100000.0 MC cycles: 3.03317 s
+```
+
+Example run of unit tests:
+```console
+$ python project.py
+Analytic vs numeric 2x2 = 'an', stabilization run = 'st', phase transition = 'ph', OpenMP benchmark = 'b', Unit tests = 'test', quit = 'q'.
+Enter run: test
+================================ test session starts =================================
+platform linux -- Python 3.8.5, pytest-6.0.1, py-1.9.0, pluggy-0.13.1 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/anders/Documents/2020H/FYS3150/FYS3150_Project_4
+collected 4 items                                                                    
+
+test_functions.py::test_analytic_energy PASSED                                 [ 25%]
+test_functions.py::test_analytic_absM PASSED                                   [ 50%]
+test_functions.py::test_analytic_Cv PASSED                                     [ 75%]
+test_functions.py::test_analytic_Xi PASSED                                     [100%]
+
+================================= 4 passed in 33.26s =================================
+```

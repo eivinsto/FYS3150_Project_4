@@ -1,4 +1,3 @@
-import pytest
 import project as p
 from subprocess import run
 import numpy as np
@@ -46,7 +45,7 @@ def test_analytic_Cv():
     # calculating analytic results:
     Cv = (1/(temp**2)) * (np.mean(E**2) - np.mean(E)**2)
     Cv_exp = (12/(temp**2)) * (np.cosh(8/temp)/((np.cosh(8/temp) + 3)**2))
-    success = np.isclose(Cv, Cv_exp, rtol=1e-2)
+    success = np.isclose(Cv, Cv_exp, rtol=5e-2)
 
     msg = f"Numeric <Cv> = {Cv} != analytic <Cv> = {Cv_exp}"
     assert success, msg
