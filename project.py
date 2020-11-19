@@ -119,7 +119,8 @@ def read_stabilization_data(file):
         f"Distribution of energies\nL = {L}, T = {temp} and " +
         randstr + "\n" + var
     )
-    plt.hist(E[slicer:], bins=np.linspace(np.min(E[slicer:]),np.max(E[slicer:]),50), density=True, stacked=True, edgecolor="black")
+    plt.hist(E[slicer:], bins=np.linspace(np.min(E[slicer:]), np.max(
+        E[slicer:]), 50), density=True, stacked=True, edgecolor="black")
     plt.xlabel("E")
     plt.ylabel("P(E)")
     # plt.legend()
