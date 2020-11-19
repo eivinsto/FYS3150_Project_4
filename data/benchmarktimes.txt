@@ -1,0 +1,8 @@
+Unoptimized 8 threads, 1e5 MC cycles: 6.83823 s
+-O1 8 threads, 1e5 MC cycles: 3.27981 s
+-O2 8 threads, 1e5 MC cycles: 3.5443 s
+-O3 8 threads, 1e5 MC cycles: 3.33299 s
+-O1, -march=native 8 threads, 1e5 MC cycles: 3.28577 s
+-O2, -march=native 8 threads, 1e5 MC cycles: 3.54694 s
+-O3, -march=native 8 threads, 1e5 MC cycles: 3.03317 s
+-O3, -march=native 1 thread, 1e5 MC cycles: 45.5962
