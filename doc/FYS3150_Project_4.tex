@@ -175,24 +175,31 @@ where $M$ is the amount of microstates of the system. The magnetization of a giv
 The mean of a general variable, $Q_i$, can be defined as:
 
 \begin{align*}
-\langle Q \rangle &= \sum\limits_i^M Q_i P_i(\beta) 
-\end{align*}
-We will also need the relation between the Helmholtz free energy $F$ and the partition function:
-
-\begin{align*}
-F &= -k_B T \ln (Z) \, ,\numberthis \label{eq:helmholtz_free_energy}
+\langle Q \rangle &= \sum\limits_i^M Q_i P_i(\beta) \numberthis \label{eq:mean}
 \end{align*}
 
-and also how heat capacity $C_V$ at constant volume relates to the partition function:
+The variance of said variable can be defined as:
 
 \begin{align*}
-C_V &= \frac{1}{k_B T^2} (\langle E^2 \rangle - \langle E \rangle^2) \numberthis \label{eq:heat_capacity}
+\text{Var}(Q) &= \langle Q^2 \rangle - \langle Q \rangle^2 \, , \numberthis \label{eq:variance} 
 \end{align*}
 
-We will also need the magnetic susceptibility, $\chi$, of the system:
+which relates to the standard deviation $\sigma_Q$:
 
 \begin{align*}
-\chi &= \frac{1}{k_B T} ( \langle \mathcal{M}^2 \rangle - \langle \mathcal{M} \rangle^2) \numberthis \label{eq:magnetic_susceptibility}
+\sigma_q &= \sqrt{\text{Var}(Q)} \numberthis \label{eq:standard_deviation}
+\end{align*}
+
+The heat capacity at constant volume $C_V$ is related to the variance of the energy as follows:
+
+\begin{align*}
+C_V &= \frac{1}{k_B T^2} \text{Var}(E) = \frac{1}{k_B T^2} (\langle E^2 \rangle - \langle E \rangle^2) \, ,\numberthis \label{eq:heat_capacity}
+\end{align*}
+
+and the magnetic susceptibility $\chi$ is related to the variance of the magnetization:
+
+\begin{align*}
+\chi &= \frac{1}{k_B T} \text{Var}(\mathcal{M}) = \frac{1}{k_B T} ( \langle \mathcal{M}^2 \rangle - \langle \mathcal{M} \rangle^2) \numberthis \label{eq:magnetic_susceptibility}
 \end{align*}
 
 In the following section we look at a sample system.
@@ -764,8 +771,34 @@ In general this functions very similarly to the previous code snippet inside thi
 
 Outside the loop of the temperatures, the double \verb+wtime+ is used to measure the amount of time it takes to run all the simulations. Before the simulations start the amound of threads allocated is printed to the terminal, and after they are finished the time spent is also printed to the terminal.
 
+After each of the simulations are finished, we write the averaged energy, magnetization and absolute of magnetization to file. We also calculate the heat capacity and the magnetic susceptibility as well, using the averaged energy squared and magnetization squared along with their non-squared counterparts:
 
-INSERT WRITETOFILEMULTI() CODE SNIPPET
+\begin{cpp}
+// Normalizing factor
+double norm = 1/(double(max_cycles));
+
+// Extract averages
+double Eaverage = average(0)*norm;
+double E2average = average(1)*norm;
+double Maverage = average(2)*norm;
+double M2average = average(3)*norm;
+double Mabsaverage = average(4)*norm;
+
+// Calculate heat capacity and susceptibility
+double heat_capacity = (E2average- Eaverage*Eaverage)
+					   /(n_spins2*temperature*temperature);
+double susceptibility = (M2average - Mabsaverage*Mabsaverage)
+					    /(n_spins2*temperature);
+
+// All expectation values are per spin, divide by 1/(n_spins^2)
+Eaverage /= n_spins2;
+Maverage /= n_spins2;
+Mabsaverage /= n_spins2;
+\end{cpp}
+
+The Armadillo \citep{Armadillo} vector \verb+average+ contains the values we need, so these are extracted and then used to calculate the heat capacity and susceptibility. We calculate the heat capacity and magnetic susceptibility using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility}, where we have scaled the equations such that $k_B = 1$. Note that the absolute of the magnetization is used to calculate the magnetic susceptibility instead of the magnetization itself, as the former is a much more stable measure of what is actually happening when the magnetization gets close to zero.
+
+When the averages are extracted from the vector, note that we multiply by a normalizing factor. This is because when calculating the varlues that are stored in \verb+average+ we have only added to their total in each Monte Carlo cycle. To actually get the average we need to divide by the amount of cycles, which is what is done by multiplying with the normalizing factor. Also note that we are interested in values per spin, so we divide by the total amount of spins (stored in variable \verb+n_spins2+) in all of the values. As we do not write averaged energy squared and magnetization squared to file, dividing them by the amount of spins as well would be redundant and is therefore not done.
 
 \subsubsection{Calculation and comparison of results} \label{sec:III:a:iv}
 
