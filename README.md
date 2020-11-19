@@ -12,7 +12,7 @@ When executed, the "project.py" script will ask you which part of the report to 
 
 ```console
 $ python project.py
-Analytic vs numeric 2x2 = 'an', stabilization run = 'st', phase transition = 'ph', OpenMP benchmark = 'b', Unit tests = test, quit = 'q'.
+Analytic vs numeric 2x2 = 'an', stabilization run = 'st', phase transition = 'ph', OpenMP benchmark = 'b', Unit tests = 'test', quit = 'q'.
 Enter run:
 ```
 
@@ -20,4 +20,6 @@ For all runs except "test", the script will ask you if you wish to generate data
 ```console
 Generate data? y/n:
 ```
-Selecting 'n'
+Selecting 'y' will run the selected simulation(s), and data analysis. Selecting 'n' will not run the selected simulation(s). Instead the script will attempt to load previously generated data from the /data/ directory, and perform the data analysis.
+
+The "test" run will generate data each time.
