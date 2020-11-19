@@ -890,13 +890,13 @@ We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arr
 		\hline
 	\end{tabular}
 	\label{table:benchmark_parallel}
-	\caption{Benchmark results of Ising-Metropolis simulation of a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\), and \(10^{5}\) Monte Carlo cycles. Optimization flags used are -O3 and -march=native. Unoptimized program is compiled with -O0. Parallelized results achieved with \(8\) threads (one value of \(T\) per thread).}
+	\caption{Benchmark results of Ising-Metropolis simulation of a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\), and \(10^{5}\) Monte Carlo cycles. Optimization flags used are -O3 and -march=native. Unoptimized program is compiled with -O0. Parallelized results are achieved with \(8\) threads (one value of \(T\) per thread).}
 \end{table}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\columnwidth]{../data/benchmark.pdf}
-	\caption{Timing results of various compiler optimization flags for . }
+	\caption{Time improvement in percentage of various compiler optimization flags for a \(20\times 20\) lattice with \(8\) evenly spaced values of \(T \in [2.20, 2.35]\). All results are achieved with parallelized runs with \(8\) threads (one value of \(T\) per thread)}
 \end{figure}
 
 
