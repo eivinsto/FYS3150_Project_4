@@ -239,30 +239,39 @@ void IsingMetropolis::run_single(bool randspin) {
 *             ... in that order.
 */
 void IsingMetropolis::write_to_file_multi(arma::vec average, double temperature) {
-  double norm = 1/(double(max_cycles));  // divided by total number of cycles
+  // Normalizing factor
+  double norm = 1/(double(max_cycles));
 
+  // Extract averages
   double Eaverage = average(0)*norm;
   double E2average = average(1)*norm;
   double Maverage = average(2)*norm;
   double M2average = average(3)*norm;
   double Mabsaverage = average(4)*norm;
 
-  // all expectation values are per spin, divide by 1/(n_spins^2)
-  double Evariance = (E2average- Eaverage*Eaverage)/n_spins2;
-  double Mvariance = (M2average - Mabsaverage*Mabsaverage)/n_spins2;
+  // All expectation values are per spin, divide by 1/(n_spins^2)
+  Eaverage /= n_spins2;
+  Maverage /= n_spins2;
+  Mabsaverage /= n_spins2;
+
+  // Calculate heat capacity and susceptibility
+  double heat_capacity = (E2average- Eaverage*Eaverage)/(n_spins2*temperature*temperature);
+  double susceptibility = (M2average - Mabsaverage*Mabsaverage)/(n_spins2*temperature);
+
+
   ofile << std::setiosflags(std::ios::showpoint | std::ios::uppercase);
   // Writing temperature
   ofile << std::setw(15) << std::setprecision(8) << temperature;
   // Writing average energy per spin
-  ofile << std::setw(15) << std::setprecision(8) << Eaverage/n_spins2;
+  ofile << std::setw(15) << std::setprecision(8) << Eaverage;
   // Writing heat capacity
-  ofile << std::setw(15) << std::setprecision(8) << Evariance/(temperature*temperature);
+  ofile << std::setw(15) << std::setprecision(8) << heat_capacity;
   // Writing average magnetization per spin
-  ofile << std::setw(15) << std::setprecision(8) << Maverage/n_spins2;
+  ofile << std::setw(15) << std::setprecision(8) << Maverage;
   // Writing susceptibility
-  ofile << std::setw(15) << std::setprecision(8) << Mvariance/temperature;
+  ofile << std::setw(15) << std::setprecision(8) << susceptibility;
   // Writing average absolute of magnetization per spin
-  ofile << std::setw(15) << std::setprecision(8) << Mabsaverage/n_spins2;
+  ofile << std::setw(15) << std::setprecision(8) << Mabsaverage;
   ofile << std::setw(15) << omp_get_thread_num() << std::endl;
 }
 
