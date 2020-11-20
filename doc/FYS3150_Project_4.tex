@@ -205,7 +205,7 @@ and the magnetic susceptibility $\chi$ is related to the variance of the magneti
 In the following section we look at a sample system.
 
 
-\subsubsection{Periodic \( 2 \times 2 \) square lattice with no external field}
+\subsubsection{Periodic \( 2 \times 2 \) square lattice with no external field} \label{sec:II:A:i}
 
 We look at a system where we have particles in a 2x2 square lattice. A configuration of the system can be visualized as follows: \newline
 
@@ -767,11 +767,11 @@ std::cout << "Finished simulating L = " << n_spins << " with "
 
 A for loop is used to iterate over the temperatures, and a simulation is performed for each of them. As these simulations are completely independent from each other, parallelizing this code using OpenMP is fairly straight forward, and we have done so in order to increase the efficiency of the simulation. We only need to make sure that the variables that are independent to the simulation are not shared. 
 
-In general this functions very similarly to the previous code snippet inside this parallelized for loop. There are some key differences however. The most important one (which also happens to be related to all the differences) is that we do not write results to file each Monte Carlo cycle, instead we write to file once after a simulation is completed. What we write to file this time is also different than previously, and as some calculations are performed inside the \verb+write_to_file_multi()+ method, we will cover this shortly after we have finished outlining what is happening in this code snippet. The \verb+write_to_file_multi()+ method is passed an Armadillo \citep{Armadillo} vector containing averaged energy, energy squared, magnetization, magnetization squared and absolute of magnetization. Along with this vector the temperature at which the simulation was ran is passed as an argument. In order to make sure that several threads do not write to the output file at the same time (which might result in cluttered lines) this call is defined as a critical section using OpenMP.
+In general this functions very similarly to the previous code snippet inside this parallelized for loop. There are some key differences however. The most important one (which also happens to be related to all the differences) is that we do not write results to file each Monte Carlo cycle, instead we write to file once after a simulation is completed. What we write to file this time is also different than previously, and as some calculations are performed inside the \verb+write_to_file_multi()+ method, we will cover this shortly after we have finished outlining what is happening in this code snippet. The \verb+write_to_file_multi()+ method is passed an Armadillo \citep{Armadillo} vector containing mean energy, energy squared, magnetization, magnetization squared and absolute of magnetization. Along with this vector the temperature at which the simulation was ran is passed as an argument. In order to make sure that several threads do not write to the output file at the same time (which might result in cluttered lines) this call is defined as a critical section using OpenMP.
 
 Outside the loop of the temperatures, the double \verb+wtime+ is used to measure the amount of time it takes to run all the simulations. Before the simulations start the amount of threads allocated is printed to the terminal, and after they are finished the time spent is also printed to the terminal. We use this to benchmark the simulations, with respect to both the parallelization and to compiler flags.
 
-After each of the simulations are finished, we write the averaged energy, magnetization and absolute of magnetization to file. We also calculate the heat capacity and the magnetic susceptibility as well, using the averaged energy squared and magnetization squared along with their non-squared counterparts:
+After each of the simulations are finished, we write the mean energy, magnetization and absolute of magnetization to file. We also calculate the heat capacity and the magnetic susceptibility as well, using the mean energy squared and magnetization squared along with their non-squared counterparts:
 
 \begin{cpp}
 // Normalizing factor
@@ -798,11 +798,11 @@ Mabsaverage /= n_spins2;
 
 The Armadillo \citep{Armadillo} vector \verb+average+ contains the values we need, so these are extracted and then used to calculate the heat capacity and susceptibility. We calculate the heat capacity and magnetic susceptibility using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility}, where we have scaled the equations such that $k_B = 1$. Note that the absolute of the magnetization is used to calculate the magnetic susceptibility instead of the magnetization itself, as the former is a much more stable measure of what is actually happening when the magnetization gets close to zero.
 
-When the averages are extracted from the vector, note that we multiply by a normalizing factor. This is because when calculating the varlues that are stored in \verb+average+ we have only added to their total in each Monte Carlo cycle. To actually get the average we need to divide by the amount of cycles, which is what is done by multiplying with the normalizing factor. Also note that we are interested in values per spin, so we divide by the total amount of spins (stored in variable \verb+n_spins2+) in all of the values. As we do not write averaged energy squared and magnetization squared to file, dividing them by the amount of spins as well would be redundant and is therefore not done.
+When the averages are extracted from the vector, note that we multiply by a normalizing factor. This is because when calculating the varlues that are stored in \verb+average+ we have only added to their total in each Monte Carlo cycle. To actually get the average we need to divide by the amount of cycles, which is what is done by multiplying with the normalizing factor. Also note that we are interested in values per spin, so we divide by the total amount of spins (stored in variable \verb+n_spins2+) in all of the values. As we do not write mean energy squared and magnetization squared to file, dividing them by the amount of spins as well would be redundant and is therefore not done.
 
 \subsubsection{Calculation and comparison of results} \label{sec:III:a:iv}
 
-The C++ programs output results to a file. Depending on the kind of run that is performed (see section \hyperref[sec:III:b]{III.B} for more details on this) the programs will either write results once per Monte Carlo sweep or once at the end of a simulation. If a single simulation (for one temperature) is performed the programs write total energy and magnetization to file once per Monte Carlo sweep. This is used to evaluate how quickly the solutions stabilize. The programs also have the possibility to run simulations for several temperatures with one run, and in this case the averaged energy, averaged magnetization, averaged absolute value of magnetization, heat capacity, magnetic susceptibility and temperature is written to file at the end of each simulation. In this case the heat capacity and magnetic susceptibility are calculated using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility} respectively.
+The C++ programs output results to a file. Depending on the kind of run that is performed (see section \hyperref[sec:III:b]{III.B} for more details on this) the programs will either write results once per Monte Carlo sweep or once at the end of a simulation. If a single simulation (for one temperature) is performed the programs write total energy and magnetization to file once per Monte Carlo sweep. This is used to evaluate how quickly the solutions stabilize. The programs also have the possibility to run simulations for several temperatures with one run, and in this case the mean energy, mean magnetization, mean absolute value of magnetization, heat capacity, magnetic susceptibility and temperature is written to file at the end of each simulation. In this case the heat capacity and magnetic susceptibility are calculated using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility} respectively.
 
 In post-processing these results can be used to estimate the critical temperature of the system. From the relations listed in equations \eqref{eq:power_law_heat_capacity}, \eqref{eq:power_law_magnetization_per_spin} and \eqref{eq:power_law_susceptibility} we can estimate the critical temperature from the behaviour of heat capacity, magnetization and magnetic susceptibility as functions of the temperature. As the exponent in the expressions for the heat capacity and magnetic susceptibility are negative, we expect that these will diverge closer to the critical temperature. In a numerical simulation of a finite lattice they will never actually diverge, but we still expect them to reach maximum values around the critical temperature, and this gives us two estimates of the critical temperature. 
 
@@ -851,7 +851,7 @@ def get_critical_temperature(Ls, Cv, Xi, T):
     return p[1], TC
 \end{python} 
 
-The variable \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+absM+ contains the averaged absolute of the magnetization, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. 
+The variable \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+absM+ contains the mean absolute of the magnetization, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. 
 
 We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arrays are both practical and have useful built-in functions that can act upon these that significantly simplify the calculations we perform in Python. In this case we use them to identify the maximum points in the two arrays for heat capacity and magnetic susceptibility using \verb+numpy.where()+ function which returns the indices at which the argument are true (argument should be a boolean array). We also use the \verb+flatten()+ member function of arrays which reduces the array to a 1-dimensional array. This is to avoid any unwanted nesting that might show up. Lastly, \verb+numpy.polyfit()+ is used to fit the calculated critical temperatures at different lattice lengths $L$ to the first order polynomial given in \eqref{eq:crit_temperature_finite_lattice}. The constant term from this fit is our estimate of the critical temperature in the thermodynamic limit. The function returns all of the critical temperature estimates.
 
@@ -914,6 +914,41 @@ We also measured the improvement in time consumption for the parallelized simula
 
 \subsection{Simulation with a $2\times 2$ lattice} \label{sec:IV:B}
 
+We simulated a $2 \times 2$ lattice to compare with the analytical results found in section \hyperref[sec:II:A:i]{II.A.1}. In these simulations we recorded the energy and magnetization per spin in each Monte Carlo sweep in order to observe how they develop, and how the values derived from them also develop as a function of the amount of sweeps performed. We have plotted the energy, absolute of magnetization, heat capacity and magnetic susceptibility as functions of the amount of sweeps performed, and these plots can be seen in figures \ref{fig:t10_2x2_energy_magnetization} and \ref{fig:t10_2x2_heat_capacity_susceptibility}. The analytic values found in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility} are also plotted for comparison. We also calculated absolute and relative errors in the final values for all of these quantities and also the absolute error for the mean magnetization. These are listed in table \ref{table:t10_2x2_errors}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{../data/t10-2x2-E.pdf}
+\includegraphics[width=\columnwidth]{../data/t10-2x2-|M|.pdf}
+\caption{This figure contains plots of the mean energy per spin and the mean absolute value of the magnetization per spin as functions of the amount of Monte Carlo sweeps performed for a simulation with a $2\times 2$ lattice and with temperature $T=1$ (in units of $k_B T/J$). The plots also contain the analytic values for these as given in equation \eqref{eq:2x2_energy} and \eqref{eq:2x2_abs_magnetization}.} \label{fig:t10_2x2_energy_magnetization}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{../data/t10-2x2-Cv.pdf}
+\includegraphics[width=\columnwidth]{../data/t10-2x2-Xi.pdf}
+\caption{This figure contains plots of the heat capacity per spin and the magnetic susceptibility per spin as functions of the amount of Monte Carlo sweeps performed for a simulation with a $2\times 2$ lattice and with temperature $T=1$ (in units of $k_B T/J$). The plots also contain the analytic values for these as given in equation \eqref{eq:2x2_heat_capacity} and \eqref{eq:2x2_susceptibility}.} \label{fig:t10_2x2_heat_capacity_susceptibility}
+\end{figure}
+
+\begin{table}[H]
+\centering 
+\caption{This table contains errors in the numerically calculated values of the mean energy $\langle E \rangle$, mean magnetization $\langle \mathcal{M} \rangle$, mean absolute of the magnetization $\langle |\mathcal{M}| \rangle$, heat capacity $C_V$ and magnetic susceptibility $\chi$ (all per spin) for a $2\times 2$ lattice with $T=1$ /in units of $k_BT/J$) after $10^6$ Monte Carlo sweeps. The numerically calculated values are compared to their analytic counterparts as they are given in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility}. Also note that the analytic value for the mean magnetization is zero, and thus there is no relative error listed as it is undefined.} \label{table:t10_2x2_errors}
+\begin{tabular}{|c|c|c|}
+\hline
+Value & Absolute error & Relative error \\
+\hline
+$\langle E \rangle$ & \num{-6.991e-05} & \num{3.503e-05} \\
+\hline
+$\langle \mathcal{M} \rangle$ & \num{-5.221e-03} & - \\
+\hline
+$\langle |\mathcal{M}| \rangle$ & \num{1.527e-05} & \num{1.529e-05} \\
+\hline 
+$C_V$ & \num{-5.535e-04} & \num{1.726e-02} \\
+\hline
+$\chi$ & \num{-8.811e-06} & \num{2.207e-06} \\
+\hline
+\end{tabular}
+\end{table}
 
 \subsection{Simulations with a $20 \times 20$ lattice} \label{sec:IV:C}
 
@@ -924,14 +959,14 @@ In order to evaluate the stability and convergence of our solver we simulated a 
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t1.0-20x20-E"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t1.0-20x20-E"}.pdf}
-\caption{This figure contains plots of averaged energy as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-energy}
+\caption{This figure contains plots of mean energy as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-energy}
 \end{figure} 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t1.0-20x20-|M|"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t1.0-20x20-|M|"}.pdf}
-\caption{This figure contains plots of the averaged absolute of the magnetization as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-absolute_magnetization}
+\caption{This figure contains plots of the mean absolute of the magnetization as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-absolute_magnetization}
 \end{figure} 
 
 \begin{figure}[H]
@@ -953,14 +988,14 @@ In order to evaluate the stability and convergence of our solver we simulated a 
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t2.4-20x20-E"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t2.4-20x20-E"}.pdf}
-\caption{This figure contains plots of averaged energy as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-energy}
+\caption{This figure contains plots of mean energy as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-energy}
 \end{figure} 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t2.4-20x20-|M|"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t2.4-20x20-|M|"}.pdf}
-\caption{This figure contains plots of the averaged absolute of the magnetization as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-absolute_magnetization}
+\caption{This figure contains plots of the mean absolute of the magnetization as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-absolute_magnetization}
 \end{figure} 
 
 \begin{figure}[H]
