@@ -393,18 +393,36 @@ if __name__ == "__main__":
         M = data[:, 1]
         absM = data[:, 2]
 
+        # Calculating heat capacity and magnetization per spin
+        Cv = (4/(temp**2)) * (np.mean(E**2) - np.mean(E)**2)
+        Xi = (4/temp) * (np.mean(M**2) - np.mean(M)**2)
+
         # calculating analytic results:
         E_exp = -2*np.sinh(8/temp)/(np.cosh(8/temp) + 3)
         absM_exp = (2*np.exp(8/temp) + 4)/(np.cosh(8/temp) + 3)/4
+        Xi_exp = (4/(2*temp)) * ((np.exp(8/temp) + 1)/(np.cosh(8/temp) + 3))
+        Cv_exp = (48/(temp**2)) * (np.cosh(8/temp)/((np.cosh(8/temp) + 3)**2))
 
         # printing absolute difference to terminal.
         print("Difference between analytic and numeric results:")
         print(f"<E>: {np.mean(E)-E_exp:e}")
         print(f"<M>: {np.mean(M):e}")
         print(f"<|M|>: {np.mean(absM)-absM_exp:e}")
+        print(rf"$C_V$: {Cv-Cv_exp:e}")
+        print(rf"$\chi$: {Xi-Xi_exp:e}")
+
+        # printing relative error to terminal.
+        print("Relative error between analytic and numeric results:")
+        print(f"<E>: {abs((np.mean(E)-E_exp)/E_exp):e}")
+        print(f"<|M|>: {abs((np.mean(absM)-absM_exp)/absM_exp):e}")
+        print(rf"$C_V$: {abs((Cv-Cv_exp)/Cv_exp):e}")
+        print(rf"$\chi$: {abs((Xi-Xi_exp)/Xi_exp):e}")
 
         # taking normalized, cumulative sum of data
         n_cycles = np.linspace(1, nmax, len(E))
+        E2 = np.cumsum(E**2)/n_cycles
+        M2 = np.cumsum(M**2)/n_cycles
+        M = np.cumsum(M)/n_cycles
         E = np.cumsum(E)/n_cycles
         absM = np.cumsum(absM)/n_cycles
 
@@ -412,11 +430,11 @@ if __name__ == "__main__":
         plt.figure()
         plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
         plt.hlines(
-            E_exp, 0, nmax, 'r', label="Analytic " + r"$\langle E \rangle/J$"
+            E_exp, 0, nmax, 'r', label="Analytic " + r"$\langle E \rangle/\, J$"
         )
-        plt.plot(n_cycles, E, label=r"$\langle E \rangle/J$")
+        plt.plot(n_cycles, E, label=r"$\langle E \rangle/\, J$")
         plt.xlabel("N")
-        plt.ylabel(r"$\langle E \rangle/J$")
+        plt.ylabel(r"$\langle E \rangle/\,J$")
         plt.legend()
         plt.grid()
         plt.savefig(
@@ -436,6 +454,30 @@ if __name__ == "__main__":
         plt.grid()
         plt.savefig(
             rootdir + f"/data/t{temp*10}-{L}x{L}-|M|.pdf", bbox_inches='tight')
+
+        plt.figure()
+        plt.title(f"Heat capacity of {L}x{L} lattice with T = {temp}")
+        plt.hlines(Cv_exp,0,nmax,'r', label=r"Analytic $C_V$")
+        plt.plot(n_cycles, ((L**2)/(temp**2)) * (E2 - E**2), label=r"$C_V$")
+        plt.xlabel("N")
+        plt.ylabel(r"$C_V/\, J k_B$")
+        plt.legend()
+        plt.grid()
+        plt.savefig(
+            rootdir + f"/data/t{temp*10}-{L}x{L}-Cv.pdf", bbox_inches='tight'
+        )
+
+        plt.figure()
+        plt.title(f"Magnetic susceptibility of {L}x{L} lattice with T = {temp}")
+        plt.hlines(Xi_exp,0,nmax,'r', label=r"Analytic $\chi$")
+        plt.plot(n_cycles, ((L**2)/temp) * (M2 - M**2), label=r"$\chi$")
+        plt.xlabel("N")
+        plt.ylabel(r"$\chi$")
+        plt.legend()
+        plt.grid()
+        plt.savefig(
+            rootdir + f"/data/t{temp*10}-{L}x{L}-Xi.pdf", bbox_inches='tight'
+        )
 
     if runflag == "st":
         """Running simulations for 20x20 lattice with T = 1 and T = 2.4."""
