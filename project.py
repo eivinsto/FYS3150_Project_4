@@ -121,9 +121,10 @@ def read_stabilization_data(file):
         randstr + "\n" + var
     )
     plt.hist(E[slicer:], bins="auto", density=True, stacked=True)
+    #plt.plot(np.sort(E[slicer:]), (2.2/(np.sqrt(2*np.pi*Evar)))*np.exp(-((np.sort(E[slicer:])-np.mean( E[slicer:] ))**2 /Evar  )/2 ) ,'r',label='Normal distribution')
     plt.xlabel("E/J")
     plt.ylabel("P(E/J)")
-    # plt.legend()
+    #plt.legend()
     plt.grid()
     plt.savefig(
         rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-PE.pdf",
