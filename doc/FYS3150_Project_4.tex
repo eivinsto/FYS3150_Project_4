@@ -419,7 +419,7 @@ C_V &\sim |T_C - T |^{-\alpha} \propto  L^{\alpha/\nu} \, , \numberthis \label{e
 where all variables are as defined earlier. We can use these relations to generate an estimate of $T_C(L)$, and if this is done for multiple $L$ we can estimate $T_C(L=\infty)$ by using equation \eqref{eq:crit_temperature_finite_lattice}. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite is simply not possible. The analytical critical temperature with $\nu=1$ is (\citep{L.Onsager1944}):
 
 \begin{align*}
-\tilde{T}_C &= \frac{k_B T_C}{J} = \frac{2}{\ln(1 + \sqrt{2})} \approx 2.269 \, , \numberthis \label{eq:crit_temperature_analytical}
+\tilde{T}_C &= \frac{k_B T_C}{J} = \frac{2}{\ln(1 + \sqrt{2})} \approx 2.26919 \, , \numberthis \label{eq:crit_temperature_analytical}
 \end{align*}
 
 where we have scaled the temperature $\tilde{T}_C$ using $k_B$ and $J$ so that it is a dimensionless quantity.
@@ -1016,8 +1016,45 @@ In order to evaluate the stability and convergence of our solver we simulated a 
 
 \subsection{Simulations with larger lattice sizes} \label{sec:IV:D}
 
+% Creating variables for simulation specs so we do not have to change them everywhere if we change them later
+\newcommand{\tempsteps}{8}
+\newcommand{\tempmin}{2.20}
+\newcommand{\tempmax}{2.35}
+
+We ran simulations with lattice sizes $40\times 40$, $60 \times 60$, $80 \times 80$ and $100 \times 100$ in the temperature range $T\in[\tempmin ,\tempmax ]$ (in units of $k_B T/J$) in order to look for signs of a phase transition. A phase transition should occur at the critical temperature. The analytical critical temperature for an infinite lattice is given in \eqref{eq:crit_temperature_analytical} and the critical temperatures for different lattice dimensions $L$ is related to the one for an infinite lattice as shown in \eqref{eq:crit_temperature_finite_lattice}. The critical temperatures measured for different lattice sizes should always be larger than the one for an infinite lattice, and so we selected the temperature interval to be such that the critical temperature for an infinite lattice is slightly less than the middle value of the interval. We chose to use $\tempsteps$ temperature steps. The calculated mean energy per spin as a function of temperature can be seen in figure \ref{fig:ph-energy}, the mean magnetization and mean absolute of the magnetization as functions of temperature can be seen in figure \ref{fig:ph-magnetization}, and the heat capacity and susceptibility as functions of temperature can be seen in \ref{fig:ph-heat-capacity-susceptibility}. We estimated the critical temperatures using the methods outlined in section \hyperref[sec:III:A.iv]{III.A.4}, and the values found are listed in table \ref{table:crit_temps}. The relative error of the numerically calculated critical temperature for an infinite lattice compared to the analytical one was found to be \num{3.78e-06}.
 
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{../data/phase-transition-E.pdf}
+\caption{This figure contains a plot of the mean energy per spin as a function of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-energy}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{../data/phase-transition-M.pdf}
+\includegraphics[width=\columnwidth]{../data/phase-transition-|M|.pdf}
+\caption{This figure contains plots of the mean magnetization per spin and mean absolute of the magnetization per spin as functions of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-magnetization}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{../data/phase-transition-Cv.pdf}
+\includegraphics[width=\columnwidth]{../data/phase-transition-Xi.pdf}
+\caption{This figure contains plots of the heat capacity per spin and magnetic susceptibility per spin as functions of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-heat-capacity-susceptibility}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{This table contains numerically calculated critical temperatures $T_C(L)$ for lattice sizes $L \times L$. The critical temperature for an infinite lattice $T_C(L=\infty)$ is estimated from the other values using equation \eqref{eq:crit_temperature_finite_lattice}, and has a relative error of \num{3.78e-06} compared to the analytical result listed in \eqref{eq:crit_temperature_analytical}.} \label{table:crit_temps}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$L$ & 40 & 60 & 80 & 100 & $\infty$ \\
+\hline
+$T_C(L)$ & 2.30714 & 2.29643 & 2.28571 & 2.28571 & 2.26918 \\
+\hline
+\end{tabular}
+\end{table}
 
 
 \newpage
