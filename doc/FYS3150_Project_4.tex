@@ -847,13 +847,13 @@ def get_critical_temperature(Ls, Cv, Xi, T):
 
     # Fitting critical temperature as a function of L to estimate
     # critical temperature at L=inf
-    p = np.polyfit(1/np.array(Ls), TC, 1)
-    return p[1], TC
+    p, V = np.polyfit(1/np.array(Ls), TC, 1, cov=True)
+    return p[1], np.sqrt(V[1][1]), TC
 \end{python} 
 
 The variable \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+absM+ contains the mean absolute of the magnetization, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. 
 
-We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arrays are both practical and have useful built-in functions that can act upon these that significantly simplify the calculations we perform in Python. In this case we use them to identify the maximum points in the two arrays for heat capacity and magnetic susceptibility using \verb+numpy.where()+ function which returns the indices at which the argument are true (argument should be a boolean array). We also use the \verb+flatten()+ member function of arrays which reduces the array to a 1-dimensional array. This is to avoid any unwanted nesting that might show up. Lastly, \verb+numpy.polyfit()+ is used to fit the calculated critical temperatures at different lattice lengths $L$ to the first order polynomial given in \eqref{eq:crit_temperature_finite_lattice}. The constant term from this fit is our estimate of the critical temperature in the thermodynamic limit. The function returns all of the critical temperature estimates.
+We use NumPy \citep{numpy} functions throughout our implementation, as NumPy arrays are both practical and have useful built-in functions that can act upon these that significantly simplify the calculations we perform in Python. In this case we use them to identify the maximum points in the two arrays for heat capacity and magnetic susceptibility using \verb+numpy.where()+ function which returns the indices at which the argument are true (argument should be a boolean array). We also use the \verb+flatten()+ member function of arrays which reduces the array to a 1-dimensional array. This is to avoid any unwanted nesting that might show up. Lastly, \verb+numpy.polyfit()+ is used to fit the calculated critical temperatures at different lattice lengths $L$ to the first order polynomial given in \eqref{eq:crit_temperature_finite_lattice}. The constant term from this fit is our estimate of the critical temperature in the thermodynamic limit. NumPy's \verb+polyfit()+ function can also return the covariance matrix, of which the second diagonal element is the uncertainty in the constant term from the fit. The function returns all of the critical temperature estimates and the uncertainty in the critical temperature for an infinite lattice from the fit.
 
 
 \subsection{Unit-testing} \label{sec:III:B}
@@ -1051,7 +1051,7 @@ We ran simulations with lattice sizes $40\times 40$, $60 \times 60$, $80 \times 
 \hline
 $L$ & 40 & 60 & 80 & 100 & $\infty$ \\
 \hline
-$T_C(L)$ & 2.30714 & 2.29643 & 2.28571 & 2.28571 & 2.26918 \\
+$T_C(L)$ & 2.307 & 2.296 & 2.286 & 2.286 & $2.269\pm 0.004$ \\
 \hline
 \end{tabular}
 \end{table}
