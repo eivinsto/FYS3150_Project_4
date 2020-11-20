@@ -169,7 +169,7 @@ void IsingMetropolis::run_multi(bool randspin) {
   int max_threads = omp_get_max_threads()*3/4;
   int thrds = std::min(max_threads, n_temps);
   std::cout << "Simulating L = " << n_spins << " with " << thrds << " threads." << std::endl;
-  double wtime = omp_get_wtime ( );
+  double wtime = omp_get_wtime();
 
   // Parallelized for loop
   #pragma omp parallel for num_threads(thrds)
@@ -199,7 +199,7 @@ void IsingMetropolis::run_multi(bool randspin) {
     #pragma omp critical
     write_to_file_multi(average, temperature(i));
   }
-  wtime = omp_get_wtime ( ) - wtime;
+  wtime = omp_get_wtime() - wtime;
   std::cout << "Finished simulating L = " << n_spins << " with " << thrds << " threads."
   << "\nElapsed time in seconds = " << wtime << std::endl;
 }

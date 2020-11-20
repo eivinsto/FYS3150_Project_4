@@ -16,7 +16,7 @@ main.exe: main.o $(OFILES)
 main.o: main.cpp
 	$(CC) $(FLAGS) $(DEBUG) main.cpp -c
 
-metropolis.o: ising_metropolis.cpp
+ising_metropolis.o: ising_metropolis.cpp
 	$(CC) $(FLAGS) $(DEBUG) ising_metropolis.cpp -c
 
 

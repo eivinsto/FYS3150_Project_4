@@ -124,7 +124,7 @@ def read_stabilization_data(file):
     #plt.plot(np.sort(E[slicer:]), (2.2/(np.sqrt(2*np.pi*Evar)))*np.exp(-((np.sort(E[slicer:])-np.mean( E[slicer:] ))**2 /Evar  )/2 ) ,'r',label='Normal distribution')
     plt.xlabel("E/J")
     plt.ylabel("P(E/J)")
-    #plt.legend()
+    # plt.legend()
     plt.grid()
     plt.savefig(
         rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-PE.pdf",
@@ -357,7 +357,7 @@ def read_benchmark(N_list, gccflags, archflag, L, n_temps):
 
 
 runflag = "start"
-nmax = int(1e6)
+nmax = int(1e7)
 if __name__ == "__main__":
     while (runflag != "an" and runflag != "st" and runflag != "ph"
            and runflag != "b" and runflag != "test"):
@@ -458,7 +458,7 @@ if __name__ == "__main__":
 
         plt.figure()
         plt.title(f"Heat capacity of {L}x{L} lattice with T = {temp}")
-        plt.hlines(Cv_exp,0,nmax,'r', label=r"Analytic $C_V$")
+        plt.hlines(Cv_exp, 0, nmax, 'r', label=r"Analytic $C_V$")
         plt.plot(n_cycles, ((L**2)/(temp**2)) * (E2 - E**2), label=r"$C_V$")
         plt.xlabel("N")
         plt.ylabel(r"$C_V/\, J k_B$")
@@ -470,7 +470,7 @@ if __name__ == "__main__":
 
         plt.figure()
         plt.title(f"Magnetic susceptibility of {L}x{L} lattice with T = {temp}")
-        plt.hlines(Xi_exp,0,nmax,'r', label=r"Analytic $\chi$")
+        plt.hlines(Xi_exp, 0, nmax, 'r', label=r"Analytic $\chi$")
         plt.plot(n_cycles, ((L**2)/temp) * (M2 - M**2), label=r"$\chi$")
         plt.xlabel("N")
         plt.ylabel(r"$\chi$")
@@ -543,14 +543,16 @@ if __name__ == "__main__":
         print("Estimated critical temperature in thermodynamical limit: ",
               TCinf, r" $\pm$ ",TCinf_uncertainty )
 
-        for i,L in enumerate(Ls):
-            print(f"Estimate critical temperature with {L}x{L} lattice: {TC[i]}")
+        for i, L in enumerate(Ls):
+            print("Estimate critical temperature " +
+                  f"with {L}x{L} lattice: {TC[i]}")
 
         # plotting data:
         plt.figure()
         plt.title(r"Mean energy")
         for i in range(len(Ls)):
-            plt.plot(T, E[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+            plt.plot(T, E[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed',
+                     marker='+', ms=8)
         plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\langle E \rangle/\,J$")
         plt.legend()
@@ -562,49 +564,53 @@ if __name__ == "__main__":
         plt.figure()
         plt.title(r"Mean magnetization")
         for i in range(len(Ls)):
-            plt.plot(T, M[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+            plt.plot(T, M[i, :], label=f"{Ls[i]}x{Ls[i]}",
+                     linestyle='dashed', marker='+', ms=8)
         plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\langle \mathcal{M} \rangle$")
         plt.legend()
         plt.grid()
         plt.savefig(
-            rootdir + f"/data/phase-transition-M.pdf", bbox_inches='tight'
+            rootdir + "/data/phase-transition-M.pdf", bbox_inches='tight'
         )
 
         plt.figure()
         plt.title("Heat capacity")
         for i in range(len(Ls)):
-            plt.plot(T, Cv[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+            plt.plot(T, Cv[i, :], label=f"{Ls[i]}x{Ls[i]}",
+                     linestyle='dashed', marker='+', ms=8)
         plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$C_{v}/\, Jk_B$")
         plt.legend()
         plt.grid()
         plt.savefig(
-            rootdir + f"/data/phase-transition-Cv.pdf", bbox_inches='tight'
+            rootdir + "/data/phase-transition-Cv.pdf", bbox_inches='tight'
         )
 
         plt.figure()
         plt.title("Magnetic susceptibility")
         for i in range(len(Ls)):
-            plt.plot(T, Xi[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+            plt.plot(T, Xi[i, :], label=f"{Ls[i]}x{Ls[i]}",
+                     linestyle='dashed', marker='+', ms=8)
         plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\chi$")
         plt.legend()
         plt.grid()
         plt.savefig(
-            rootdir + f"/data/phase-transition-Xi.pdf", bbox_inches='tight'
+            rootdir + "/data/phase-transition-Xi.pdf", bbox_inches='tight'
         )
 
         plt.figure()
         plt.title(r"Mean absolute value of magnetization")
         for i in range(len(Ls)):
-            plt.plot(T, absM[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+            plt.plot(T, absM[i, :], label=f"{Ls[i]}x{Ls[i]}",
+                     linestyle='dashed', marker='+', ms=8)
         plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
         plt.legend()
         plt.grid()
         plt.savefig(
-            rootdir + f"/data/phase-transition-|M|.pdf", bbox_inches='tight'
+            rootdir + "/data/phase-transition-|M|.pdf", bbox_inches='tight'
         )
 
     if runflag == "b":
