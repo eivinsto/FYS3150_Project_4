@@ -442,7 +442,7 @@ if __name__ == "__main__":
 
         plt.figure()
         plt.title(f"Average magnitude of magnetization of {L}x{L}" +
-                  f"lattice with T = {temp}")
+                  f" lattice with T = {temp}")
         plt.hlines(
             absM_exp, 0, nmax, 'r',
             label="Analytic " + r"$\langle | \mathcal{M} | \rangle$"
