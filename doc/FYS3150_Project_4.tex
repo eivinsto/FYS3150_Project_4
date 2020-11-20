@@ -467,7 +467,7 @@ where we only sum over \(k\), since only one spin \(s_{l}\) is flipped.
 For a two dimensional lattice, each spin only has four neighbours, thus we can write out the sum for any randomly chosen \(s_{l}\) with neighbours \(s_{a}, s_{b}, s_{c}, s_{d}\) as
 
 \begin{align*}
-	\Delta E = 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \\
+	\Delta E = 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \numberthis \label{eq:singleflip_energy_change} \\
 	\Delta E = 2J(\pm 1)\left[(\pm 1) + (\pm 1) + (\pm 1) + (\pm 1)\right]
 \end{align*}
 
@@ -555,11 +555,7 @@ E = 4J \quad \begin{array}{ccc}
 
 with $\Delta E = -8J$. These are the only possible changes in energy. The other possible transitions are the ones above but in reverse, and the energy change is then just what is listed, but with the sign being flipped. 
 
-With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case. In a two-dimensional system it is beneficiary to denote the spins as matrix elements $s_{ij}$ where $i$ is the lattice position of the spin in the $x$-direction and similarly for $j$ in the $y$-direction. With this notation we can establish an expression for the energy change from flipping spin $s_{ij}$:
-
-\begin{align*}
-\Delta E &= -2J s_{ij} \bigg( s_{i,j+1} + s_{i,j-1} + s_{i+1,j} + s_{i-1,j} \bigg) \numberthis \label{eq:singleflip_energy_change}
-\end{align*}
+With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case.
 
 A problem we encounter at this point is how we model the periodic boundary conditions. If we use a square lattice, we can use the amount of spins in a dimension $L$ and the modulo operator to define a function $f(i,k)$ that takes a valid index $i$ and what is to be added to it $k$, and returns the correct index on the other side of the lattice if it is out of bounds:
 
