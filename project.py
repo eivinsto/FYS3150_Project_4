@@ -542,51 +542,69 @@ if __name__ == "__main__":
         print("Estimated critical temperature in thermodynamical limit: ",
               TCinf)
 
+        for i,L in enumerate(Ls):
+            print(f"Estimate critical temperature with {L}x{L} lattice: {TC[i]}")
+
         # plotting data:
         plt.figure()
-        plt.title(r"$\langle E \rangle/J$")
+        plt.title(r"Mean energy")
         for i in range(len(Ls)):
-            plt.plot(T, E[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel(r"$k_B T/J$")
-        plt.ylabel(r"$\langle E \rangle/J$")
+            plt.plot(T, E[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+        plt.xlabel(r"$k_B T/\,J$")
+        plt.ylabel(r"$\langle E \rangle/\,J$")
         plt.legend()
         plt.grid()
+        plt.savefig(
+            rootdir + f"/data/phase-transition-E.pdf", bbox_inches='tight'
+        )
 
         plt.figure()
-        plt.title(r"$\langle \mathcal{M} \rangle$")
+        plt.title(r"Mean magnetization")
         for i in range(len(Ls)):
-            plt.plot(T, M[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel(r"$k_B T/J$")
+            plt.plot(T, M[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+        plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\langle \mathcal{M} \rangle$")
         plt.legend()
         plt.grid()
+        plt.savefig(
+            rootdir + f"/data/phase-transition-M.pdf", bbox_inches='tight'
+        )
 
         plt.figure()
-        plt.title(r"$C_{v}$")
+        plt.title("Heat capacity")
         for i in range(len(Ls)):
-            plt.plot(T, Cv[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel(r"$k_B T/J$")
-        plt.ylabel(r"$C_{v}$")
+            plt.plot(T, Cv[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+        plt.xlabel(r"$k_B T/\,J$")
+        plt.ylabel(r"$C_{v}/\, Jk_B$")
         plt.legend()
         plt.grid()
+        plt.savefig(
+            rootdir + f"/data/phase-transition-Cv.pdf", bbox_inches='tight'
+        )
 
         plt.figure()
-        plt.title(r"$\chi$")
+        plt.title("Magnetic susceptibility")
         for i in range(len(Ls)):
-            plt.plot(T, Xi[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel(r"$k_B T/J$")
+            plt.plot(T, Xi[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+        plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\chi$")
         plt.legend()
         plt.grid()
+        plt.savefig(
+            rootdir + f"/data/phase-transition-Xi.pdf", bbox_inches='tight'
+        )
 
         plt.figure()
-        plt.title(r"$\langle | \mathcal{M} | \rangle$")
+        plt.title(r"Mean absolute value of magnetization")
         for i in range(len(Ls)):
-            plt.plot(T, absM[i, :], label=f"L = {Ls[i]}")
-        plt.xlabel(r"$k_B T/J$")
+            plt.plot(T, absM[i, :], label=f"{Ls[i]}x{Ls[i]}", linestyle='dashed', marker='+', ms=8)
+        plt.xlabel(r"$k_B T/\,J$")
         plt.ylabel(r"$\langle | \mathcal{M} | \rangle$")
         plt.legend()
         plt.grid()
+        plt.savefig(
+            rootdir + f"/data/phase-transition-|M|.pdf", bbox_inches='tight'
+        )
 
     if runflag == "b":
         L = 20
