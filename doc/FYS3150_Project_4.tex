@@ -138,6 +138,13 @@ Abstract
 \tableofcontents
 
 \section{Introduction} \label{sec:I}
+The Ising model is a widely popular model for the simulation of phase transitions in magnetic systems. In this report we will look at a 2D lattice of two-state magnetic spins and simulate both temperatures at which the system is magnetized, and states at which the system is not magnetized. To perform our simulations, we will create a C++ program that performs Monte Carlo simulations of the Ising model using the Metropolis algorithm. We will be using periodic boundary conditions for our 2D lattice.
+
+Firstly we will test our implementation by simulating a \(2\times 2\) lattice and comparing the numeric mean energy, mean magnetization, mean magnitude of magnetization, specific heat capacity and magnetic susceptibility to analytically derived values.
+
+We will then investigate the stability of our implementation, by simulating a \(20\times 20\) lattice for both phases of the magnetization. We will look at how many Monte Carlo cycles are necessary to achieve the most likely state of the system. Furthermore, we will look at the amount of accepted spin flips during simulation, as well as the probability distribution \(P(E)\) of the energies of the system.
+
+Lastly, we will attempt to find the critical temperature at which the phase transition occurs. This will be done by simulating various temperatures in near the critical temperature for lattices of various sizes, and then using the specific heat capacities and magnetic susceptibilities to estimate the critical temperature of each lattice, which in turn are used to estimate the critical temperature in the thermodynamic limit of a 2D lattice with infinitely many spins.
 
 
 \newpage
