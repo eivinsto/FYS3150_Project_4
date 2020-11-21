@@ -796,6 +796,68 @@ The Armadillo \citep{Armadillo} vector \verb+average+ contains the values we nee
 
 When the averages are extracted from the vector, note that we multiply by a normalizing factor. This is because when calculating the varlues that are stored in \verb+average+ we have only added to their total in each Monte Carlo cycle. To actually get the average we need to divide by the amount of cycles, which is what is done by multiplying with the normalizing factor. Also note that we are interested in values per spin, so we divide by the total amount of spins (stored in variable \verb+n_spins2+) in all of the values. As we do not write mean energy squared and magnetization squared to file, dividing them by the amount of spins as well would be redundant and is therefore not done.
 
+Our system has a total of \(24\) threads available (see \hyperref[C]{appendix C}), and since the simulation of multiple temperature values is parallelized by running one simulation thread for each temperature, we end up leaving quite a few unused threads when we run the parallelized simulation for \(8\) temperatures. To take advantage of the remaining threads, we introduce another level of parallelization in the \verb+project.py+ python-script:
+\begin{python}
+def phase_trans_test(nmax, Ls, files, n_temps):
+    """Function running simulations for phase transition.
+    Runs the cpp program for each L-value. If enough threads are
+    available, multiple instances of the cpp program are run
+    concurrently.
+
+    Arguments:
+    nmax -- int: number of Monte Carlo cycles to perform.
+    Ls -- iterable: iterable containing the L-values to simulate.
+    files -- iterable: iterable containing the filenames to
+    				   write data to.
+    n_temps -- int: number of temperatures to simulate in interval
+                    [Tmin, Tmax].
+    """
+    Tmin, Tmax = 2.2, 2.35  # min and max temp.
+
+    # number of concurrent subprocesses to spawn
+    n_thrds = np.max([mp.cpu_count()//n_temps, 1])
+
+    def phase_L_sim(i):
+        """Function spawning subprocess and returning it."""
+        p = Popen(
+            [
+                "./main.exe",
+                files[i],
+                "multi",
+                f"{Ls[i]}",
+                f"{nmax}",
+                f"{Tmin}",
+                f"{Tmax}",
+                f"{n_temps}"
+            ],
+            cwd=src
+        )
+        return p
+
+    # sets number of subprocesses to spawn at the same time:
+    ranges = [len(Ls[i:i+n_thrds])
+    		  for i in range(0, len(Ls), n_thrds)]
+    		  
+    # iterating through number of subprocesses
+    # to spawn at the same time:
+    print("Spawning subprocesses:")
+    sims = [phase_L_sim(j) for j in range(ranges[0])]
+
+    # loop checking status of subprocesses,
+    # and spawning new subprocesses when a current one finishes.
+    i = len(sims)
+    while i < len(Ls):
+        for p in sims:
+            if p.poll() is not None:
+                print("Spawning subprocesses:")
+                sims.append(phase_L_sim(i))
+                i += 1
+
+    # waiting for all subprocesses to finish
+    [p.wait() for p in sims]
+\end{python}
+The above python function takes in a list of lattice dimensions \(L\), and spawns independent instances of the C++ program for each \(L\), such that the maximum amount of possible threads are used during simulation. In our case we have \(8\) threads for each value of \(L\), meaning we can simulate \(3\) values of \(L\) at any given time, resulting in \(3\cdot 8 = 24\) threads being used.
+
 \subsubsection{Calculation and comparison of results} \label{sec:III:a:iv}
 
 The C++ programs output results to a file. Depending on the kind of run that is performed (see section \hyperref[sec:III:b]{III.B} for more details on this) the programs will either write results once per Monte Carlo sweep or once at the end of a simulation. If a single simulation (for one temperature) is performed the programs write total energy and magnetization to file once per Monte Carlo sweep. This is used to evaluate how quickly the solutions stabilize. The programs also have the possibility to run simulations for several temperatures with one run, and in this case the mean energy, mean magnetization, mean absolute value of magnetization, heat capacity, magnetic susceptibility and temperature is written to file at the end of each simulation. In this case the heat capacity and magnetic susceptibility are calculated using equations \eqref{eq:heat_capacity} and \eqref{eq:magnetic_susceptibility} respectively.
