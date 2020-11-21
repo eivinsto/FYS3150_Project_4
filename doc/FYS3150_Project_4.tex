@@ -1189,18 +1189,40 @@ Through tests of the convergence of the results, we found that how many Monte Ca
 
 \appendix
 \section{Source code} \label{A}
-All code for this report was written in C++ and Python 3.6, and the complete set of files can be found at
+All code for this report was written in C++ and Python 3.6, and the complete set of files can be found at:
+
 \url{https://github.com/eivinsto/FYS3150_Project_4.git}.
 
 \cprotect\subsection{\verb+ising_metropolis.hpp+} \label{A.1}
 
+Header file containing definitions for the \verb+IsingMetropolis+ class, which is used to run the simulations. The file can be found at:
+
+\url{https://github.com/eivinsto/FYS3150_Project_4/blob/main/src/ising_metropolis.hpp}
+
 \cprotect\subsection{\verb+ising_metropolis.cpp+} \label{A.2}
+
+Source file containing the methods and constructors belonging to the \verb+IsingMetropolis+ class. The file can be found at:
+
+\url{https://github.com/eivinsto/FYS3150_Project_4/blob/main/src/ising_metropolis.cpp}
 
 \cprotect\subsection{\verb+main.cpp+} \label{A.3}
 
+Main program which can operate the simulations run in the \verb+IsingMetropolis+ class using command line arguments. The file can be found at:
+
+\url{https://github.com/eivinsto/FYS3150_Project_4/blob/main/src/main.cpp}
+
 \cprotect\subsection{\verb+python.py+} \label{A.4}
 
+Python script that automates the simulations performed in this report, and also produces plots and any post-processing of data necessary to produce the full results presented. The file can be found at:
+
+\url{https://github.com/eivinsto/FYS3150_Project_4/blob/main/project.py}
+
 \cprotect\subsection{\verb+test_functions.py+} \label{A.5}
+
+Python script that contains the unit-test using a $2 \times 2$-lattice, and comparing the results to analytical ones within a tolerance limit. The file can be found at:
+
+\url{https://github.com/eivinsto/FYS3150_Project_4/blob/main/test_functions.py}
+
 
 \newpage
 \section{Selected results} \label{B}
