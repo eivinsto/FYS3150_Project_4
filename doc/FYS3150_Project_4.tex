@@ -910,7 +910,7 @@ We also measured the improvement in time consumption for the parallelized simula
 
 \subsection{Simulation with a $2\times 2$ lattice} \label{sec:IV:B}
 
-We simulated a $2 \times 2$ lattice to compare with the analytical results found in section \hyperref[sec:II:A:i]{II.A.1}. In these simulations we recorded the energy and magnetization per spin in each Monte Carlo sweep in order to observe how they develop, and how the values derived from them also develop as a function of the amount of sweeps performed. We have plotted the energy, absolute of magnetization, heat capacity and magnetic susceptibility as functions of the amount of sweeps performed, and these plots can be seen in figures \ref{fig:t10_2x2_energy_magnetization} and \ref{fig:t10_2x2_heat_capacity_susceptibility}. The analytic values found in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility} are also plotted for comparison. We also calculated absolute and relative errors in the final values for all of these quantities and also the absolute error for the mean magnetization. These are listed in table \ref{table:t10_2x2_errors}.
+We simulated a $2 \times 2$ lattice to compare with the analytical results found in section \hyperref[sec:II:A:i]{II.A.1}. In these simulations we recorded the energy and magnetization per spin in each Monte Carlo sweep in order to observe how they develop, and how the values derived from them also develop as a function of the amount of sweeps performed. We have plotted the energy, absolute of magnetization, heat capacity and magnetic susceptibility as functions of the amount of sweeps performed, and these plots can be seen in figures \ref{fig:t10_2x2_energy_magnetization} and \ref{fig:t10_2x2_heat_capacity_susceptibility}. The analytic values found in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility} are also plotted for comparison. We also calculated errors and relative errors in the final values for all of these quantities and also the absolute error for the mean magnetization. These are listed in table \ref{table:t10_2x2_errors}. The errors are the differences between the numerical values and the analytical values.
 
 \begin{figure}[H]
 \centering
@@ -931,7 +931,7 @@ We simulated a $2 \times 2$ lattice to compare with the analytical results found
 \caption{This table contains errors in the numerically calculated values of the mean energy $\langle E \rangle$, mean magnetization $\langle \mathcal{M} \rangle$, mean absolute of the magnetization $\langle |\mathcal{M}| \rangle$, heat capacity $C_V$ and magnetic susceptibility $\chi$ (all per spin) for a $2\times 2$ lattice with $T=1$ /in units of $k_BT/J$) after $10^6$ Monte Carlo sweeps. The numerically calculated values are compared to their analytic counterparts as they are given in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility}. Also note that the analytic value for the mean magnetization is zero, and thus there is no relative error listed as it is undefined.} \label{table:t10_2x2_errors}
 \begin{tabular}{|c|c|c|}
 \hline
-Value & Absolute error & Relative error \\
+Value & Error & Relative error \\
 \hline
 $\langle E \rangle$ & \num{-6.991e-05} & \num{3.503e-05} \\
 \hline
@@ -1057,10 +1057,19 @@ $T_C(L)$ & 2.307 & 2.296 & 2.286 & 2.286 & $2.269\pm 0.004$ \\
 
 \section{Discussion} \label{sec:V}
 
+We have implemented a solver for a two-dimensional Ising model of spin interactions, in a square lattice with no external field, using the Metropolis algorithm. Using this solver we have simulated this model at several temperatures and lattice sizes, and in this section we will discuss the results presented in the previous sections.
+
 \subsection{Benchmark and timings} \label{sec:V:A}
 From the results in table \hyperref[table:benchmark_parallel]{II}, we se that parallelizing our metropolis simulation of the ising model by 
 
 \subsection{Simulation with a $2\times 2$ lattice} \label{sec:V:B}
+
+The results from this simulation can be seen in section \hyperref[sec:IV:B]{IV.B}. As expected we see (in figures \ref{fig:t10_2x2_energy_magnetization} and \ref{fig:t10_2x2_heat_capacity_susceptibility}) that the mean energy, absolute of the magnetization, heat capacity and susceptibility all stabilize around the expected values we derived in section \hyperref[sec:II:A:i]{II.A.1} after a sufficient amount of Monte Carlo sweeps ($N$ in the plots) have been performed. In general we see that all the values start to get close to their expected values after about $10^5$ sweeps, and that they are fairly stable after \num{2e5} sweeps. At first glance it may seem like the magnetic susceptibility is much more stable than the energy, heat capacity, and absolute of the magnetization, but that is not really the case, as the scale of the vertical axis in the plot of the magnetic susceptibility is much larger than in the other plots.
+
+We also calculated the error (difference between numerically calculated and analytical values) and the relative errors in the final values of the energy, magnetization, absolute of the magnetization, heat capacity and mangetic susceptibility. These results can be seen in table \ref{table:t10_2x2_errors}. The errors are not all that interesting, as none of them are very large. What is interesting though, is that they are all smaller than the analytical values. This is most likely an artifact of the initial configuration of the system. As most of the relative errors are also very small, we can conclude that the numerical values converge as expected. One notable exception here is the heat capacity, where there is a relative error of almost 2\%. An error such as this is significant, but we must also take into account that the system here is very small, and is thus fairly prone to numerical error as we discussed in section \hyperref[sec:III:C]{III.C}. 
+
+We also chose to use this system as a unit-test for our implementation, and as it is desirable to compare the numerical and analytical values for all of the quantities measured we also include a comparison of the heat capacity. As the relative error in the heat capacity is significantly larger than the other quantities the tolerance in this test also needs to be larger in order for the test to pass. In general it is bad practice to adjust the test to the results, but due to the nature of these simulations it is necessary to first attempt to quantify the size of the numerical errors we make in order to determine what a good selection of tolerance is. Therefore we chose to first 
+test that the results behaved as expected, and then formulate the unit-test to make sure that nothing breaks after we have verified that the solver works as it should.
 
 \subsection{Simulations with a $20 \times 20$ lattice} \label{sec:V:C}
 
