@@ -1177,13 +1177,17 @@ In general our results present very few signs of there being large numerical err
 
 For future research, with more computational resources available, this will become significant and an adapatation must be done, or else the errors in the results will be significant. Changing the method of calculating the averages will most likely involve adding floating point operations to each sweep, and with this there is a possibility for the truncation error in these to propagate and add a more significant contribution to the errors in the results. Thus the more desirable method of increasing the scaling options of the simulations is simply to use larger data types to store the values. By changing the variables from doubles to 16 byte long doubles we can double the amount of significant digits that they contain. This would also increase the amount of Monte Carlo sweeps that we can have before there is loss of precision by a order of magnitude equal to the amount of significant digits added by this change of variable type. Thus we recommend for future research using similar methods for even larger lattice sizes to consider the effects of this interaction between lattice size and amount of Monte Carlo sweeps, and from that picking the data type that is best suited to the simulation. 
 
+\clearpage
 
 
-
-\newpage
 
 \section{Conclusion} \label{sec:VI}
 
+We have implemented a solver for the Ising Model in two dimensions, with a square lattice and no exeternal field, using the Metropolis algorithm. This implementation was used to simulate this system for various lattice sizes and temperatures. Numerical results from these simulations, such as mean energy, mean magnetization, mean magnitude of the magnetization, heat capacity, and magnetic susceptibility were all compared to their analytical counterparts, and in general we found good agreement between these. This indicates that our implementation generates correct results, within limitations on lattice size and amount of Monte Carlo sweeps performed. In general a certain amount of sweeps is necessary for the solution to converge, and smaller lattice sizes can cause significant contributions to the numerical errors, which we found to be the case at least somewhat. We also expected there to be an upper limit on the amount of Monte Carlo sweeps that can be performed for a given lattice size before we start to lose significant digits during the calculation of the results, but this limit was not encountered in our simulations. All in all, nothing was found that indicates that our implementation does not work as it should.
+
+For larger lattice sizes we expect to see phase transition behavious around a critical temperature. When we simulated for different lattice sizes, we were able to estimate the critical temperature of the system at some of these lattice sizes and from these results estimate the critical temperature in the thermodynamical limit $T_C(L=\infty) = 2.269 \pm 0.004$. This overlaps with the analytical value of $T_C(L=\infty) = 2/\ln(1 + \sqrt{2})$, and has a relative error \num{3.78e-06} from the value itself when all digits produced are taken into account.  
+
+Through tests of the convergence of the results, we found that how many Monte Carlo sweeps that are necessary for the system to equillibrate depends on the temperature and the lattice size. In general the amount of sweeps necessary for the solution to converge increases both when the lattice size increases, and when the temperature gets closer to the critical temperature. 
 
 \onecolumngrid
 \bibliography{kilder.bib}{}
