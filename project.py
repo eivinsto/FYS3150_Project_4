@@ -1,4 +1,4 @@
-from subprocess import run, Popen, PIPE, call
+from subprocess import run, Popen, PIPE
 import multiprocessing as mp
 import os
 import sys
@@ -54,6 +54,7 @@ def read_stabilization_data(file):
 
     # reading data
     data = np.genfromtxt(file)
+    nmax = len(data[:, 0])
     E = data[:, 0]
     absM = data[:, 2]
     accepted_configs = data[:, 3]
@@ -121,10 +122,15 @@ def read_stabilization_data(file):
         randstr + "\n" + var
     )
     plt.hist(E[slicer:], bins="auto", density=True, stacked=True)
-    #plt.plot(np.sort(E[slicer:]), (2.2/(np.sqrt(2*np.pi*Evar)))*np.exp(-((np.sort(E[slicer:])-np.mean( E[slicer:] ))**2 /Evar  )/2 ) ,'r',label='Normal distribution')
+    if temp > 1:
+        normdis = (2.2/(np.sqrt(2*np.pi*Evar))) * \
+            np.exp(-((np.sort(E[slicer:])-np.mean(E[slicer:]))**2 / Evar)/2)
+
+        plt.plot(np.sort(E[slicer:]), normdis, 'r',
+                 label='Normal distribution')
+        plt.legend()
     plt.xlabel("E/J")
     plt.ylabel("P(E/J)")
-    # plt.legend()
     plt.grid()
     plt.savefig(
         rootdir + f"/data/{randstr}-t{temp}-{L}x{L}-PE.pdf",
@@ -261,23 +267,23 @@ def benchmark(N_list, gccflags, archflag, L, n_temps):
             for i in range(len(gccflags)):
                 # compiling program with specified flags
                 if j == 0:
-                    call(["g++", gccflags[i], "ising_metropolis.cpp",
-                          "-fopenmp", "-c"], cwd=src)
-                    call(["g++", gccflags[i], "main.cpp",
-                          "-fopenmp", "-c"], cwd=src)
-                    call(["g++", gccflags[i], "-fopenmp", "main.o",
-                          "ising_metropolis.o", "-o", "benchmark.exe",
-                          "-larmadillo"],
-                         cwd=src)
+                    run(["g++", gccflags[i], "ising_metropolis.cpp",
+                         "-fopenmp", "-c"], cwd=src)
+                    run(["g++", gccflags[i], "main.cpp",
+                         "-fopenmp", "-c"], cwd=src)
+                    run(["g++", gccflags[i], "-fopenmp", "main.o",
+                         "ising_metropolis.o", "-o", "benchmark.exe",
+                         "-larmadillo"],
+                        cwd=src)
                 else:
-                    call(["g++", gccflags[i], archflag, "ising_metropolis.cpp",
-                          "-fopenmp", "-c"], cwd=src)
-                    call(["g++", gccflags[i], archflag, "main.cpp",
-                          "-fopenmp", "-c"], cwd=src)
-                    call(["g++", gccflags[i], archflag, "-fopenmp", "main.o",
-                          "ising_metropolis.o", "-o", "benchmark.exe",
-                          "-larmadillo"],
-                         cwd=src)
+                    run(["g++", gccflags[i], archflag, "ising_metropolis.cpp",
+                         "-fopenmp", "-c"], cwd=src)
+                    run(["g++", gccflags[i], archflag, "main.cpp",
+                         "-fopenmp", "-c"], cwd=src)
+                    run(["g++", gccflags[i], archflag, "-fopenmp", "main.o",
+                         "ising_metropolis.o", "-o", "benchmark.exe",
+                         "-larmadillo"],
+                        cwd=src)
 
                 # running simulation with current compilation.
                 p = Popen(
@@ -390,6 +396,7 @@ if __name__ == "__main__":
 
         # reading data:
         data = np.genfromtxt(file)
+        nmax = len(data[:, 0])
         E = data[:, 0]
         M = data[:, 1]
         absM = data[:, 2]
@@ -431,7 +438,8 @@ if __name__ == "__main__":
         plt.figure()
         plt.title(f"Average energy of {L}x{L} lattice with T = {temp}")
         plt.hlines(
-            E_exp, 0, nmax, 'r', label="Analytic " + r"$\langle E \rangle/\, J$"
+            E_exp, 0, nmax, 'r', label="Analytic " +
+            r"$\langle E \rangle/\, J$"
         )
         plt.plot(n_cycles, E, label=r"$\langle E \rangle/\, J$")
         plt.xlabel("N")
@@ -469,7 +477,8 @@ if __name__ == "__main__":
         )
 
         plt.figure()
-        plt.title(f"Magnetic susceptibility of {L}x{L} lattice with T = {temp}")
+        plt.title(f"Magnetic susceptibility of {L}x{L}" +
+                  f" lattice with T = {temp}")
         plt.hlines(Xi_exp, 0, nmax, 'r', label=r"Analytic $\chi$")
         plt.plot(n_cycles, ((L**2)/temp) * (M2 - M**2), label=r"$\chi$")
         plt.xlabel("N")
@@ -541,7 +550,7 @@ if __name__ == "__main__":
         # estimating critical temperature:
         TCinf, TCinf_uncertainty, TC = get_critical_temperature(Ls, Cv, Xi, T)
         print("Estimated critical temperature in thermodynamical limit: ",
-              TCinf, r" $\pm$ ",TCinf_uncertainty )
+              TCinf, u" \u00b1 ", TCinf_uncertainty)
 
         for i, L in enumerate(Ls):
             print("Estimate critical temperature " +
@@ -558,7 +567,7 @@ if __name__ == "__main__":
         plt.legend()
         plt.grid()
         plt.savefig(
-            rootdir + f"/data/phase-transition-E.pdf", bbox_inches='tight'
+            rootdir + "/data/phase-transition-E.pdf", bbox_inches='tight'
         )
 
         plt.figure()
@@ -626,6 +635,8 @@ if __name__ == "__main__":
         read_benchmark(N_list, gccflags, archflag, L, n_temps)
 
     if runflag == "test":
+        run(["make", "test"], cwd=src)
+        run(["./test_main.exe"], cwd=src)
         run(["python3", "-m", "pytest", "-v"])
         run(["rm", "-rf", rootdir + "/data/2x2-test.dat"])
 
