@@ -44,16 +44,21 @@ Example run of unit tests:
 $ python project.py
 Analytic vs numeric 2x2 = 'an', stabilization run = 'st', phase transition = 'ph', OpenMP benchmark = 'b', Unit tests = 'test', quit = 'q'.
 Enter run: test
-================================ test session starts =================================
+g++ -Wall -Wextra -O3 -march=native -fopenmp test_functions.cpp -c
+g++ -Wall -Wextra -O3 -march=native -fopenmp test_main.o test_functions.o ising_metropolis.o -o test_main.exe -larmadillo
+===============================================================================
+All tests passed (4 assertions in 2 test cases)
+
+===================================================================================== test session starts =====================================================================================
 platform linux -- Python 3.8.5, pytest-6.0.1, py-1.9.0, pluggy-0.13.1 -- /usr/bin/python3
 cachedir: .pytest_cache
 rootdir: /home/anders/Documents/2020H/FYS3150/FYS3150_Project_4
-collected 4 items                                                                    
+collected 4 items
 
-test_functions.py::test_analytic_energy PASSED                                 [ 25%]
-test_functions.py::test_analytic_absM PASSED                                   [ 50%]
-test_functions.py::test_analytic_Cv PASSED                                     [ 75%]
-test_functions.py::test_analytic_Xi PASSED                                     [100%]
+test_functions.py::test_analytic_energy PASSED                                                                                                                                          [ 25%]
+test_functions.py::test_analytic_absM PASSED                                                                                                                                            [ 50%]
+test_functions.py::test_analytic_Cv PASSED                                                                                                                                              [ 75%]
+test_functions.py::test_analytic_Xi PASSED                                                                                                                                              [100%]
 
-================================= 4 passed in 33.26s =================================
+===================================================================================== 4 passed in 32.96s ======================================================================================
 ```
