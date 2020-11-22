@@ -147,7 +147,7 @@ Firstly we will test our implementation by simulating a \(2\times 2\) lattice an
 
 We will then investigate the stability of our implementation, by simulating a \(20\times 20\) lattice for both phases of the magnetization. We will look at how many Monte Carlo cycles are necessary to achieve the most likely state of the system. Furthermore, we will look at the amount of accepted spin flips during simulation, as well as the probability distribution \(P(E)\) of the energies of the system.
 
-Lastly, we will attempt to find the critical temperature at which the phase transition occurs. This will be done by simulating various temperatures in near the critical temperature for lattices of various sizes, and then using the specific heat capacities and magnetic susceptibilities to estimate the critical temperature of each lattice, which in turn are used to estimate the critical temperature in the thermodynamic limit of a 2D lattice with infinitely many spins.
+Lastly, we will attempt to find the critical temperature at which the phase transition occurs. This will be done by simulating various temperatures near the critical temperature for lattices of various sizes, and then using the specific heat capacities and magnetic susceptibilities to estimate the critical temperature of each lattice, which in turn are used to estimate the critical temperature in the thermodynamic limit of a 2D lattice with infinitely many spins.
 
 
 \newpage
@@ -170,7 +170,7 @@ In order to further proceed we need a probability that governs the system. For t
 P_i (\beta) &= \frac{e^{-\beta E_i}}{Z} \numberthis \label{eq:boltzmann_dist} \, ,
 \end{align*}
 
-where $\beta = (k_B T)^{-1}$, $E_i$ the energy of a specific configuration of the system, $Z$ is the partition function, and the subscript $i$ denotes the configuration of the system. The parameter $\beta$ contains $k_B$ which is the Boltzmann constant, and $T$ is the temperature. The partition function is a normalization factor for the probability distribution, and is the sum of all the possible Boltzmann factors:
+where $\beta = (k_B T)^{-1}$, $E_i$ is the energy of a specific configuration of the system, $Z$ is the partition function, and the subscript $i$ denotes the configuration of the system. The parameter $\beta$ contains $k_B$ which is the Boltzmann constant, and $T$ is the temperature. The partition function is a normalization factor for the probability distribution, and is the sum of all the possible Boltzmann factors:
 
 \begin{align*}
 Z &= \sum\limits_i^M e^{-\beta E_i} \numberthis \label{eq:ising_partition_function} \, ,
@@ -406,13 +406,13 @@ where $\nu$ is a constant. A phase transition such as the one that the Ising mod
 \xi (T) &\propto L \, ,
 \end{align*}
 
-where we assume the lattice to be square, and $L$ is the amount of spins in one direction in this finite lattice. Connecting this with the previous result we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit:
+where we assume the lattice to be square, and $L$ is the amount of spins in one direction in this finite lattice. Combining this with \eqref{eq:power_law_correlation_length_} we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit:
 
 \begin{align*}
 T_C(L) - T_C(L= \infty) &= aL^{-1/\nu} \, , \numberthis \label{eq:crit_temperature_finite_lattice} 
 \end{align*}
 
-where $a$ is a constant, and $\nu$ is the same constant as earlier. Combining this with the results for the heat capacity, the mean magnetization, and the magnetic susceptibility gives us the following relations in a finite lattice (\citep[p.78]{landau_binder_2014}):
+where $a$ is a constant, and $\nu$ is the same constant as earlier. Combining this with \eqref{eq:power_law_heat_capacity}, \eqref{eq:power_law_magnetization_per_spin} and \eqref{eq:power_law_susceptibility} gives us the following relations in a finite lattice (\citep[p.78]{landau_binder_2014}):
 
 \begin{align*}
 C_V &\sim |T_C - T |^{-\alpha} \propto  L^{\alpha/\nu} \, , \numberthis \label{eq:finite_lattice_heat_capacity} \\
@@ -420,7 +420,7 @@ C_V &\sim |T_C - T |^{-\alpha} \propto  L^{\alpha/\nu} \, , \numberthis \label{e
 \chi &\sim |T_C - T|^{-\gamma} \propto L^{\gamma/\nu} \, , \numberthis \label{eq:finite_lattice_susceptibility}
 \end{align*}
 
-where all variables are as defined earlier. We can use these relations to generate an estimate of $T_C(L)$, and if this is done for multiple $L$ we can estimate $T_C(L=\infty)$ by using equation \eqref{eq:crit_temperature_finite_lattice}. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite is simply not possible. The analytical critical temperature with $\nu=1$ is (\citep{L.Onsager1944}):
+where all variables are as defined earlier. We can use these relations to generate an estimate of $T_C(L)$, and if this is done for multiple $L$ we can estimate $T_C(L=\infty)$ by using equation \eqref{eq:crit_temperature_finite_lattice}. This allows us to calculate values for finite lattices numerically and relate them with results from the thermodynamic limit, which is essential as simulating an infinite lattice is simply not possible. The analytical critical temperature with $\nu=1$ is (\citep{L.Onsager1944}):
 
 \begin{align*}
 \tilde{T}_C &= \frac{k_B T_C}{J} = \frac{2}{\ln(1 + \sqrt{2})} \approx 2.269 \, , \numberthis \label{eq:crit_temperature_analytical}
@@ -433,15 +433,15 @@ where we have scaled the temperature $\tilde{T}_C$ using $k_B$ and $J$ so that i
 
 One method of simulating a system in the Ising model is through a Markov chain Monte Carlo setup, where we iterate and flip spins depending on the probability of the change in total energy that flipping said spins incur. The Metropolis algorithm \citep{Metropolis} is one such setup which we will explain in this section.
 
-We propose a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equillibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system, we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \eqref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
+We propose that a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equillibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system gains energy), we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \eqref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
 
 \begin{align*}
 P_{a\to b}(T)  &= \frac{P_b (T) }{P_a (T)} = e^{-\beta \Delta E }\, . 
 \end{align*}
 
-In this case we assume that the change in energy is positive number, so this is always smaller than one as we wish for a probability. We then draw a random number $r$ between $0$ and $1$ using a random number generator, and compare this to the probability of the transition $P_{a\to b}(T)$. If $r\leq P_{a\to b} (T)$ we accept the new configuration, otherwise we keep the previous configuration. The process up to this point can be called a Monte Carlo cycle. The Monte Carlo cycle is performed a sufficient amount of times until the system has stabilized, which is characterized by the macroscopic variables of the system being stable.
+In this case we assume that the change in energy is positive number, so this is always smaller than one as we wish for a probability. We then draw a random number $r$ between $0$ and $1$ using a random number generator, and compare this to the probability of the transition $P_{a\to b}(T)$. If $r\leq P_{a\to b} (T)$ we accept the new configuration, otherwise we keep the previous configuration. Performing the aforementioned check for all spins in the system is known as a Monte Carlo cycle. The Monte Carlo cycle is performed a sufficient amount of times until the system has stabilized, which is characterized by the macroscopic variables of the system being stable.
 
-As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as this contains an exponential this is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
+As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as the expression contains an exponential, it is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
 
 If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. The difference in energy between the states of a two dimensional lattice when one spin is flipped can be calculated using equation \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as:
 
