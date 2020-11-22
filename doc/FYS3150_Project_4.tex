@@ -162,7 +162,7 @@ The Ising model is a mathematical model of ferromagnetic systems. It is based on
 E &= -J \sum\limits_{<kl>}^N s_k s_l - B \sum\limits_k^N s_k \numberthis \label{eq:ising_general_total_energy} \, ,
 \end{align*}
 
-where $J$ is a parameter determining the strength of the interaction between adjacent particles, $B$ is a parameter determining the strength of the external magnetic field, and $N$ is the number of particles. The notation $<kl>$ in the first sum indicates that we should sum over all adjacent particles, and the values summed over, $s$, are the spins of particles, where the subscripts denote which particle it belongs to. The spins can be $s = \pm 1$, which we often denote with an arrow pointing upwards ($\uparrow$) for $s = +1$ and a downwards pointing arrow ($\downarrow$) for $s = -1$.
+where $J$ is a parameter determining the strength of the interaction between adjacent particles, $B$ is a parameter determining the strength of the external magnetic field, and $N$ is the number of particles. The notation $<kl>$ in the first sum indicates that we should sum over all adjacent particles. The values summed over, $s$, are the spins of particles, where the subscripts denote which particle it belongs to. The spins can be $s = \pm 1$, which we often denote with an arrow pointing upwards ($\uparrow$) for $s = +1$ and a downwards pointing arrow ($\downarrow$) for $s = -1$.
 
 In order to further proceed we need a probability that governs the system. For this purpose, the Boltzmann distribution is used:
 
@@ -197,7 +197,7 @@ The variance of said variable can be defined as:
 which relates to the standard deviation $\sigma_Q$:
 
 \begin{align*}
-\sigma_q &= \sqrt{\text{Var}(Q)} \numberthis \label{eq:standard_deviation}
+\sigma_Q &= \sqrt{\text{Var}(Q)} \numberthis \label{eq:standard_deviation}
 \end{align*}
 
 The heat capacity at constant volume $C_V$ is related to the variance of the energy as follows:
@@ -212,41 +212,35 @@ and the magnetic susceptibility $\chi$ is related to the variance of the magneti
 \chi &= \frac{1}{k_B T} \text{Var}(\mathcal{M}) = \frac{1}{k_B T} ( \langle \mathcal{M}^2 \rangle - \langle \mathcal{M} \rangle^2) \numberthis \label{eq:magnetic_susceptibility}
 \end{align*}
 
+The probability of a configuration is only dependent on the energy, which can cause the magnetization to be a problematic quantity for finite lattice sizes. If there is no external field, and all the spins are flipped (all spins that were $+1$ are set to $-1$ and vice versa), this will cause the sign of the magnetization to change, while the energy remains the same. Thus these two states with different magnetization share the same energy, and are equally probable. In a physical context this is perfectly fine, and in fact a kind of behaviour we want the system to exhibit. For a numerical simulation however, this can be problematic as the magnetization will no longer be as stable a quantity, and in some cases it will thus be desirable to use the mean absolute value of the magnetization instead.
+
+
 In the following section we look at a sample system.
 
 
 \subsubsection{Periodic \( 2 \times 2 \) square lattice with no external field} \label{sec:II:A:i}
 
-We look at a system where we have particles in a 2x2 square lattice. A configuration of the system can be visualized as follows: \newline
+We look at a system where we have particles in a $2\times 2$ square lattice. A sample configuration of the system can be visualized as follows: \newline
 
-\begin{center}
-\begin{tabular}{cc}
-$\bullet$ & $\bullet$ \\
-$\bullet$ & $\bullet$
-\end{tabular}  , \newline
-\end{center}
-
-where we change the dots out for arrows to mark the spin of the particles. A sample configuration of the system can be visualized as follows: \newline
-
-\begin{center}
-\begin{tabular}{cc}
-$\uparrow$ & $\downarrow$ \\
-$\downarrow$ & $\uparrow$
-\end{tabular}  . \newline
-\end{center}
+\begin{align*}
+\begin{array}{cc}
+\uparrow & \downarrow \\
+\downarrow & \uparrow
+\end{array}  \, , 
+\end{align*}
 
 
-We can denote the spins of the system as $s_{ij}$, where the index $i$ corresponds to the row the particle is in and $j$ to the column. With periodic boundary conditions, the total energy of the system is then given by:
+where arrows are fitted into a $2\times 2$ square lattice. We can denote the spins of the system as $s_{ij}$, where the index $i$ corresponds to the row the particle is in and $j$ to the column. With periodic boundary conditions, the total energy of the system is then given by:
 
 \begin{align*}
 E &= -J ( 2s_{11}s_{12} + 2s_{11}s_{21} + 2s_{22}s_{21} + 2s_{22}s_{12}) \numberthis \label{eq:2x2_sq_lattice_en}
 \end{align*}
 
-As there are two possible states that the particles can be in, and there are four particles total, there are $2^4 = 16$ microstates. We are interested in the possible energies of this system, and they are listed in table \ref{table:2x2_sq_lattice_en_and_mag} along with the total magnetization, where we have used \eqref{eq:2x2_sq_lattice_en} and \eqref{eq:ising_magnetization} to calculate these values. Note that the values in this table are sorted by macrostate, as some of the microstates are effectively equal because of the symmetries of the system. There are a total of 6 configurations with two spins pointing upwards, but these do not all have the same energy, which means that the macrostate of the system cannot be uniquely determined by the amount of spins that point up (or down for that matter). If the two spins pointing upwards are adjacent the total energy is 0, and there are four such configurations. If the two spins are not adjacent the total energy is $8J$, and there are two such states. As there are then two macrostates (different energies) corresponding to two spins pointing up, we need a second identifier. The degeneracy of these macrostates differ, and so by listing both the degeneracy and the amount of spins pointing up we can uniquely determine all the macrostates of the system. This was used in the table.
+As there are two possible states that the particles can be in, and there are four particles total, there are $2^4 = 16$ microstates. We are interested in the possible energies of this system, and they are listed in Table \ref{table:2x2_sq_lattice_en_and_mag} along with the total magnetization, where we have used equations \eqref{eq:2x2_sq_lattice_en} and \eqref{eq:ising_magnetization} to calculate these values. Note that the values in this table are sorted by macrostate, as some of the microstates are effectively equal because of the symmetries of the system. There are a total of 6 configurations with two spins pointing upwards, but these do not all have the same energy, which means that the macrostate of the system cannot be uniquely determined by the amount of spins that point up (or down for that matter). If the two spins pointing upwards are adjacent the total energy is 0, and there are four such configurations. If the two spins are not adjacent the total energy is $8J$, and there are two such states. As there are then two macrostates (different energies) corresponding to two spins pointing up, we need a second identifier. The degeneracy of these macrostates differ, and so by listing both the degeneracy and the amount of spins pointing up we can uniquely determine all the macrostates of the system. This was used in the table.
 
 \begin{table}[H]
 \centering
-\caption{This table contains the energies and total magnetization for all possible macrostates of the Ising model with a 2x2 square lattice of particles. The uniqueness of the macro state is determined by the amount of spins that are up (first column) and the degeneracy of said state (second column). Both are needed, as in the case with two spins pointing up there are four configurations with the two upwards pointing spins being adjacent, and two with them not being adjacent.} \label{table:2x2_sq_lattice_en_and_mag}
+\caption{This table contains the energies and total magnetization for all possible macrostates of the Ising model with a $2\times 2$ square lattice of particles. The uniqueness of the macro state is determined by the amount of spins that are up (first column) and the degeneracy of said state (second column). Both are needed, as in the case with two spins pointing up there are four configurations with the two upwards pointing spins being adjacent, and two with them not being adjacent, corresponding to different energies.} \label{table:2x2_sq_lattice_en_and_mag}
 \begin{tabular}{|c|c|c|c|}
 \hline
 Spins up & Degeneracy & Energy & Magnetization \\
@@ -285,14 +279,14 @@ The expectation value for the energy can be found as follows:
  &= -8J\frac{\sinh(8J\beta) }{\cosh (8J\beta) + 3} \numberthis \label{eq:2x2_energy}
 \end{align*}
 
-It is simple to see that $\langle M \rangle = 0$, so a more interesting measure would be the expectation value of the absolute of the magnetization. The expectation value for the absolute value of the magnetization can be found similarly:
+It is simple to see that $\langle M \rangle = 0$, so a more interesting measure would be the expectation value of the absolute of the magnetization. This is found to be:
 
 \begin{align*}
 \langle |\mathcal{M}| \rangle &= \sum\limits_i^M |\mathcal{M}_i| P_i(\beta) \\
  &= \frac{2e^{8J\beta} + 4}{\cosh (8 J \beta) + 3} \numberthis \label{eq:2x2_abs_magnetization}
 \end{align*}
 
-In order to find the heat capacity it is first necessary to find the expectation value of squared energy:
+In order to find the heat capacity it is first necessary to find the expectation value of the energy squared:
 
 \begin{align*}
 \langle E^2 \rangle &= \sum\limits_i^M E_i^2 P_i(\beta) \\
@@ -376,13 +370,13 @@ The mean magnetization per spin is given by:
 
 when the temperature is lower than a specific critical value $T_C$. Above this value the mean magnetization per spin is zero.
 
-These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. The heat capacity, magnetization and susceptibility all excibit a power law behaviour (\citep{Stanley1999}, \cite[chapter 2.1.2]{landau_binder_2014}) in the region where $T\to T_C$ and $T$ is close to $T_C$. Specifically the heat capacity behaves as:
+These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. The heat capacity, magnetization and susceptibility all excibit a power law behaviour (\citep{Stanley1999}, \cite[chapter 2.1.2]{landau_binder_2014}) in the region where $T\to T_C$ from below. Specifically the heat capacity behaves as:
 
 \begin{align*}
 C_V &\sim \bigg| T_C - T \bigg| ^{-\alpha} \, , \numberthis \label{eq:power_law_heat_capacity}
 \end{align*} 
 
-when $T\to T_C$ from below, and $T$ is close to $T_C$. It can be determined that the correct solution is $\alpha = 0$, meaning that this behaves according to the power law singularity in the thermodynamic limit. The magnetization per spin behaves as:
+when $T\to T_C$ from below. It can be determined that the correct solution is $\alpha = 0$, meaning that this behaves according to the power law singularity in the thermodynamic limit. The magnetization per spin behaves as:
 
 \begin{align*}
 \langle \mathcal{M} / N \rangle &\sim (T_C - T)^{\beta} \, , \numberthis \label{eq:power_law_magnetization_per_spin}
@@ -412,7 +406,7 @@ where $\nu$ is a constant. A phase transition such as the one that the Ising mod
 \xi (T) &\propto L \, ,
 \end{align*}
 
-where $L$ is the amount of spins in one direction in this finite lattice. Connecting this with the previous result we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit:
+where we assume the lattice to be square, and $L$ is the amount of spins in one direction in this finite lattice. Connecting this with the previous result we can define a connection between the critical temperature in a finite lattice and the one in the thermodynamical limit:
 
 \begin{align*}
 T_C(L) - T_C(L= \infty) &= aL^{-1/\nu} \, , \numberthis \label{eq:crit_temperature_finite_lattice} 
@@ -437,9 +431,9 @@ where we have scaled the temperature $\tilde{T}_C$ using $k_B$ and $J$ so that i
 
 \subsection{The Ising model and the Metropolis algorithm} \label{sec:II:b}
 
-One method of simulating a system in the Ising model is through a Markov Chain Monte Carlo setup, where we iterate and flip spins depending on the change in total energy that flipping said spins incur. The Metropolis algorithm \citep{Metropolis} is one such setup which we will explain in this section.
+One method of simulating a system in the Ising model is through a Markov chain Monte Carlo setup, where we iterate and flip spins depending on the probability of the change in total energy that flipping said spins incur. The Metropolis algorithm \citep{Metropolis} is one such setup which we will explain in this section.
 
-We propose a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equillibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system, we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \ref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
+We propose a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equillibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system, we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \eqref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
 
 \begin{align*}
 P_{a\to b}(T)  &= \frac{P_b (T) }{P_a (T)} = e^{-\beta \Delta E }\, . 
@@ -449,7 +443,7 @@ In this case we assume that the change in energy is positive number, so this is 
 
 As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as this contains an exponential this is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
 
-If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. The difference in energy between the states of a two dimensional lattice when one spin is flipped can be calculated using \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as:
+If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. The difference in energy between the states of a two dimensional lattice when one spin is flipped can be calculated using equation \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as:
 
 \begin{align*}
 	\Delta E = E_{2} - E_{1} = \left(-J \sum\limits_{<kl>}^N s_k^{2} s_l^{2}\right) -
@@ -477,8 +471,8 @@ where we only sum over \(k\), since only one spin \(s_{l}\) is flipped.
 For a two dimensional lattice, each spin only has four neighbours, thus we can write out the sum for any randomly chosen \(s_{l}\) with neighbours \(s_{a}, s_{b}, s_{c}, s_{d}\) as
 
 \begin{align*}
-	\Delta E = 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \numberthis \label{eq:singleflip_energy_change} \\
-	\Delta E = 2J(\pm 1)\left[(\pm 1) + (\pm 1) + (\pm 1) + (\pm 1)\right]
+	\Delta E &= 2Js_{l}^{1}\left(s_{a} + s_{b} + s_{c} + s_{d}\right) \numberthis \label{eq:singleflip_energy_change} \\
+	\Delta E &= 2J(\pm 1)\left[(\pm 1) + (\pm 1) + (\pm 1) + (\pm 1)\right]
 \end{align*}
 
 From this we see that if all spins \(s_{k}\) have the same sign we get
@@ -570,14 +564,14 @@ With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ an
 A problem we encounter at this point is how we model the periodic boundary conditions. If we use a square lattice, we can use the amount of spins in a dimension $L$ and the modulo operator to define a function $f(i,k)$ that takes a valid index $i$ and what is to be added to it $k$, and returns the correct index on the other side of the lattice if it is out of bounds:
 
 \begin{align*}
-f(i) &= (i+k+L)\%L \, , \numberthis \label{eq:periodic}
+f(i,k) &= (i+k+L)\%L \, , \numberthis \label{eq:periodic}
 \end{align*}
 
-where \% is the modulo operator in this case. Note that we add $L$ to the total as well, as the function could return a negative value if $k$ was negative otherwise. The function might still return a negative value, but we have assumed here that $|k|$ is never larger than $L$. 
+where \% is the modulo operator in this case. Note that we add $L$ to the total as well, as the function could return a negative value if $k$ was negative otherwise depending on the definition of the modulo operator. The function might still return a negative value, but we have implicitly assumed here that $|k|$ is never larger than $L$. 
  
 We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
-Every time a spin is flipped we need to update total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. The difference in magnetization can be found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\) (subscript one denotes the magnetization before the spin is flipped, and 2 the magnetization after): 
+Every time a spin is flipped we need to update the total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. The difference in magnetization can be found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\) (subscript one denotes the magnetization before the spin is flipped, and 2 the magnetization after): 
 
 \begin{align*}
 	\mathcal{M}_2 - \mathcal{M}_{1} &= \sum\limits_j^N s_j^{2} - \sum\limits_j^N s_j^{1} =
