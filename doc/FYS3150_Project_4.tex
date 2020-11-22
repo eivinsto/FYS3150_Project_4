@@ -917,7 +917,7 @@ Interactions between the randomized nature of the simulations and the finite lat
 
 We performed several benchmarks of our solver with and without parallelization and with different compiler flags. In Table \ref{table:benchmark_parallel} we have listed timings of simulations with a $20 \times 20$ lattice at various temperatures. These simulations were ran both parallelized and serialized. In the case of the latter only one set of simulations was run with the optimalization flags -O3 and -march=native in C++. In the case of the former the simulations were run once with only the -O0 compiler flag, and once with the same set of compiler flags as the latter.
 
-We also measured the improvement in time consumption for the parallelized simulations for different combinations of compiler flags, and various amounts of Monte Carlo cycles. These time improvements are plotted against amount of Monte Carlo cycles in Figure \ref{fig:benchmark_compiler_flags}.
+We also measured the improvement in time consumption for the parallelized simulations for different combinations of compiler flags, and various amounts of Monte Carlo sweeps. These time improvements are plotted against amount of Monte Carlo sweeps, $N$, in Figure \ref{fig:benchmark_compiler_flags}.
 
 \begin{table}[H]
 	\centering
@@ -945,7 +945,7 @@ We also measured the improvement in time consumption for the parallelized simula
 
 \subsection{Simulation with a $2\times 2$ lattice} \label{sec:IV:B}
 
-We simulated a $2 \times 2$ lattice to compare with the analytical results found in section \hyperref[sec:II:A:i]{II.A.1}. In these simulations we recorded the energy and magnetization per spin in each Monte Carlo sweep in order to observe how they develop, and how the values derived from them also develop as a function of the amount of sweeps performed. We have plotted the energy, absolute of magnetization, heat capacity and magnetic susceptibility as functions of the amount of sweeps performed, and these plots can be seen in Figures \ref{fig:t10_2x2_energy_magnetization} and \ref{fig:t10_2x2_heat_capacity_susceptibility}. The analytic values found in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility} are also plotted for comparison. We also calculated errors and relative errors in the final values for all of these quantities and also the absolute error for the mean magnetization. These are listed in Table \ref{table:t10_2x2_errors}. The errors are the differences between the numerical values and the analytical values.
+We simulated a $2 \times 2$ lattice to compare with the analytical results found in section \hyperref[sec:II:A:i]{II.A.1}. In these simulations we recorded the energy and magnetization per spin in each Monte Carlo sweep in order to observe how they develop, and how the values derived from them also develop as a function of the amount of sweeps performed. We have plotted the energy, absolute value of the magnetization, heat capacity and magnetic susceptibility as functions of the amount of sweeps performed, and these plots can be seen in Figures \ref{fig:t10_2x2_energy_magnetization} and \ref{fig:t10_2x2_heat_capacity_susceptibility}. The analytic values found in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility} are also plotted for comparison. We also calculated errors and relative errors in the final values for all of these quantities and also the error for the mean magnetization. These are listed in Table \ref{table:t10_2x2_errors}. The errors are the differences between the numerical values and the analytical values.
 
 \begin{figure}[H]
 \centering
@@ -963,7 +963,7 @@ We simulated a $2 \times 2$ lattice to compare with the analytical results found
 
 \begin{table}[H]
 \centering 
-\caption{This table contains errors in the numerically calculated values of the mean energy $\langle E \rangle$, mean magnetization $\langle \mathcal{M} \rangle$, mean absolute of the magnetization $\langle |\mathcal{M}| \rangle$, heat capacity $C_V$ and magnetic susceptibility $\chi$ (all per spin) for a $2\times 2$ lattice with $T=1$ /in units of $k_BT/J$) after $10^6$ Monte Carlo sweeps. The numerically calculated values are compared to their analytic counterparts as they are given in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility}. Also note that the analytic value for the mean magnetization is zero, and thus there is no relative error listed as it is undefined.} \label{table:t10_2x2_errors}
+\caption{This table contains errors in the numerically calculated values of the mean energy $\langle E \rangle$, mean magnetization $\langle \mathcal{M} \rangle$, mean absolute value of the magnetization $\langle |\mathcal{M}| \rangle$, heat capacity $C_V$ and magnetic susceptibility $\chi$ (all per spin) for a $2\times 2$ lattice with $T=1$ (in units of $k_BT/J$) after $10^6$ Monte Carlo sweeps. The numerically calculated values are compared to their analytic counterparts as they are given in equations \eqref{eq:2x2_energy}, \eqref{eq:2x2_abs_magnetization}, \eqref{eq:2x2_heat_capacity}, and \eqref{eq:2x2_susceptibility}. Also note that the analytic value for the mean magnetization is zero, and thus there is no relative error listed as it is undefined.} \label{table:t10_2x2_errors}
 \begin{tabular}{|c|c|c|}
 \hline
 Value & Error & Relative error \\
@@ -983,28 +983,28 @@ $\chi$ & \num{-8.811e-06} & \num{2.207e-06} \\
 
 \subsection{Simulations with a $20 \times 20$ lattice} \label{sec:IV:C}
 
-In order to evaluate the stability and convergence of our solver we simulated a $20 \times 20$ lattice of spins with temperatures $T = 1$ and $T = 2.4$ (in units of $k_B T/J$). We ran these simulations with both an ordered intial state (all spins pointing up) and a disordered initial state (randomized spin configuration). Plots of the average energy, absolute of the magnetization, and the number of accepted configurations as functions of the amount of Monte Carlo cycles performed in the simulations with $T=1$ can be seen in Figures \ref{fig:20x20-T1.0-energy}, \ref{fig:20x20-T1.0-absolute_magnetization} and \ref{fig:20x20-T1.0-Nconf} respectively. Similar plots for the simulations with $T=2.4$ can be seen in Figures \ref{fig:20x20-T2.4-energy}, \ref{fig:20x20-T2.4-absolute_magnetization}, and \ref{fig:20x20-T2.4-Nconf}. We also calculated the probability distributions for the energy in these simulations and they can be seen in Figure \ref{fig:20x20-T1.0-PE} for $T=1$ and Figure \ref{fig:20x20-T2.4-PE} for $T=2.4$. The probability distributions were calculated by binning the the energy values recorded during the simulations and normalizing the results. This was done using Matplotlib's histogram function. A slightly modified normal distribution is also plotted on top of the plots of the probability distribution for $T=2.4$. In order to get the peaks to be approximately similar, it was necessary to multiply the normal distribution by a constant $2.2$. 
+In order to evaluate the stability and convergence of our solver we simulated a $20 \times 20$ lattice of spins with temperatures $T = 1$ and $T = 2.4$ (in units of $k_B T/J$). We ran these simulations with both an ordered intial state (all spins pointing up) and a disordered initial state (randomized spin configuration). Plots of the average energy, absolute of the magnetization, and the number of accepted configurations as functions of the amount of Monte Carlo sweeps performed in the simulations with $T=1$ can be seen in Figures \ref{fig:20x20-T1.0-energy}, \ref{fig:20x20-T1.0-absolute_magnetization} and \ref{fig:20x20-T1.0-Nconf} respectively. Similar plots for the simulations with $T=2.4$ can be seen in Figures \ref{fig:20x20-T2.4-energy}, \ref{fig:20x20-T2.4-absolute_magnetization}, and \ref{fig:20x20-T2.4-Nconf}. We also calculated the probability distributions for the energy in these simulations and they can be seen in Figure \ref{fig:20x20-T1.0-PE} for $T=1$ and Figure \ref{fig:20x20-T2.4-PE} for $T=2.4$. The probability distributions were calculated by binning the the energy values recorded during the simulations and normalizing the results. This was done using Matplotlib's histogram function. A slightly modified normal distribution is also plotted on top of the plots of the probability distribution for $T=2.4$. In order to get the peaks to be approximately similar, it was necessary to multiply the normal distribution by a constant $2.2$. 
 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t1.0-20x20-E"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t1.0-20x20-E"}.pdf}
-\caption{This figure contains plots of mean energy as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-energy}
+\caption{This figure contains plots of mean energy as a function of amount of Monte Carlo sweeps performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-energy}
 \end{figure} 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t1.0-20x20-|M|"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t1.0-20x20-|M|"}.pdf}
-\caption{This figure contains plots of the mean absolute of the magnetization as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-absolute_magnetization}
+\caption{This figure contains plots of the mean absolute of the magnetization as a function of amount of Monte Carlo sweeps performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-absolute_magnetization}
 \end{figure} 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t1.0-20x20-Nconf"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t1.0-20x20-Nconf"}.pdf}
-\caption{This figure contains plots of the total amount of accepted configurations as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the amount of accepted configurations when the initial state is ordered (all spins pointing up) and the second plot shows amount of accepted configurations when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-Nconf}
+\caption{This figure contains plots of the total amount of accepted configurations as a function of amount of Monte Carlo sweeps performed for simulations with a $20\times 20$ lattice and temperature $T=1$ (in units of $k_B T/J$). The first plot shows the amount of accepted configurations when the initial state is ordered (all spins pointing up) and the second plot shows amount of accepted configurations when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T1.0-Nconf}
 \end{figure}
 
 \begin{figure}[H]
@@ -1019,21 +1019,21 @@ In order to evaluate the stability and convergence of our solver we simulated a 
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t2.4-20x20-E"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t2.4-20x20-E"}.pdf}
-\caption{This figure contains plots of mean energy as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-energy}
+\caption{This figure contains plots of mean energy as a function of amount of Monte Carlo sweeps performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the energy when the initial state is ordered (all spins pointing up) and the second plot shows the energy when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-energy}
 \end{figure} 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t2.4-20x20-|M|"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t2.4-20x20-|M|"}.pdf}
-\caption{This figure contains plots of the mean absolute of the magnetization as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-absolute_magnetization}
+\caption{This figure contains plots of the mean absolute of the magnetization as a function of amount of Monte Carlo sweeps performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the development of the magnetization when the initial state is ordered (all spins pointing up) and the second plot shows the magnetization when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-absolute_magnetization}
 \end{figure} 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{{"../data/ordered initial spin.-t2.4-20x20-Nconf"}.pdf}
 \includegraphics[width=\columnwidth]{{"../data/disordered initial spin.-t2.4-20x20-Nconf"}.pdf}
-\caption{This figure contains plots of the total amount of accepted configurations as a function of amount of Monte Carlo cycles performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the amount of accepted configurations when the initial state is ordered (all spins pointing up) and the second plot shows amount of accepted configurations when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-Nconf}
+\caption{This figure contains plots of the total amount of accepted configurations as a function of amount of Monte Carlo sweeps performed for simulations with a $20\times 20$ lattice and temperature $T=2.4$ (in units of $k_B T/J$). The first plot shows the amount of accepted configurations when the initial state is ordered (all spins pointing up) and the second plot shows amount of accepted configurations when the initial state is disordered (randomized spin configuration).} \label{fig:20x20-T2.4-Nconf}
 \end{figure}
 
 \begin{figure}[H]
@@ -1053,7 +1053,7 @@ In order to evaluate the stability and convergence of our solver we simulated a 
 \newcommand{\tempmax}{2.35}
 \newcommand{\nmax}{10^7}
 
-We ran simulations with lattice sizes $40\times 40$, $60 \times 60$, $80 \times 80$ and $100 \times 100$ in the temperature range $T\in[\tempmin ,\tempmax ]$ (in units of $k_B T/J$) in order to look for signs of a phase transition. All the simulations were ran with $N=\nmax$ Monte Carlo sweeps. A phase transition should occur at the critical temperature. The analytical critical temperature for an infinite lattice is given in \eqref{eq:crit_temperature_analytical} and the critical temperatures for different lattice dimensions $L$ is related to the one for an infinite lattice as shown in \eqref{eq:crit_temperature_finite_lattice}. The critical temperatures measured for different lattice sizes should always be larger than the one for an infinite lattice, and so we selected the temperature interval to be such that the critical temperature for an infinite lattice is slightly less than the middle value of the interval. We chose to use $\tempsteps$ temperature steps. The calculated mean energy per spin as a function of temperature can be seen in Figure \ref{fig:ph-energy}, the mean magnetization and mean absolute of the magnetization as functions of temperature can be seen in Figure \ref{fig:ph-magnetization}, and the heat capacity and susceptibility as functions of temperature can be seen in \ref{fig:ph-heat-capacity-susceptibility}. We estimated the critical temperatures using the methods outlined in section \hyperref[sec:III:A.iv]{III.A.4}, and the values found are listed in Table \ref{table:crit_temps}. The relative error of the numerically calculated critical temperature for an infinite lattice compared to the analytical one was found to be \num{3.78e-06}.
+We ran simulations with lattice sizes $40\times 40$, $60 \times 60$, $80 \times 80$ and $100 \times 100$ in the temperature range $T\in[\tempmin ,\tempmax ]$ (in units of $k_B T/J$) in order to look for signs of a phase transition. All the simulations were ran with $N=\nmax$ Monte Carlo sweeps. A phase transition should occur at the critical temperature. The analytical critical temperature for an infinite lattice is given in \eqref{eq:crit_temperature_analytical} and the critical temperatures for different lattice dimensions $L$ is related to the one for an infinite lattice as shown in \eqref{eq:crit_temperature_finite_lattice}. The critical temperatures measured for different lattice sizes should always be larger than the one for an infinite lattice, and so we selected the temperature interval to be such that the critical temperature for an infinite lattice is slightly less than the middle value of the interval. We chose to use $\tempsteps$ temperature steps. The calculated mean energy per spin as a function of temperature can be seen in Figure \ref{fig:ph-energy}, the mean magnetization and mean absolute of the magnetization as functions of temperature can be seen in Figure \ref{fig:ph-magnetization}, and the heat capacity and susceptibility as functions of temperature can be seen in Figure \ref{fig:ph-heat-capacity-susceptibility}. We estimated the critical temperatures using the methods outlined in section \hyperref[sec:III:A.iv]{III.A.4}, and the values found are listed in Table \ref{table:crit_temps}. The relative error of the numerically calculated critical temperature for an infinite lattice compared to the analytical one was found to be \num{3.78e-06}.
 
 
 \begin{figure}[H]
@@ -1066,14 +1066,14 @@ We ran simulations with lattice sizes $40\times 40$, $60 \times 60$, $80 \times 
 \centering
 \includegraphics[width=\columnwidth]{../data/phase-transition-M.pdf}
 \includegraphics[width=\columnwidth]{../data/phase-transition-|M|.pdf}
-\caption{This figure contains plots of the mean magnetization per spin and mean absolute of the magnetization per spin as functions of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-magnetization}
+\caption{This figure contains plots of the mean magnetization per spin and mean absolute value of the magnetization per spin as functions of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-magnetization}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{../data/phase-transition-Cv.pdf}
 \includegraphics[width=\columnwidth]{../data/phase-transition-Xi.pdf}
-\caption{This figure contains plots of the heat capacity per spin and magnetic susceptibility per spin as functions of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-heat-capacity-susceptibility}
+\caption{This figure contains plots of the specific heat capacity and magnetic susceptibility per spin as functions of temperature from simulations with lattice sizes as indicated by the legend in the plot.} \label{fig:ph-heat-capacity-susceptibility}
 \end{figure}
 
 \begin{table}[H]
