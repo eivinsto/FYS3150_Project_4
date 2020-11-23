@@ -129,7 +129,7 @@
 \noaffiliation                            % ignore this
 
 \begin{abstract}
-We simulated the Ising model of a 2D lattice with periodic boundary conditions for various temperatures and lattice sizes using the Metropolis algorithm. Testing on a \(2 \times 2\) lattice showed good agreement between numeric and analytic results, and simulating a $20 \times 20$ lattice allowed us to validate the stability of the implementation. This indicates that our implementation is reliable. We simulated \(10^{7}\) Monte Carlo cycles of \(L\times L\) lattices with \(L \in \{40, 60, 80, 100\}\) for \(8\) evenly spaced temperatures \(T \in [2.20, 2.35]\), and estimated the critical temperature in the thermodynamical limit $T_C(L=\infty) = 2.269 \pm 0.004$ with a relative error of \num{3.78e-06} from the analytical value of $T_C(L=\infty) = 2/\ln(1 + \sqrt{2})$. By parallelizing our simulations of multiple \(T\) and \(L\), we were able to achieve a \(85\%\) performance increase. Using compiler optimization flags, we achieved an additional \(55\%\) performance increase.
+We simulated the Ising model of a 2D lattice with periodic boundary conditions for various temperatures and lattice sizes using the Metropolis algorithm. Testing on a \(2 \times 2\) lattice showed good agreement between numeric and analytic results, and simulating a $20 \times 20$ lattice allowed us to validate the stability of the implementation and the convergence of the results. This indicates that our implementation is reliable. We simulated \(10^{7}\) Monte Carlo cycles of \(L\times L\) lattices with \(L \in \{40, 60, 80, 100\}\) for \(8\) evenly spaced temperatures \(T \in [2.20, 2.35]\), and estimated the critical temperature in the thermodynamical limit $T_C(L=\infty) = 2.269 \pm 0.004$ with a relative error of \num{3.78e-06} from the analytical value of $T_C(L=\infty) = 2/\ln(1 + \sqrt{2})$. By parallelizing our simulations of multiple \(T\) and \(L\), we were able to achieve a \(85\%\) performance increase. Using compiler optimization flags, we achieved an additional \(55\%\) performance increase.
 \end{abstract}
 
 \maketitle                                % creates the title, author, date
@@ -139,7 +139,7 @@ We simulated the Ising model of a 2D lattice with periodic boundary conditions f
 
 \section{Introduction} \label{sec:I}
 
-Phase transitions are an important physical phenomena, and models that predict them are thus of great importance. One such model is the Ising model for magnetic spins, which considers only the closest neighbour interactions of the spins. Given a large enough system this model predicts phase transition behaviour around a critical temperature where the system moves from an ordered state, where the system is magnetized, to a disordered state where it is not.
+Phase transitions are an important physical phenomena, and models that predict them are thus of great importance. One such model is the Ising model for magnetic spins, which considers only the closest neighbour interactions of the spins. Given a large enough system this model predicts phase transition behaviour around a critical temperature where the system moves from an ordered state, where the system is magnetized, to a disordered state, where it is not.
 
 In this report we will look at a 2D lattice of two-state magnetic spins with periodic boundary conditions and simulate at various temperatures in both the region where we expect the system to be magnetized, and where we expect it to not be magnetized. To perform our simulations, we will create a C++ program that performs Monte Carlo simulations of the Ising model using the Metropolis algorithm. We will outline and discuss the implementation of this algorithm, highlighting the choices we make and why we make them.
 
@@ -162,7 +162,7 @@ The Ising model is a mathematical model of ferromagnetic systems. It is based on
 E &= -J \sum\limits_{<kl>}^N s_k s_l - B \sum\limits_k^N s_k \numberthis \label{eq:ising_general_total_energy} \, ,
 \end{align*}
 
-where $J$ is a parameter determining the strength of the interaction between adjacent particles, $B$ is a parameter determining the strength of the external magnetic field, and $N$ is the number of particles. The notation $<kl>$ in the first sum indicates that we should sum over all adjacent particles. The values summed over, $s$, are the spins of particles, where the subscripts denote which particle it belongs to. The spins can be $s = \pm 1$, which we often denote with an arrow pointing upwards ($\uparrow$) for $s = +1$ and a downwards pointing arrow ($\downarrow$) for $s = -1$.
+where $J$ is a parameter determining the strength of the interaction between adjacent particles, $B$ is a parameter determining the strength of the external magnetic field, and $N$ is the number of particles. The notation $<kl>$ in the first sum indicates that we should sum over all adjacent particles. The values summed over, $s$, are the spins of the particles, where the subscripts denote which particle it belongs to. The spins can be $s = \pm 1$, which we often denote with an arrow pointing upwards ($\uparrow$) for $s = +1$ and a downwards pointing arrow ($\downarrow$) for $s = -1$.
 
 In order to further proceed we need a probability that governs the system. For this purpose, the Boltzmann distribution is used:
 
@@ -170,7 +170,7 @@ In order to further proceed we need a probability that governs the system. For t
 P_i (\beta) &= \frac{e^{-\beta E_i}}{Z} \numberthis \label{eq:boltzmann_dist} \, ,
 \end{align*}
 
-where $\beta = (k_B T)^{-1}$, $E_i$ is the energy of a specific configuration of the system, $Z$ is the partition function, and the subscript $i$ denotes the configuration of the system. The parameter $\beta$ contains $k_B$ which is the Boltzmann constant, and $T$ is the temperature. The partition function is a normalization factor for the probability distribution, and is the sum of all the possible Boltzmann factors:
+where $\beta = (k_B T)^{-1}$, $E_i$ is the energy of a specific configuration of the system, $Z$ is the partition function, and the subscript $i$ denotes the configuration of the system. The parameter $\beta$ contains the Boltzmann constant $k_B$ and the temperature $T$. The partition function is a normalization factor for the probability distribution, and is the sum of all the possible Boltzmann factors:
 
 \begin{align*}
 Z &= \sum\limits_i^M e^{-\beta E_i} \numberthis \label{eq:ising_partition_function} \, ,
@@ -240,7 +240,7 @@ As there are two possible states that the particles can be in, and there are fou
 
 \begin{table}[H]
 \centering
-\caption{This table contains the energies and total magnetization for all possible macrostates of the Ising model with a $2\times 2$ square lattice of particles. The uniqueness of the macro state is determined by the amount of spins that are up (first column) and the degeneracy of said state (second column). Both are needed, as in the case with two spins pointing up there are four configurations with the two upwards pointing spins being adjacent, and two with them not being adjacent, corresponding to different energies.} \label{table:2x2_sq_lattice_en_and_mag}
+\caption{This table contains the energies and total magnetization for all possible macrostates of the Ising model with a $2\times 2$ square lattice of particles. The uniqueness of the macrostate is determined by the amount of spins that are up (first column) and the degeneracy of said state (second column). Both are needed, as in the case with two spins pointing up there are four configurations with the two upwards pointing spins being adjacent, and two with them not being adjacent, corresponding to different energies.} \label{table:2x2_sq_lattice_en_and_mag}
 \begin{tabular}{|c|c|c|c|}
 \hline
 Spins up & Degeneracy & Energy & Magnetization \\
@@ -319,7 +319,7 @@ All of these values we have calculated here can be compared with numerical resul
 
 \subsubsection{Periodic square lattice with no external field in the thermodynamical limit} \label{sec:II:A:ii}
 
-Solving the two-dimensional Ising model is a highly non-trivial task, and so we will only list the resulting expressions in the case where there is no external field. These expressions were found by Lars Onsager so we refer to his work \citep{L.Onsager1944} instead of performing the calculations ourselves. The partition function is given by the following:
+Solving the two-dimensional Ising model analytically is a highly non-trivial task, and so we will only list the resulting expressions in the case where there is no external field. These expressions were found by Lars Onsager so we refer to his work \citep{L.Onsager1944} instead of performing the calculations ourselves. The partition function is given by the following:
 
 \begin{align*}
 Z_N &= [2\cosh(\beta J) e^I ]^N \, , \numberthis \label{eq:LO_partition_function}
@@ -370,7 +370,7 @@ The mean magnetization per spin is given by:
 
 when the temperature is lower than a specific critical value $T_C$. Above this value the mean magnetization per spin is zero.
 
-These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. The heat capacity, magnetization and susceptibility all excibit a power law behaviour (\citep{Stanley1999}, \cite[chapter 2.1.2]{landau_binder_2014}) in the region where $T\to T_C$ from below. Specifically the heat capacity behaves as:
+These solutions have the interesting feature that they predict a phase transition at this critical temperature $T_C$. If the magnetization is zero, this implies that the state is disordered, meaning that we move from an ordered state to a disordered state at the critical temperature. The heat capacity, magnetization and susceptibility all excibit a power law behaviour (\citep{Stanley1999}, \cite[chapter 2.1.2]{landau_binder_2014}) in the region where $T\to T_C$ from below. Specifically the heat capacity behaves as:
 
 \begin{align*}
 C_V &\sim \bigg| T_C - T \bigg| ^{-\alpha} \, , \numberthis \label{eq:power_law_heat_capacity}
@@ -433,15 +433,15 @@ where we have scaled the temperature $\tilde{T}_C$ using $k_B$ and $J$ so that i
 
 One method of simulating a system in the Ising model is through a Markov chain Monte Carlo setup, where we iterate and flip spins depending on the probability of the change in total energy that flipping said spins incur. The Metropolis algorithm \citep{Metropolis} is one such setup which we will explain in this section.
 
-We propose that a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $a$) to another (denoted $b$) incurs a change in the total energy defined by $\Delta E = E_b - E_a$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equilibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system gains energy), we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $a$ to $b$ by using the Boltzmann distribution \eqref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
+We propose that a change in a set of spins will cause a change in the total configuration of the system. Changing the configuration of the system from one (denoted $1$) to another (denoted $2$) incurs a change in the total energy defined by $\Delta E = E_2 - E_1$. If the change in energy is negative we instantly accept the new configuration, as the second law of thermodynamics states that the system should always move towards equilibrium (lowest energy) in a closed system. If however the change is positive (meaning that the system gains energy), we wish to let probabilities determine whether or not we accept the new configuration. We can calculate the probability of moving from configuration $1$ to $2$ by using the Boltzmann distribution \eqref{eq:boltzmann_dist} ($P_i(T)$ where $i$ denotes the configuration of the system):
 
 \begin{align*}
-P_{a\to b}(T)  &= \frac{P_b (T) }{P_a (T)} = e^{-\beta \Delta E }\, . 
+P_{1\to 2}(T)  &= \frac{P_2 (T) }{P_1 (T)} = e^{-\beta \Delta E }\, . 
 \end{align*}
 
-In this case we assume that the change in energy is positive number, so this is always smaller than one as we wish for a probability. We then draw a random number $r$ between $0$ and $1$ using a random number generator, and compare this to the probability of the transition $P_{a\to b}(T)$. If $r\leq P_{a\to b} (T)$ we accept the new configuration, otherwise we keep the previous configuration. Performing the aforementioned check for all spins in the system is known as a Monte Carlo cycle. The Monte Carlo cycle is performed a sufficient amount of times until the system has stabilized, which is characterized by the macroscopic variables of the system being stable.
+In this case we assume that the change in energy is positive number, so this is always smaller than one as we wish for a probability. We then draw a random number $r$ between $0$ and $1$ using a random number generator, and compare this to the probability of the transition $P_{1\to 2}(T)$. If $r\leq P_{1\to 2} (T)$ we accept the new configuration, otherwise we keep the previous configuration. Performing the aforementioned check for an amount of the spins in the system is known as a Monte Carlo cycle. The Monte Carlo cycle is performed a sufficient amount of times until the system has stabilized, which is characterized by the macroscopic variables of the system being stable.
 
-As we can see we need to somehow calculate $P_{a\to b} (T)$ in every Monte Carlo cycle, and as the expression contains an exponential, it is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{a\to b} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
+As we can see we need to somehow calculate $P_{1\to 2} (T)$ in every Monte Carlo cycle, and as the expression contains an exponential, it is computationally expensive. We can, however, modify the Monte Carlo cycle in such a way that there only are set values of $\Delta E$, which means that we can precalculate $P_{1\to 2} (T)$. Doing this will cause a massive speed up in the calculation. We have not yet outlined how we propose a new configuration, and this will also be covered by this same method.
 
 If we flip only one spin at a time, there are only five possible changes in energy $\Delta E$. The difference in energy between the states of a two dimensional lattice when one spin is flipped can be calculated using equation \eqref{eq:ising_general_total_energy}. Assuming no outside magnetic field gives us the difference between states \(1\) and \(2\) as:
 
@@ -452,16 +452,19 @@ If we flip only one spin at a time, there are only five possible changes in ener
 
 where a superscript is used to denote which state the respective spins belong to.
 
-Since we are only interested in the difference in energy from flipping a single spin in the lattice, we can assume that \(s_{k}^{1} = s_{k}^{2} = s_{k}\). Thus we can rewrite \(\Delta E\) as
+Since we are only interested in the difference in energy from flipping a single spin in the lattice, we can assume that \(s_{k}^{1} = s_{k}^{2} = s_{k}\). Thus we can rewrite \(\Delta E\) as:
+
 \begin{align*}
  	\Delta E = J \sum_{<kl>}^{N} s_{k} \left(s_{l}^{1} - s_{l}^{2}\right).
 \end{align*}
 
-Furthermore, any spin can only be \(\pm 1\) and spin \(s_{l}\) is flipped such that \(s_{l}^{2} = -s_{l}^{1}\). From this it follows that \begin{align*}
+Furthermore, any spin can only be \(\pm 1\) and spin \(s_{l}\) is flipped such that \(s_{l}^{2} = -s_{l}^{1}\). From this it follows that: 
+
+\begin{align*}
 	\left(s_{l}^{1} - s_{l}^{2}\right) = \left(s_{l}^{1} + s_{l}^{1}\right) = 2s_{l}^{1}.
 \end{align*}
 
-The difference in energy can then be written as
+The difference in energy can then be written as:
 
 \begin{align*}
  	\Delta E = 2Js_{l}^{1} \sum_{<k>}^{N} s_{k}, \numberthis \label{eq:delta_e}
@@ -557,9 +560,9 @@ E = 4J \quad \begin{array}{ccc}
 \end{array} \, ,
 \end{align*}
 
-with $\Delta E = -8J$. These are the only possible changes in energy. The other possible transitions are the ones above but in reverse, and the energy change is then just what is listed, but with the sign being flipped. 
+with $\Delta E = -8J$. The remaining other possible transitions and energy changes are the ones listed above, but in reverse. The energy change is then just what is listed, but with the sign being flipped. 
 
-With this in mind we can precalculate all the probabilities $P_{a \to b} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{a\to b} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case.
+With this in mind we can precalculate all the probabilities $P_{1 \to 2} (T)$ and use these. In the case where $\Delta E < 0$ we have that $P_{1\to 2} (T) > 1$, which means that it seizes to be a proper probability, but if we draw a random number and compare it to this as outlined earlier, the test will always pass if $\Delta E < 0$, meaning that we do not have to handle this as a special case.
 
 A problem we encounter at this point is how we model the periodic boundary conditions. If we use a square lattice, we can use the amount of spins in a dimension $L$ and the modulo operator to define a function $f(i,k)$ that takes a valid index $i$ and what is to be added to it $k$, and returns the correct index on the other side of the lattice if it is out of bounds:
 
@@ -567,11 +570,11 @@ A problem we encounter at this point is how we model the periodic boundary condi
 f(i,k) &= (i+k+L)\%L \, , \numberthis \label{eq:periodic}
 \end{align*}
 
-where \% is the modulo operator in this case. Note that we add $L$ to the total as well, as the function could return a negative value if $k$ was negative otherwise depending on the definition of the modulo operator. The function might still return a negative value, but we have implicitly assumed here that $|k|$ is never larger than $L$. 
+where \% is the modulo operator in this case. Note that we add $L$ to the total as well, as the function could return a negative value if $k$ was negative otherwise, depending on the definition of the modulo operator. The function might still return a negative value, but we have implicitly assumed here that $|k|$ is never larger than $L$. 
  
 We have established that flipping one spin at a time is beneficial to the speed of the calculation. For larger systems this is a very small change, and so it is a good idea to flip more than one spin in each Monte Carlo cycle. Also if we want a more random process each cycle, we can also pick random spins that we attempt to flip, which we also choose to do later on. Exactly how all this is performed is outlined in section \hyperref[sec:III]{III}.
 
-Every time a spin is flipped we need to update the total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. The difference in magnetization can be found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\) (subscript one denotes the magnetization before the spin is flipped, and 2 the magnetization after): 
+Every time a spin is flipped we need to update the total energy and magnetization. The change in energy is $\Delta E$ and this can simply be added to the total. The difference in magnetization can be found using \eqref{eq:ising_magnetization}, and subtracting \(M_{2} - M_{1}\) (subscript 1 denotes the magnetization before the spin is flipped, and 2 the magnetization after): 
 
 \begin{align*}
 	\mathcal{M}_2 - \mathcal{M}_{1} &= \sum\limits_j^N s_j^{2} - \sum\limits_j^N s_j^{1} =
