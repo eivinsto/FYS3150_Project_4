@@ -883,7 +883,7 @@ for i, L in enumerate(Ls):
 # critical temperature at L=inf
 p, V = np.polyfit(1/np.array(Ls), TC, 1, cov=True)
 TC_inf = p[1]
-TC_inf_var = V[1][1]
+TC_inf_var = V[1, 1]
 \end{python} 
 
 The NumPy \citep{numpy} array \verb+Ls+ contains the dimensionality of the lattice for the various simulations, \verb+Cv+ contains the heat capacity, \verb+Xi+ contains the magnetic susceptibility, and \verb+T+ contains the temperatures. The arrays \verb+Cv+ and \verb+Xi+ are such that the first indice corresponds to which lattice size $L \times L$ it is related to, and the second indice corresponds to which temperature it is related to.
