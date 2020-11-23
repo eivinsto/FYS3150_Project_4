@@ -243,7 +243,7 @@ def get_critical_temperature(Ls, Cv, Xi, T):
     # Fitting critical temperature as a function of L to estimate critical
     # temperature at L=inf
     p, V = np.polyfit(1/np.array(Ls), TC, 1, cov=True)
-    return p[1], np.sqrt(V[1][1]), TC
+    return p[1], np.sqrt(V[1, 1]), TC
 
 
 def benchmark(N_list, gccflags, archflag, L, n_temps):
